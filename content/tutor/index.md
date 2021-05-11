@@ -2,10 +2,29 @@
 title: "Tutor"
 date: 2021-04-08T16:01:10-07:00
 draft: false
+markup:
+  tableOfContents:
+    endLevel: 3
+    ordered: true
+    startLevel: 2
 ---
+{{< toc >}}
 
+## Services offered
+ueoaueoa
+## Contact Me
 
-## Experience
+You can schedule an appointment with me by clicking the blue button below which will pop up a widget showing my current availabilities.
+If you are having trouble viewing the button you can use schedule link.
+Please contact me via email at matthedm@uci.edu
+
+## Teaching Objectives
+
+## Background & Experience
+
+### Schooling
+
+I received my B.S in Computer Science with a specialization in algorithms from the University of California Irvine (UCI) in 2018. I can email you a copy of my transcript upon request.
 
 ### Python lab tutor for UCI freshman
 
