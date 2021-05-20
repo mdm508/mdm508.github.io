@@ -28,8 +28,8 @@ pygmentsUseClasses = true
     weight = 20
 
   [[menu.main]]
-    identifier = "at"
-    name = "autogenic-training"
+    identifier = "student-materials"
+    name = "student-materials"
     title = ""
     url = "/at/"
     weight = 20
