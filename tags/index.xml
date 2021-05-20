@@ -14,16 +14,5 @@
     
     
     
-    
-    <item>
-      <title>Hello World</title>
-      <link>https://example.com/hello-world/</link>
-      <pubDate>Thu, 08 Apr 2021 15:57:10 -0700</pubDate>
-      
-      <guid>https://example.com/hello-world/</guid>
-      <description>This is my obligatory hello world post.</description>
-    </item>
-    
-    
   </channel>
 </rss>
