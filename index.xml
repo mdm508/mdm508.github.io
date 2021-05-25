@@ -1,18 +1,32 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Website</title>
-    <link>https://example.com/</link>
-    <description>Recent content on Website</description>
+    <title>Computer Worlds</title>
+    <link>/</link>
+    <description>Recent content on Computer Worlds</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-US</language>
+    <language>en</language>
+    <copyright>&amp;copy; 2021 &lt;a href=&#34;https://mdm508.github.io/&#34;&gt;M. McLaughlin&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Mon, 24 May 2021 19:17:16 -0700</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Pedagogical Languages</title>
+      <link>/posts/pl/</link>
+      <pubDate>Mon, 24 May 2021 19:17:16 -0700</pubDate>
+      
+      <guid>/posts/pl/</guid>
+      <description>A beginners main concern is to develop problem solving skills that allow them to design high quality programs. While one can learn to program with an industry level language like Python or C++, it should be noted that these languages were not designed with the beginner in mind and hence make the process of developing problem solving skills more difficult.
+ Learning to design programs is primarily about the study of principles and the acquisition of transferable skills.</description>
+    </item>
     
-	<atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    
-    
-    
+    <item>
+      <title>My Teaching Principles</title>
+      <link>/posts/principles/</link>
+      <pubDate>Mon, 24 May 2021 19:11:57 -0700</pubDate>
+      
+      <guid>/posts/principles/</guid>
+      <description>Excellent programmers are excellent problem solvers. Thus, helping students become problem solvers is one of my top priorities. Getting comfortable reasoning abstractly and learning how to manage the complexity inherit in writing large programs are two of the greatest challenges new programmers face. It is my view that anyone is capable of solving difficult problems provided they develop habits. The specific behaviors needed to excel in a given field will vary. Though, in general, efficient practice over time leads to mastery.</description>
+    </item>
     
   </channel>
 </rss>
