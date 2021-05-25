@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Microprocessors on Computer Worlds</title>
+    <link>/docs/micro/</link>
+    <description>Recent content in Microprocessors on Computer Worlds</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>&amp;copy; 2021 &lt;a href=&#34;https://mdm508.github.io/&#34;&gt;M. McLaughlin&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Mon, 24 May 2021 16:38:10 -0700</lastBuildDate><atom:link href="/docs/micro/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>
