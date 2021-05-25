@@ -8,7 +8,27 @@
     <language>en</language>
     <copyright>&amp;copy; 2021 &lt;a href=&#34;https://mdm508.github.io/&#34;&gt;M. McLaughlin&lt;/a&gt;
 </copyright>
-    <lastBuildDate>Mon, 24 May 2021 19:17:16 -0700</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 25 May 2021 11:27:22 -0700</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>03 Object interactions</title>
+      <link>/docs/java/03/</link>
+      <pubDate>Tue, 25 May 2021 11:27:22 -0700</pubDate>
+      
+      <guid>/docs/java/03/</guid>
+      <description>Key Ideas Abstraction is the ability to ignore details of parts to focus attention on a higher level of a problem.
+Modularization is the process of dividing a whole into well-defined parts, which can be built and examined separately, and which interact in well-defined ways.
+      </description>
+    </item>
+    
+    <item>
+      <title>Chapter 1 What does the CPU do?</title>
+      <link>/docs/micro/01cpu/</link>
+      <pubDate>Tue, 25 May 2021 11:03:24 -0700</pubDate>
+      
+      <guid>/docs/micro/01cpu/</guid>
+      <description>Key Ideas </description>
+    </item>
+    
     <item>
       <title>Pedagogical Languages</title>
       <link>/posts/pl/</link>
