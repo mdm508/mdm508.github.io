@@ -11,7 +11,8 @@ weight: 1
 
 
 Java is a great programming language to learn about object oriented programming.
-With Java, you will be able to create complex applications. 
+With Java, you will be able to create complex applications.  There are many resources for learning
+Java online that are excellent. 
 
 ## Blue Jay
 I teach primarily using ["Objects first with Java".](https://www.bluej.org/). It is the book with

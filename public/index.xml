@@ -8,16 +8,61 @@
     <language>en</language>
     <copyright>&amp;copy; 2021 &lt;a href=&#34;https://mdm508.github.io/&#34;&gt;M. McLaughlin&lt;/a&gt;
 </copyright>
-    <lastBuildDate>Tue, 25 May 2021 11:27:22 -0700</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 31 May 2021 22:02:46 -0700</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>05 nevuhtnaeos</title>
+      <link>/docs/java/05/</link>
+      <pubDate>Mon, 31 May 2021 21:40:38 -0700</pubDate>
+      
+      <guid>/docs/java/05/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>01 Classes and Objects</title>
+      <link>/docs/java/01/</link>
+      <pubDate>Mon, 31 May 2021 20:15:04 -0700</pubDate>
+      
+      <guid>/docs/java/01/</guid>
+      <description>Key Concepts object, class, instance, method, signature, parameter, type, state, source code, return value, compiler
+ Java objects model objects from a problem domain. Objects are created from classes. The class describes the kind of object; the objects represent individual instances of the class We can communicate with objects by invoking methods on them. Objects usually do something if we invoke a method. Methods can have parameters to provide additional information for a task. The method name and the parameter types of a method are called its signature.</description>
+    </item>
+    
+    <item>
+      <title>Data definitions</title>
+      <link>/docs/htdp/htdd/</link>
+      <pubDate>Tue, 25 May 2021 17:04:09 -0700</pubDate>
+      
+      <guid>/docs/htdp/htdd/</guid>
+      <description>What is a information Anything you can sense is information.
+ music colors the name of school  Basically information is stuff in the real world.
+You cant literally put this kind of information into computer.
+01001010100010 name of an mp3 number number of kids in your school ip adress
+We can represent things in the real world in a form the computer can understand.
+Shoe
+Brand, Price, Qty, Color, ID, Model, Location
+using the innformation we would like to answer some questions  check if a shoe is in stock check what is the most expensive shoe which store is in stock  Atomic This is when information can be captured by a single atomic value</description>
+    </item>
+    
+    <item>
+      <title>How to design functions</title>
+      <link>/docs/htdp/htdf/</link>
+      <pubDate>Tue, 25 May 2021 16:39:29 -0700</pubDate>
+      
+      <guid>/docs/htdp/htdf/</guid>
+      <description>What is a design recipe?  Creating a function involves a series of several steps The design recipe is a systematic approach to designing functions.  Steps in the design recipe Create the contract and stub Contract Every function will take some arguments. Those arguments have some type. When you make a function one of the first things to do is to state what types of input can this function handle.
+Additionally, every function will output a value, and that value has a type.</description>
+    </item>
+    
     <item>
       <title>03 Object interactions</title>
       <link>/docs/java/03/</link>
       <pubDate>Tue, 25 May 2021 11:27:22 -0700</pubDate>
       
       <guid>/docs/java/03/</guid>
-      <description>Key Ideas Abstraction is the ability to ignore details of parts to focus attention on a higher level of a problem.
-Modularization is the process of dividing a whole into well-defined parts, which can be built and examined separately, and which interact in well-defined ways.
-      </description>
+      <description>Key Ideas   Abstraction is the ability to ignore details of parts to focus attention on a higher level of a problem.
+  Modularization is the process of dividing a whole into well-defined parts, which can be built and examined separately, and which interact in well-defined ways.
+  The class diagram shows the classes of an applica-tion and the relationships between them. It gives infor-mation about the source code and presents the static view of a program.</description>
     </item>
     
     <item>
@@ -26,7 +71,8 @@ Modularization is the process of dividing a whole into well-defined parts, which
       <pubDate>Tue, 25 May 2021 11:03:24 -0700</pubDate>
       
       <guid>/docs/micro/01cpu/</guid>
-      <description>Key Ideas </description>
+      <description>Key Ideas  Computers can process any type of information Information in the real world comes in many forms.
+ A school bell is information. It tells us when class starts or ends. Light from the sun coming through the window tells us its day time. Your calling your name from across the room tells you your friend wants your attention.  </description>
     </item>
     
     <item>

@@ -10,14 +10,33 @@
 </copyright>
     <lastBuildDate>Mon, 24 May 2021 19:07:10 -0700</lastBuildDate><atom:link href="/docs/java/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>05 nevuhtnaeos</title>
+      <link>/docs/java/05/</link>
+      <pubDate>Mon, 31 May 2021 21:40:38 -0700</pubDate>
+      
+      <guid>/docs/java/05/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>01 Classes and Objects</title>
+      <link>/docs/java/01/</link>
+      <pubDate>Mon, 31 May 2021 20:15:04 -0700</pubDate>
+      
+      <guid>/docs/java/01/</guid>
+      <description>Key Concepts object, class, instance, method, signature, parameter, type, state, source code, return value, compiler
+ Java objects model objects from a problem domain. Objects are created from classes. The class describes the kind of object; the objects represent individual instances of the class We can communicate with objects by invoking methods on them. Objects usually do something if we invoke a method. Methods can have parameters to provide additional information for a task. The method name and the parameter types of a method are called its signature.</description>
+    </item>
+    
+    <item>
       <title>03 Object interactions</title>
       <link>/docs/java/03/</link>
       <pubDate>Tue, 25 May 2021 11:27:22 -0700</pubDate>
       
       <guid>/docs/java/03/</guid>
-      <description>Key Ideas Abstraction is the ability to ignore details of parts to focus attention on a higher level of a problem.
-Modularization is the process of dividing a whole into well-defined parts, which can be built and examined separately, and which interact in well-defined ways.
-      </description>
+      <description>Key Ideas   Abstraction is the ability to ignore details of parts to focus attention on a higher level of a problem.
+  Modularization is the process of dividing a whole into well-defined parts, which can be built and examined separately, and which interact in well-defined ways.
+  The class diagram shows the classes of an applica-tion and the relationships between them. It gives infor-mation about the source code and presents the static view of a program.</description>
     </item>
     
   </channel>
