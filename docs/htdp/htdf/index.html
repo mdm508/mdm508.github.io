@@ -6,7 +6,7 @@
 
 
 
-<title>Chapter 1 What does the CPU do? | Microprocessors | Computer Worlds</title>
+<title>How to design functions | How to Design Programs | Computer Worlds</title>
 
 <meta name="generator" content="Hugo Eureka 0.8.0" />
 <link rel="stylesheet" href="/css/eureka.min.css">
@@ -61,8 +61,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/images/icon_hu64421c6c7700f606f0ad45d807017b09_5843_180x180_fill_box_center_2.png">
 
 <meta name="description"
-  content="Key Ideas  Computers can process any type of information Information in the real world comes in many forms.
- A school bell is information. It tells us when class starts or ends. Light from the sun coming through the window tells us its day time. Your calling your name from across the room tells you your friend wants your attention.  ">
+  content="What is a design recipe?  Creating a function involves a series of several steps The design recipe is a systematic approach to designing functions.  Steps in the design recipe Create the contract and stub Contract Every function will take some arguments. Those arguments have some type. When you make a function one of the first things to do is to state what types of input can this function handle.
+Additionally, every function will output a value, and that value has a type.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -74,12 +74,12 @@
       "item":"/docs/"},{
       "@type": "ListItem",
       "position": 2 ,
-      "name":"Microprocessors",
-      "item":"/docs/micro/"},{
+      "name":"How to Design Programs",
+      "item":"/docs/htdp/"},{
       "@type": "ListItem",
       "position": 3 ,
-      "name":"Chapter 1 What does the CPU do?",
-      "item":"/docs/micro/01cpu/"}]
+      "name":"How to design functions",
+      "item":"/docs/htdp/htdf/"}]
 }
 </script>
 
@@ -91,11 +91,11 @@
     "@type": "Article",
     "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "/docs/micro/01cpu/"
+        "@id": "/docs/htdp/htdf/"
     },
-    "headline": "Chapter 1 What does the CPU do? | Microprocessors | Computer Worlds","datePublished": "2021-05-25T11:03:24-07:00",
-    "dateModified": "2021-05-25T11:03:24-07:00",
-    "wordCount":  59 ,
+    "headline": "How to design functions | How to Design Programs | Computer Worlds","datePublished": "2021-05-25T16:39:29-07:00",
+    "dateModified": "2021-05-25T16:39:29-07:00",
+    "wordCount":  374 ,
     "publisher": {
         "@type": "Person",
         "name": "C. Wang",
@@ -104,22 +104,22 @@
             "url": "/images/icon.png"
         }
         },
-    "description": "Key Ideas  Computers can process any type of information Information in the real world comes in many forms.\n A school bell is information. It tells us when class starts or ends. Light from the sun coming through the window tells us its day time. Your calling your name from across the room tells you your friend wants your attention.  "
+    "description": "What is a design recipe?  Creating a function involves a series of several steps The design recipe is a systematic approach to designing functions.  Steps in the design recipe Create the contract and stub Contract Every function will take some arguments. Those arguments have some type. When you make a function one of the first things to do is to state what types of input can this function handle.\nAdditionally, every function will output a value, and that value has a type."
 }
-</script><meta property="og:title" content="Chapter 1 What does the CPU do? | Microprocessors | Computer Worlds" />
+</script><meta property="og:title" content="How to design functions | How to Design Programs | Computer Worlds" />
 <meta property="og:type" content="article" />
 
 
 <meta property="og:image" content="/images/icon.png">
 
 
-<meta property="og:url" content="/docs/micro/01cpu/" />
+<meta property="og:url" content="/docs/htdp/htdf/" />
 
 
 
 
-<meta property="og:description" content="Key Ideas  Computers can process any type of information Information in the real world comes in many forms.
- A school bell is information. It tells us when class starts or ends. Light from the sun coming through the window tells us its day time. Your calling your name from across the room tells you your friend wants your attention.  " />
+<meta property="og:description" content="What is a design recipe?  Creating a function involves a series of several steps The design recipe is a systematic approach to designing functions.  Steps in the design recipe Create the contract and stub Contract Every function will take some arguments. Those arguments have some type. When you make a function one of the first things to do is to state what types of input can this function handle.
+Additionally, every function will output a value, and that value has a type." />
 
 
 
@@ -136,10 +136,10 @@
 
 
 
-<meta property="article:published_time" content="2021-05-25T11:03:24-07:00" />
+<meta property="article:published_time" content="2021-05-25T16:39:29-07:00" />
 
 
-<meta property="article:modified_time" content="2021-05-25T11:03:24-07:00" />
+<meta property="article:modified_time" content="2021-05-25T16:39:29-07:00" />
 
 
 
@@ -244,7 +244,7 @@
     class="hidden md:block overflow-y-auto mx-6 md:mx-0 pr-6 pt-2 md:max-h-doc-sidebar bg-primary-bg md:bg-transparent">
     <div class="flex flex-wrap ml-4 -mr-2 p-2 bg-secondary-bg md:bg-primary-bg rounded">
         <a class=" hover:text-eureka"
-            href="/docs/micro/">Microprocessors</a>
+            href="/docs/htdp/">How to Design Programs</a>
         
         
         
@@ -258,8 +258,19 @@
     
     <li class="py-2">
         <div class="">
+            <a class=" hover:text-eureka"
+                href="/docs/htdp/htdd/">Data definitions</a>
+        </div>
+        
+    </li>
+    
+    
+    
+    
+    <li class="py-2">
+        <div class="">
             <a class=" text-eureka  hover:text-eureka"
-                href="/docs/micro/01cpu/">Chapter 1 What does the CPU do?</a>
+                href="/docs/htdp/htdf/">How to design functions</a>
         </div>
         
     </li>
@@ -278,7 +289,7 @@
         </div>
         <div class="w-full md:w-3/4 lg:w-4/5 pb-8 pt-2 md:pt-8">
             <div class="w-full lg:w-3/4 pl-6 ml-0 mr-auto">
-                <h1 class="font-bold text-3xl text-primary-text">Chapter 1 What does the CPU do?</h1>
+                <h1 class="font-bold text-3xl text-primary-text">How to design functions</h1>
                 <div class="flex flex-wrap flex-row items-center mt-2 text-tertiary-text">
     <div class="mr-6 my-2">
         <i class="fas fa-calendar mr-1"></i>
@@ -286,7 +297,7 @@
     </div>
     <div class="mr-6 my-2">
         <i class="fas fa-clock mr-1"></i>
-        <span>1 min read</span>
+        <span>2 min read</span>
     </div>
     
     
@@ -299,15 +310,79 @@
                     
                     
                     <div class="content">
-                        <h2 id="key-ideas">Key Ideas</h2>
-<h2 id="heading"></h2>
-<h3 id="computers-can-process-any-type-of-information">Computers can process any type of information</h3>
-<p>Information in the real world comes in many forms.</p>
+                        <h2 id="what-is-a-design-recipe">What is a design recipe?</h2>
 <ul>
-<li>A school bell is information. It tells us when class starts or ends.</li>
-<li>Light from the sun coming through the window tells us its day time.</li>
-<li>Your calling your name from across the room tells you your friend wants your attention.</li>
+<li>Creating a function involves a series of several steps</li>
+<li>The design recipe is a systematic approach to designing functions.</li>
 </ul>
+<h2 id="steps-in-the-design-recipe">Steps in the design recipe</h2>
+<h3 id="create-the-contract-and-stub">Create the contract and stub</h3>
+<h4 id="contract">Contract</h4>
+<p>Every function will take some arguments. Those arguments have some type.
+When you make a function one of the first things to do is to state
+what types of input can this function handle.</p>
+<p>Additionally, every function will output a value, and that value has a type. So
+you should also say what type of output the function produces.</p>
+<p>We can specify both the types of the input and output in the <strong>contract</strong>.</p>
+<pre>
+Number Number -> Number
+</pre>
+<h4 id="stub">Stub</h4>
+<ul>
+<li>Every function must have a name</li>
+<li>Functions also need to name the parameters.</li>
+<li>In the stub we specfify the name of the function as well as the name of each parameter</li>
+</ul>
+<pre>
+fun add(a, m):
+...
+end
+</pre>
+<h3 id="turn-examples-into-test-cases">Turn examples into test cases</h3>
+<ul>
+<li>test cases help us have more confidence that our function is doing what we want it to do</li>
+<li>turning examples into test cases help us to think of different strategies for how to solve the problem</li>
+</ul>
+<p>When you create a test case avoid hard coding the answer. You have to somehow take the input and turn it into the desired output using some sort of transformation on the input.</p>
+<pre><code>check:
+   add(3,2) is 6
+end
+</code></pre>
+<p>This is an example of hardcoding a test case. It doesn&rsquo;t
+how to transform 3 and 2 into 6.</p>
+<p>A better test case shows you how to do that transformation.</p>
+<p>'''
+check:
+add(3,2) is 3 + 2
+end
+'''</p>
+<h3 id="apply-template-if-appopriate">Apply template if appopriate</h3>
+<ul>
+<li>Depending on what the input types are you may or may not use a template</li>
+</ul>
+<p>In this example we are using a template because Flavor is an enum
+and we know that enums have multiple cases depending on the value of
+the input.</p>
+<pre><code>Flavor is one of
+- &quot;vanilla&quot;
+- &quot;chocolate&quot;
+
+Flavor -&gt;
+fun flavor(f):
+  if f == &quot;vanilla&quot;:
+     ...
+  else f == &quot;chocolate&quot;:
+     ...
+  else:
+     ...
+end
+</code></pre>
+<h3 id="write-the-body">Write the body</h3>
+<ul>
+<li>Looking back at your template and your examples it should be pretty easy to write the body of the function</li>
+</ul>
+<h2 id="test-it">Test it</h2>
+<p>Make sure that you actually passed all the test cases.</p>
 
                     </div>
                     
@@ -318,6 +393,18 @@
 
 
                     
+<div class="flex flex-col md:flex-row md:justify-between -mx-2 mt-4 px-2 pt-4 border-t">
+    <div>
+        
+        <span class="block font-bold">Previous</span>
+        <a href="/docs/htdp/htdd/" class="block">Data definitions</a>
+        
+    </div>
+    <div class="md:text-right mt-4 md:mt-0">
+        
+    </div>
+</div>
+
                     
 
 
@@ -332,12 +419,21 @@
 <div class="sticky-toc hidden lg:block px-6 pb-6  pt-10 -mt-10 border-l ">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#key-ideas">Key Ideas</a></li>
-    <li><a href="#heading"></a>
+    <li><a href="#what-is-a-design-recipe">What is a design recipe?</a></li>
+    <li><a href="#steps-in-the-design-recipe">Steps in the design recipe</a>
       <ul>
-        <li><a href="#computers-can-process-any-type-of-information">Computers can process any type of information</a></li>
+        <li><a href="#create-the-contract-and-stub">Create the contract and stub</a>
+          <ul>
+            <li><a href="#contract">Contract</a></li>
+            <li><a href="#stub">Stub</a></li>
+          </ul>
+        </li>
+        <li><a href="#turn-examples-into-test-cases">Turn examples into test cases</a></li>
+        <li><a href="#apply-template-if-appopriate">Apply template if appopriate</a></li>
+        <li><a href="#write-the-body">Write the body</a></li>
       </ul>
     </li>
+    <li><a href="#test-it">Test it</a></li>
   </ul>
 </nav>
 </div>
