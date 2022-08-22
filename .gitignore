@@ -1,0 +1,9 @@
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+/public/
+.DS_Store
+node_modules
+dist
+tmp

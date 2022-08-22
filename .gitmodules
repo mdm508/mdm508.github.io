@@ -1,0 +1,3 @@
+[submodule "docs/themes/hugo-xmin"]
+	path = docs/themes/hugo-xmin
+	url = https://github.com/mdm508/hugo-xmin

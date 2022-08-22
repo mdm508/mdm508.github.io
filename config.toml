@@ -1,0 +1,19 @@
+baseURL = 'https://mdm508.github.io'
+languageCode = 'en-us'
+title = 'My New Hugo Site'
+theme = 'hugo-xmin'
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[menu]
+[[menu.main]]
+  name = 'Htdp'
+  url = '/htdp'
+  weight = 1
+[[menu.main]]
+  name = "Posts"
+  url = "/post/"
+  weight = 3
