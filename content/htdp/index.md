@@ -16,6 +16,17 @@ hw: Homework
 Please complete the readings or watch the videos before class.
 This will allow us to focus on problem solving during the labs.
 
+## Resources
+
+- [Design Recipes Summary](https://courses.edx.org/courses/course-v1:UBCx+SPD1x+2T2016/77860a93562d40bda45e452ea064998b/)
+- [Cheat Sheet](https://s3.amazonaws.com/edx-course-spdx-kiczales/HTC/recipe-checklist.pdf)
+- [Light Videos](http://www.cs.utah.edu/~mflatt/htdp-lite/)
+
+
+This page has links to very shorty videos that parallel many of the topics below.
+
+
+
 ## Arithmetic
 - What is computation? Performing arithmetic in BSL.
 - Primitive types: Number, Image, Boolean, String
@@ -27,15 +38,13 @@ This will allow us to focus on problem solving during the labs.
 {{<header_read>}}
 \*  indicates that material is supplementary  
 
-- [Prologue](https://htdp.org/2018-01-06/book/part_prologue.html)
-- [1.1-1.4](https://htdp.org/2018-01-06/book/part_one.html#%28part._ch~3abasic-arithmetic%29)
-- [2.1-2.5](https://htdp.org/2018-01-06/book/part_one.html#%28part._ch~3afuncs-progs%29)
+- [Prologue](https://htdp.org/2022-8-7/Book/part_prologue.html)
+- [1.1-1.7](https://htdp.org/2022-8-7/Book/part_one.html#%28part._ch~3abasic-arithmetic%29)
 
 
 *(71 minutes)*
 
-1. [programs in the world](https://www.youtube.com/channel/uc7dejiuwsxsncw4pqnrqw8w)\*
-2. [arithmetic is computing](https://www.youtube.com/watch?v=w_a1qserlu4&ab_channel=matthewflatt)\*
+1. [programs in the world](https://www.youtube.com/watch?v=dJbpHukiQ7I&t=1s&ab_channel=SystematicProgramDesign)\*
 3. [Expressions](https://www.youtube.com/watch?v=6wABnrIFZmQ&list=PL6NenTZG6Krqu5RRQi3TUGc605rrGGGWw&index=4&ab_channel=SystematicProgramDesign)
 4. [How racket evaluates expressions](https://www.youtube.com/watch?v=4wUiCxxCc68&list=PL6NenTZG6Krqu5RRQi3TUGc605rrGGGWw&index=5&ab_channel=SystematicProgramDesign)
 5. [Strings and images](https://www.youtube.com/watch?v=wYyKnPA5fSI&list=PL6NenTZG6Krqu5RRQi3TUGc605rrGGGWw&index=6&ab_channel=SystematicProgramDesign)
