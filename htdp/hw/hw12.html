@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Lab 12</title></head><body style="bgcolor: white; width: 45em; margin-left: auto; margin-right: auto"><h2>Lab 12</h2><p>Last updated: Friday, December 2nd, 2011 10:45am</p><p>Implement <a href="http://en.wikipedia.org/wiki/Minesweeper_%28computer_game%29">Minesweeper</a>.</p><p>The details are up to you, but your solution should include the
+following required elements:</p><ul>
+<li>It should be a graphical game implemented with Racket and the
+<tt>2htdp/universe</tt> library or in Java with swing GUI classes.
+(Racket is probably easier for this task.)</li>
+
+<li>All tiles should be covered intially.</li>
+
+<li>Handle clicks on a tile to reveal either a blank space
+(no adjacent bombs), a number (between 1 and 8 adjacent bombs),
+or a bomb.</li>
+
+<li>The initial board should be configurable and it should describe
+where the bombs are located.  Numbers showing adjacent-bomb counts
+should be computed from that initial board.</li>
+</ul><p>You can choose a fixed size for the board, or you can make the
+size configurable.  For initial boards, you can try to generate them
+randomly or just use a fixed board (as long as the rest of the
+implementation doesn&rsquo;t depend on that specific fixed board).</p><p>For extra credit, include an option in the game to indicate which
+of the currently covered tiles could be safely uncovered using at least
+single-square analysis (as described on the Wikipedia page) and
+information about the uncovered tiles.</p><hr /><table width="100%"><tr><td align="right">Last update: Friday, August 26th, 2022<address>matthedm@uci.edu</address></td></tr></table></body></html>
