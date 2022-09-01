@@ -1,6 +1,6 @@
 <div>
     <hr>
     Table Of Contents
-    {{ .Page.TableOfContents }}
+    {{ .Page.TableOfContents | replaceRE "<ul>[[:space:]]*<li>[[:space:]]*<ul>" "<ul>" | replaceRE "</ul>[[:space:]]*</li>[[:space:]]*</ul>" "</ul>" |  safeHTML }}
     <hr>
 </div>

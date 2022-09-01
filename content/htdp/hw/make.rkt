@@ -16,7 +16,8 @@
 		       (run file args)))
 	  (lambda () (close-output-port p))))]))
 
-(define hws      '(0 1 2 3 4 5 6 7 8 9 10 11 12))
+;(define hws      '(0 1 2 3 4 5 6 7 8 9 10 11 12))
+(define hws      '(1 2 3 4 5 6 7 8 9 10 11 12))
 (define labs     '(0 1 2 3 4 5 6 7 8 9 10 11))
 (define starters '())
 (define hwsols   '())
@@ -26,29 +27,27 @@
                    17 18 19 20 21 22 23 24 25 26 27 28 29 
                    30 31))
 
-(define outfiles
-  (append
-   (list
-    "index.html" "schedule.html"
-    "syllabus.html" "scribble-common.js" "scribble-style.css" "scribble.css"
-    "syllabus.pdf"
-    "cs1410-handin.plt" "cartoon-duck.png"
-    "mt1-sample.pdf" 
-    "mini-dr.rkt" "string.rkt" "mini-dr-defns.png"
-    "tester.jar" "eclipse.txt" "Animals.java" "Animals2.java"
-    "mt2ex.pdf" "mt2ex-soln.pdf" "more-java.pdf" "Maze.java" "Maze2.java"
-    "maze2.zip" "maze3.zip" "maze.rkt" "maze2.rkt" "eval.zip"
-    "calc.rkt" "fish.rkt"
-    "battleship-1.rkt" "battleship-2.rkt" "battleship-3.zip"
-    "battleship-4.zip" "battleship-5.zip" "battleship-j.zip"
-    "final-ex.txt" "final-ex-ans.txt"
-    )
-   (map (lambda (n) (format "lecture~a.pdf" n)) slides)
-   (map (lambda (n) (format "lec~a.rkt" n)) codes)
-   (map (lambda (n) (format "hw~a.html" n)) hws)
-   (map (lambda (n) (format "lab~a.html" n)) labs)
-   (map (lambda (n) (format "hw~a.scm" n)) starters)
-   (map (lambda (n) (format "hw~asol.scm" n)) hwsols)))
+(define outfiles    (map (lambda (n) (format "hw~a.html" n)) hws))
+   ; "index.html" "schedule.html"
+   ; "syllabus.pdf"
+   ; "cs1410-handin.plt" "cartoon-duck.png"
+   ; "mt1-sample.pdf" 
+   ; "mini-dr.rkt" "string.rkt" "mini-dr-defns.png"
+   ; "tester.jar" "eclipse.txt" "Animals.java" "Animals2.java"
+   ; "mt2ex.pdf" "mt2ex-soln.pdf" "more-java.pdf" "Maze.java" "Maze2.java"
+   ; "maze2.zip" "maze3.zip" "maze.rkt" "maze2.rkt" "eval.zip"
+   ; "calc.rkt" "fish.rkt"
+   ; "battleship-1.rkt" "battleship-2.rkt" "battleship-3.zip"
+   ; "battleship-4.zip" "battleship-5.zip" "battleship-j.zip"
+   ; "final-ex.txt" "final-ex-ans.txt"
+    
+  ; (map (lambda (n) (format "lecture~a.pdf" n)) slides)
+  ; (map (lambda (n) (format "lec~a.rkt" n)) codes)
+
+  ; (map (lambda (n) (format "lab~a.html" n)) labs)
+  ; (map (lambda (n) (format "hw~a.scm" n)) starters)
+  ; (map (lambda (n) (format "hw~asol.scm" n)) hwsols)))
+
 
 (define (zip files n)
   (let ([dest (format "~a.zip" n)])

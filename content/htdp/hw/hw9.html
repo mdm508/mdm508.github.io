@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Lab 9</title></head><body style="bgcolor: white; width: 45em; margin-left: auto; margin-right: auto"><h2>Lab 9</h2><p>Last updated: Friday, November 4th, 2011 10:45am</p><p>Start with <tt><a href="Maze2.java">Maze2.java</a></tt> or <tt><a href="maze2.zip">maze2.zip</a></tt>.</p><p>Although you implement this assignment in Java with Eclipse, you can handin your
+work using DrRacket. Alternatively, you can handin through a web browser using
+the <a href="https://rains.cs.utah.edu:7979/servlets/status.ss">handin status server</a>.
+The latter is better if you work with multiple files, in which case you can
+submit a <tt>.zip</tt> file containing your work.</p><h3>Part 1 &ndash; Color-Detecting Doors</h3><p>Add a new kind of door, <tt>ColorDetector</tt>, though which only players
+holding color keys (i.e., any key that is not <tt>"black"</tt> or <tt>"white"</tt>)
+can pass. A color-detector door goes into a room.</p><p>For example, given</p><pre>  IDoor monoDoor = new ColorDetector(northRoom);</pre><p>then</p><pre>  monoDoor.escapePath(new Person("Alaska", 5.0, "blue"))</pre><p>should produce a non-failure path, since the person has a color key.</p><h3>Part 2 &ndash; Multiple Keys</h3><p>Generalize <tt>Person</tt> to hold a list of keys. Although Java has
+some built-in classes for holding collections of values, for now define
+an <tt>IKeyList</tt> type and use it for the list of keys.</p><h3>Part 3 &ndash; Preparing for Kinds of Rooms</h3><p>So far, we have only one kind of room. To support more kinds of
+rooms, change the maze code by switching uses of the <tt>Room</tt> type to
+<tt>IRoom</tt>, and make the existing <tt>Room</tt> class implement
+<tt>IRoom</tt>.</p><p>For this step, <tt>Room</tt> will be the only kind of <tt>IRoom</tt>.</p><h3>Part 4 &ndash; Accumulating Keys</h3><p>Add a new kind of <tt>IRoom</tt> called <tt>KeyRoom</tt> that has only one door (unlike <tt>Room</tt>)
+plus a key of a given color. When a player passes through
+the room, the player also picks up the key.</p><p>For example, given the door</p><pre>  new Into(new KeyRoom(new Into(new Room(blueToPlanets, new Escape("Provo"))),
+                       "blue"))</pre><p>then a player who starts with no keys will be able to reach <tt>"mars"</tt>,
+because the key room lets the player pick up a blue key before
+reaching the blue-keyed door. In contrast, the door</p><pre>  new Locked(new KeyRoom(planets, "blue"), "blue")</pre><p>is impassable to a player who doesn&rsquo;t start with a blue key, since
+the key is supplied on the wrong side of the door.</p><p>With this change, the <tt>Person</tt> argument to <tt>escapePath</tt> serves as an
+accumulator that gathers keys from <tt>KeyRoom</tt>s while looking
+for an escape.</p><hr /><table width="100%"><tr><td align="right">Last update: Friday, August 26th, 2022<address>matthedm@uci.edu</address></td></tr></table></body></html>

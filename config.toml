@@ -4,6 +4,9 @@ title = 'My New Hugo Site'
 theme = 'hugo-xmin'
 
 [markup]
+  [markup.tableOfContents]
+    endLevel = 2
+    startLevel = 1
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
@@ -17,3 +20,4 @@ theme = 'hugo-xmin'
   name = "Posts"
   url = "/post/"
   weight = 3
+
