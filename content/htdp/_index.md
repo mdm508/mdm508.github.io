@@ -19,23 +19,27 @@ This will allow us to focus on problem solving during the labs.
 
 
 ## Resources
-
+### Related to Racket
 - [Design Recipes Summary](https://courses.edx.org/courses/course-v1:UBCx+SPD1x+2T2016/77860a93562d40bda45e452ea064998b/)
 - [Cheat Sheet](https://s3.amazonaws.com/edx-course-spdx-kiczales/HTC/recipe-checklist.pdf)
 - [Light Videos](http://www.cs.utah.edu/~mflatt/htdp-lite/)
 
-- [Typing Practice](https://www.keybr.com/) 
+This page has links to very shorty videos that parallel many of the topics below.
+### General
+[Typing Practice](https://www.keybr.com/) 
 
 Learning how to type accurately
 without looking at the keys will make your life a lot easier when programming. You might
 also consider learning an alternative keyboard layout such as [Dvorak](https://en.wikipedia.org/wiki/Dvorak_keyboard_layout) if you already developed bad habits in
-QWERTY. I
-- [Alcumus](https://artofproblemsolving.com/alcumus) 
+QWERTY.
+
+[Alcumus](https://artofproblemsolving.com/alcumus) 
   
 Great resource for improving your math skills. I recommend solving all of the 
-pre-algebra problems before moving onto algebra. This will give you a better foundation. In my opinion this website is much better then Khan Academy for learning mathematics. 
+pre-algebra first. In my opinion this website is much better then Khan Academy for learning mathematics. To use Alcumus you need to register. When you register, 
+be aware that if you don't select an age of 18 or older than you will need you parents permission to set up the account, which is absurd because I can't think of any parent who would object to their child solving extra math problems.
 
-This page has links to very shorty videos that parallel many of the topics below.
+
 
 #### Conventions used on this page
 \*  :: material is supplementary  
