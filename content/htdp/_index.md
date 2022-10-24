@@ -1,7 +1,7 @@
 ---
-title: "Htdp"
+title: "How to Design Programs Curriculum"
 date: 2022-08-14T10:18:54-07:00
-draft: false
+
 toc: true
 tableOfContents:
     endLevel: 2
@@ -10,22 +10,20 @@ tableOfContents:
 hw: Homework
 ---
 
-
-
 {{<toc>}}
 
-Please complete the readings or watch the videos before class.
-This will allow us to focus on problem solving during the labs.
+# Resources
+Below is a large zip file containing racket most of the racket source code that
+you will need for homework problems.
 
-
-## Resources
-### Related to Racket
+{{< download "practice-problems.zip" >}}
+## Related to Racket
 - [Design Recipes Summary](https://courses.edx.org/courses/course-v1:UBCx+SPD1x+2T2016/77860a93562d40bda45e452ea064998b/)
 - [Cheat Sheet](https://s3.amazonaws.com/edx-course-spdx-kiczales/HTC/recipe-checklist.pdf)
 - [Light Videos](http://www.cs.utah.edu/~mflatt/htdp-lite/)
 
 This page has links to very shorty videos that parallel many of the topics below.
-### General
+## General
 [Typing Practice](https://www.keybr.com/) 
 
 Learning how to type accurately
@@ -39,8 +37,6 @@ Great resource for improving your math skills. I recommend solving all of the
 pre-algebra first. In my opinion this website is much better then Khan Academy for learning mathematics. To use Alcumus you need to register. When you register, 
 be aware that if you don't select an age of 18 or older than you will need you parents permission to set up the account, which is absurd because I can't think of any parent who would object to their child solving extra math problems.
 
-
-
 #### Conventions used on this page
 \*  :: material is supplementary  
 
@@ -51,7 +47,6 @@ be aware that if you don't select an age of 18 or older than you will need you p
 
 {{<header_ass>}}
 - Read and code along with the [Prologue](https://htdp.org/2022-8-7/Book/part_prologue.html)
-- {{< download "practice/00-arithmetic.zip" "Arithmetic Practice">}}
 
 {{<header_read>}}
 - [1 Arithmetic](https://htdp.org/2022-8-7/Book/part_one.html#%28part._ch~3abasic-arithmetic%29) 
@@ -75,7 +70,6 @@ be aware that if you don't select an age of 18 or older than you will need you p
 {{<estimate 6-7>}}
 
 {{<header_ass>}}
-- {{< download "practice/01-htdf.zip" "Function Practice">}}
 - [Lab Duck Animation](hw/hw1.html)
 
 {{<header_read>}}
@@ -92,7 +86,6 @@ be aware that if you don't select an age of 18 or older than you will need you p
 {{<estimate 6-8>}}
 
 {{<header_ass>}}
-- {{< download "practice/02-htdd.zip" "Data Definitions Practice">}}
 - *Lab TBD*
 
 {{<header_read>}}
@@ -119,7 +112,6 @@ be aware that if you don't select an age of 18 or older than you will need you p
 ## How to Design Worlds
 {{<estimate 3-6>}}
 {{<header_ass>}}
-- {{< download "practice/03-hdw.zip" "World Practice">}}
 - [Lab Ducks in the World](hw/hw2.html)
   
 {{<header_read>}}
@@ -138,7 +130,6 @@ be aware that if you don't select an age of 18 or older than you will need you p
 ## Compound Data
 {{<estimate 5-7>}}
 {{<header_ass>}}
-- {{< download "practice/04-compound.zip" "Compound Practice">}}
 - [Lab Part 1 Graphical Editor](https://htdp.org/2022-2-9/Book/part_one.html#%28part._sec~3aedit1%29)
 - [Lab Part 2 Virtual Pet World](https://htdp.org/2022-2-9/Book/part_one.html#%28part._sec~3azoo1%29)
 
@@ -152,14 +143,12 @@ be aware that if you don't select an age of 18 or older than you will need you p
 2. [Compound data definitions](https://www.youtube.com/watch?v=ieSkX9RdobM&list=PL6NenTZG6KrpA-ww35EwcaxY-tgh82TAh&index=3&ab_channel=SystematicProgramDesign)
 3. [Compound data and world programs](https://www.youtube.com/watch?v=hBuDgdIRhYo&list=PL6NenTZG6KrpA-ww35EwcaxY-tgh82TAh&index=4&ab_channel=SystematicProgramDesign) *22 minutes*
 
+Coming soon
+# II Arbitrarily Large Data
+# III Abstraction
+# IV Intertwined Data
+# V Generative Recursion
+# VI Accumulators
 
 
 
-*Matthew's Todo List*
-- Add lab for data definitions
-- Add material for these sections
-- II Arbitrarily Large Data
-- III Abstraction
-- IV Intertwined Data
-- V Generative Recursion
-- VI Accumulators -->

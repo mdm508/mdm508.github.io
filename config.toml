@@ -13,9 +13,13 @@ theme = 'hugo-xmin'
 
 [menu]
 [[menu.main]]
+  name = "About"
+  url="/"
+  weight = 1
+[[menu.main]]
   name = 'Htdp'
   url = '/htdp'
-  weight = 1
+  weight = 2
 [[menu.main]]
   name = "Posts"
   url = "/post/"
