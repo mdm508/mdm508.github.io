@@ -15,6 +15,7 @@ draft: false
       matthedm@uci.edu
     </a>
     </span>
+    <a href ="https://github.com/mdm508">💻Github</a>
   </div>
 </div>
 </div>
@@ -44,3 +45,5 @@ private tutoring via zoom.
 If there is a language not listed here that you want to learn just let me
 know. I tend to prefer using a pedalogical language based of Racket called 
 [BSL](https://htdp.org/2022-8-7/Book/part_preface.html#%28part._drtl%29). 
+
+### Recent posts

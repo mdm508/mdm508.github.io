@@ -17,10 +17,6 @@ theme = 'hugo-xmin'
   url="/"
   weight = 1
 [[menu.main]]
-  name = 'Htdp'
-  url = '/htdp'
-  weight = 2
-[[menu.main]]
   name = "Posts"
   url = "/post/"
   weight = 3
