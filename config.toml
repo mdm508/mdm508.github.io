@@ -1,6 +1,6 @@
 baseURL = 'https://mdm508.github.io'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'Coding With Matt'
 theme = 'hugo-xmin'
 
 [markup]
@@ -10,18 +10,4 @@ theme = 'hugo-xmin'
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
-
-[menu]
-[[menu.main]]
-  name = "About"
-  url="/"
-  weight = 1
-[[menu.main]]
-  name = "Posts"
-  url = "/post/"
-  weight = 3
-[[menu.main]]
-name = 'Htdp'
-url = '/htdp'
-weight = 2
 
