@@ -55,19 +55,3 @@ thead, tfoot, tr:nth-child(even) { background: #eee; }
 nav > ul > li {
   list-style: none;
 }
-
-.cta-button {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #2e668f;
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 5px;
-  margin-bottom: 10px; /* Add margin to create space between the button and the image */
-}
-
-.cta-button:hover {
-  background-color: #407853;
-}
-

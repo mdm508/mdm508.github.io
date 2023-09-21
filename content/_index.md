@@ -88,4 +88,10 @@ At the core of my teaching philosophy are four key goals:
 ![Javascript](js-logo.png)  
 ![Scratch](scratch-logo.png)
 
+<hr>
 
+
+<div class=cta-box>
+    <img src="penguin.png" alt="Penguin">
+    <a href="mailto:matthedm@uci.edu" class="cta-button">Set up a lesson today</a>
+</div>

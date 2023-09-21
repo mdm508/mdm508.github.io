@@ -11,3 +11,4 @@ theme = 'hugo-xmin'
     [markup.goldmark.renderer]
       unsafe = true
 
+custom_css = ["custom.css"]
