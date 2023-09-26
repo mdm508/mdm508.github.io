@@ -28,30 +28,39 @@ of coding.
 
 The demo will be offered on two dates. To join the meeting go to 
 https://pwa.zoom.us/wc and enter the ID for the meeting you want to join.
-I encourage you to [Preview the lesson](https://www.bootstrapworld.org/materials/fall2023/en-us/lessons/hoc-wescheme-intro/index.shtml#)
-and start writting some code. See you at the demo!
+
+
 
 
 
 <table>
   <tr>
+    <th></th>
     <th>Date</th>
     <th>Time</th>
     <th>Zoom ID</th>
   </tr>
   <tr>
-    <td>Wednesday September 27th</td>
+    <td>Wednesday</td>
+    <td>September 27th</td>
     <td>6:00pm - 7:00pm</td>
     <td>96165193214</td>
   </tr>
   <tr>
-    <td>Saturday September 30th</td>
+    <td>Saturday</td>
+    <td>September 30th</td>
     <td>11:00am - 12pm</td>
     <td>96930559414</td>
   </tr>
 </table>
 
+### Lesson Preview
+In the first half of the lesson we will use [Scratch](https://scratch.mit.edu/) and in the second, [WeScheme](https://www.wescheme.org/).
 
+- We will use the [Scratch Starter](https://scratch.mit.edu/projects/898666614) to make a simple snowflake catching game.
+- Then we will make cool shapes with the [WeScheme Starter](https://www.bootstrapworld.org/materials/fall2023/en-us/lessons/hoc-wescheme-intro/index.shtml#).
+
+Get ready to have some fun. See you at the demo.
 
 ## About me
 Welocome to my webpage. I'm Matthew. I'm passionate about sharing my knowledge
