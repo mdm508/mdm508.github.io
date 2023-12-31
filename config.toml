@@ -12,3 +12,13 @@ theme = 'hugo-xmin'
       unsafe = true
 
 custom_css = ["custom.css"]
+
+[[menu.main]]
+name = "Home"
+url = "/"
+weight = 1 
+
+[[menu.main]]
+name = "Waabl"
+url = "/wabl/"
+weight = 2  
