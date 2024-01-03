@@ -4,5 +4,8 @@ and anything else I don't feel like warrants a blog post but
 I want to record. 
 
 == Pop up tasks ==
+- vim wiki doesnt appear on site
 - how do i go up and down in this window.
+- no more random tasks use this for random stuff.
+- delete sometimes doesnt work in gvim
 - 
