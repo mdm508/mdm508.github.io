@@ -1,7 +1,8 @@
-= My knowledge base =
+== My knowledge base ==
 This area is for storing notes, random thoughts, half baked ideas
 and anything else I don't feel like warrants a blog post but
 I want to record. 
 
-
-
+== Pop up tasks ==
+- how do i go up and down in this window.
+- 
