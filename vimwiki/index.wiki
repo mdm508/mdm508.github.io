@@ -1,5 +1,7 @@
 = My knowledge base =
-* Thing 1
-* Thing 2
-* Thing 3
+This area is for storing notes, random thoughts, half baked ideas
+and anything else I don't feel like warrants a blog post but
+I want to record. 
+
+
 
