@@ -27,7 +27,27 @@ reminded of them and hear them offered to me in a different way.
 I sometimes don't value my own ideas and need to hear them from
 someone else before I am willing to believe them.
 
+It was a really full day today despite not doing a lot of things. I got a lot
+out of my reading. 
 
+Yush and I discussed her starting a game where she could explore her
+Grandma's old house. I'm excited to be able to support her in this goal.
+The best part is that she will be the leader of this project since it is her
+memories after all. I feel like I have been able to contribute a few ideas
+without being overbearing. I am proud of myself for that. 
+
+Refactored my goals today. The new list is this
+
+1. Follow the path 
+2. Live Healthy 
+3. Be iOS Developer 
+4. Fluent Chinese 
+5. Do math 
+6. Play the piano 
+7. Read 
+8. Financial Awarenes
+
+I hope I spelled everything right.
 
 == 5 ==
 Got up at 5:30 today. Feeling a bit tired but am hoping to get a lot done 
@@ -35,7 +55,7 @@ today. Biggest thing is to finish up doing my yearly review. As I am reviewing
 I have a bad habit of doing other things and getting distracted. So when
 I am reviewing I want to focus all my attention on the review.
 
-- [ ] Complete yearly review.
+- [X] Complete yearly review.
 
 == 4 ==
 Let's review and focus only on reviewing and nothing else. 
