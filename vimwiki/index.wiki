@@ -7,21 +7,16 @@ I want to record.
 [[diary:diary|Diary]]
 
 
-== Pop ups == 
-- [ ] Finish setting up budget
-- [ ] Setup dropbox on your iphone as well as ynab
-- [ ] how do i go up and down in this window.
-- [ ] delete sometimes doesnt work in gvim
-- [ ] Buy a watch to help you follow a schedule.
-
 == Random thoughts ==
+- [[adhd]]
 - [[tv|Getting the most out of watching TV]]
 - At the end of each month I will send invoices and look at budget
 - [[write_chinese|How I learn Chinese Characters]]
 - [[ll_principles|Language learning Principles]]
-
 - [[answer|Answering my own Questions]]
 - [[reading|Some thoughts about reading]]
 
+> Mark Twain has been quoted as saying that he respected a person who could spell a word more than one way 
 
-
+== Great Links ==
+[[videos]]
