@@ -19,6 +19,6 @@ url = "/"
 weight = 1 
 
 [[menu.main]]
-name = "Waabl"
-url = "/wabl/"
+name = "Posts"
+url = "/post/"
 weight = 2  

@@ -1,7 +1,8 @@
 ---
 title: "Links"
 date: 2022-10-24T15:45:52-07:00
-draft: true
+draft: false
+tags: ["chinese"]
 ---
 
 I have a tendency to forget about bookmark so I am going
