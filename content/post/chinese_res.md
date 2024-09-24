@@ -5,10 +5,18 @@ draft: false
 tags: ["chinese"]
 ---
 
-I have a tendency to forget about bookmark so I am going
-to be making a post that contains sites that I have found useful or interesting.
+## Video
+- [Lazy Chinese](https://www.youtube.com/@comprehensiblechinese)
+My old teachers channel. She posts interesting storys great for begginners and intermediate students.
 
-## Learning Chinese
+- [屏田說故事](https://www.youtube.com/@user-sj2tq4lh9f)
+Mom and daughter reading childrens storys. The collection is massive.
+Despite the books being for kids, I found them difficult. 
+
+## Hanzi
+### [Character Sheets](https://dohliam.github.io/chinese-character-worksheets/)
+Tool to generate characters
+
 ### [Youglish](https://youglish.com/)
 Search a vocabulary word or phrase and see examples on youtube.
 
@@ -29,7 +37,6 @@ Lots of free arcticles related to language learning. I find the articles
 on this page motivating and interesting.
 
 
-
-
-
+## Typing
+[Canjie 5](https://www.chinesecj.com/forum/forum.php?mod=viewthread&tid=195320). You can install Canjie 5 on windows.
 
