@@ -19,4 +19,25 @@ Apple accepted Waabl to the all mighty app
 store during WWDC23. Getting the app published was a major milestone but I 
 still have a long ways to go until I'm happy with it.
 
-Someday I will post dev updates to this page. 
+## Update to dev branch 10/19
+The app now has the following features
+* Cloud sync with de-duplication.
+* Basic widget
+* An ugly green button that you press to update word status.
+
+It has taken quite a while to get here. In the end I had a realization when
+I sat down with a notepad and thought about why the widget was not updating.
+It was because the widget was doing a fetch request that relied on cloud kit
+yet I had set up the widget to only use a local version of the store. So
+it was not getting notified about the updates. 
+
+At that point I decided maybe my widget doesn't even need to do a fetch 
+request at all. Instead I decided to make use of `UserDefaults`. 
+
+So now, whenever the main app updates the current word I 
+1) encode and write the current word to `UserDefaults`
+2) reload the widget timeline.
+
+I'm not sure why I resisted this solution originally. Next steps are to
+refactor the code for this current commit and get ready to publish to the 
+app store :)
