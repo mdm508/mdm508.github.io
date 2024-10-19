@@ -6,4 +6,11 @@ came up with the name &ldquo;Wobble&rdquo;&mldr;. but that was taken so I ended 
 name it <a href=https://apps.apple.com/us/app/waabl/id1671041620>Waabl</a>.
 It&rsquo;s a silly name devoid of meaning and yet I have ground fond of it.</p><p>Apple accepted Waabl to the all mighty app
 store during WWDC23. Getting the app published was a major milestone but I
-still have a long ways to go until I&rsquo;m happy with it.</p><p>Someday I will post dev updates to this page.</p></main><footer></footer></body></html>
+still have a long ways to go until I&rsquo;m happy with it.</p><h2 id=update-to-dev-branch-1019>Update to dev branch 10/19</h2><p>The app now has the following features</p><ul><li>Cloud sync with de-duplication.</li><li>Basic widget</li><li>An ugly green button that you press to update word status.</li></ul><p>It has taken quite a while to get here. In the end I had a realization when
+I sat down with a notepad and thought about why the widget was not updating.
+It was because the widget was doing a fetch request that relied on cloud kit
+yet I had set up the widget to only use a local version of the store. So
+it was not getting notified about the updates.</p><p>At that point I decided maybe my widget doesn&rsquo;t even need to do a fetch
+request at all. Instead I decided to make use of <code>UserDefaults</code>.</p><p>So now, whenever the main app updates the current word I</p><ol><li>encode and write the current word to <code>UserDefaults</code></li><li>reload the widget timeline.</li></ol><p>I&rsquo;m not sure why I resisted this solution originally. Next steps are to
+refactor the code for this current commit and get ready to publish to the
+app store :)</p></main><footer></footer></body></html>
