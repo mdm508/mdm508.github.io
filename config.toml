@@ -24,7 +24,3 @@ url = "/post/"
 weight = 2  
 
 
-[[menu.main]]
-name = "Wiki"
-url = "https://mdm508.github.io/vimwiki/"
-weight = 2  

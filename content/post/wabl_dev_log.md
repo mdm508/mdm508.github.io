@@ -19,6 +19,10 @@ Apple accepted Waabl to the all mighty app
 store during WWDC23. Getting the app published was a major milestone but I 
 still have a long ways to go until I'm happy with it.
 
+## 2025 March 24th.
+- Can't believe I am still working on this app.
+- I want to ship this update before my birthday. 
+
 ## Update to dev branch 10/19
 The app now has the following features
 * Cloud sync with de-duplication.
