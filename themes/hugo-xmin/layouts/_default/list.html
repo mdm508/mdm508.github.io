@@ -1,20 +1,18 @@
-{{ partial "header.html" . }}
-
-{{if not .IsHome }}
-<h1>{{ .Title | markdownify }}</h1>
-{{ end }}
-
-{{ .Content }}
-
-<ul>
-  {{ $pages := .Pages }}
-  {{ if .IsHome }}{{ $pages = slice }}{{ end }}
-  {{ range (where $pages "Section" "!=" "") }}
-  <li>
-    <span class="date">{{ .Date.Format "2006/01/02" }}</span>
-    <a href="{{ .RelPermalink }}">{{ .Title | markdownify }}</a>
-  </li>
+{{ define "main" }}
+  {{ if not .IsHome }}
+    <h1>{{ .Title | markdownify }}</h1>
   {{ end }}
-</ul>
 
-{{ partial "footer.html" . }}
+  {{ .Content }}
+
+  <ul>
+    {{/* Filter pages that have a non-empty Section and sort them by Date descending */}}
+    {{ $pages := sort (where .Pages "Section" "!=" "") "Date" "desc" }}
+    {{ range $pages }}
+      <li>
+        <span class="date">{{ .Date.Format "2006/01/02" }}</span>
+        <a href="{{ .RelPermalink }}">{{ .Title | markdownify }}</a>
+      </li>
+    {{ end }}
+  </ul>
+{{ end }}

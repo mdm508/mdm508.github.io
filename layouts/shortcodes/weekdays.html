@@ -1,0 +1,20 @@
+{{- $monday := .Date | time.AsTime -}}
+== {{ $monday | dateFormat "Monday, January 2" }}==
+
+{{- $tuesday := $monday.AddDate 0 0 1 -}}
+== {{ $tuesday | dateFormat "Monday, January 2" }}==
+
+{{- $wednesday := $monday.AddDate 0 0 2 -}}
+== {{ $wednesday | dateFormat "Monday, January 2" }}==
+
+{{- $thursday := $monday.AddDate 0 0 3 -}}
+== {{ $thursday | dateFormat "Monday, January 2" }}==
+
+{{- $friday := $monday.AddDate 0 0 4 -}}
+== {{ $friday | dateFormat "Monday, January 2" }}==
+
+{{- $saturday := $monday.AddDate 0 0 5 -}}
+== {{ $saturday | dateFormat "Monday, January 2" }}==
+
+{{- $sunday := $monday.AddDate 0 0 6 -}}
+== {{ $sunday | dateFormat "Monday, January 2" }}==

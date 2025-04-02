@@ -21,6 +21,11 @@ weight = 1
 [[menu.main]]
 name = "Posts"
 url = "/post/"
-weight = 2  
+weight = 2
+
+[[menu.main]]
+name = "Weeks"
+url = "/week/"
+weight = 3
 
 

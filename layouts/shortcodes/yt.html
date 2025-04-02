@@ -1,0 +1,35 @@
+{{- /* Positional parameter: the YouTube video ID */ -}}
+{{- $videoID := .Get 0 -}}
+
+{{- /* Optional parameters with defaults */ -}}
+{{- $autoplay       := .Get "autoplay"       | default "0" -}}
+{{- $controls       := .Get "controls"       | default "1" -}}
+{{- $rel            := .Get "rel"            | default "0" -}}
+{{- $modestbranding := .Get "modestbranding" | default "1" -}}
+{{- $ivPolicy       := .Get "iv_load_policy" | default "3" -}}  {{/* disables annotations */}}
+{{- $playsinline    := .Get "playsinline"    | default "1" -}}
+{{- $start          := .Get "start"          | default "" -}}
+{{- $end            := .Get "end"            | default "" -}}
+
+{{- /* Build query parameters slice */ -}}
+{{- $params := slice -}}
+{{- $params = $params | append (printf "autoplay=%s" $autoplay) -}}
+{{- $params = $params | append (printf "controls=%s" $controls) -}}
+{{- $params = $params | append (printf "rel=%s" $rel) -}}
+{{- $params = $params | append (printf "modestbranding=%s" $modestbranding) -}}
+{{- $params = $params | append (printf "iv_load_policy=%s" $ivPolicy) -}}
+{{- $params = $params | append (printf "playsinline=%s" $playsinline) -}}
+{{- if $start }}{{- $params = $params | append (printf "start=%s" $start) -}}{{ end -}}
+{{- if $end   }}{{- $params = $params | append (printf "end=%s"   $end)   -}}{{ end -}}
+
+{{- /* Create query string from parameters */ -}}
+{{- $query := delimit $params "&" -}}
+
+<div class="youtube-container">
+  <iframe width="560" height="315"
+          src="https://www.youtube.com/embed/{{ $videoID }}?{{ $query }}"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+  </iframe>
+</div>
