@@ -1,4 +1,37 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Coding With Matt</title><link>https://mdm508.github.io/</link><description>Recent content on Coding With Matt</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Sat, 30 Dec 2023 15:29:38 -0800</lastBuildDate><atom:link href="https://mdm508.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Waabl</title><link>https://mdm508.github.io/post/wabl_dev_log/</link><pubDate>Sat, 30 Dec 2023 15:29:38 -0800</pubDate><guid>https://mdm508.github.io/post/wabl_dev_log/</guid><description>&lt;ul>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Coding With Matt</title><link>https://mdm508.github.io/</link><description>Recent content on Coding With Matt</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 30 May 2025 22:51:11 -0700</lastBuildDate><atom:link href="https://mdm508.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Cinderella</title><link>https://mdm508.github.io/post/cinderella/</link><pubDate>Fri, 30 May 2025 22:51:11 -0700</pubDate><guid>https://mdm508.github.io/post/cinderella/</guid><description>&lt;p>Here is a play a wrote for my Chinese Class. It is a modern adaption of Cinderella. We performed the play and Suyan played Cinderella and I played the prince. The stepmother was played by another class mate whose name escapes me, but she was physically perfect for the role. She was tall, skinny. sharp facial features and quick and strong willed. But her heart wasn&amp;rsquo;t really into the play unfortunately. Suyan on the other hand killed her monologue and I felt really happy with out performance. I did just okay. I should have rehearsed more than I did. But I guess towards the end of the class, me heart also wasnt in it, depsite having written this thing.&lt;/p></description></item><item><title>Self Guided Coding Lesson</title><link>https://mdm508.github.io/post/intro-lesson/</link><pubDate>Fri, 30 May 2025 22:10:37 -0700</pubDate><guid>https://mdm508.github.io/post/intro-lesson/</guid><description>&lt;p>A while back I hosted a few coding demos online. I copy and pasted the original post below because I think these are still great introductory lessons that kids can use to help them break into the world of programming.&lt;/p>
+&lt;p>In the first half of the lesson, we will use &lt;a href="https://scratch.mit.edu/">Scratch&lt;/a> and in the second, &lt;a href="https://www.wescheme.org/">WeScheme&lt;/a>.&lt;/p>
+&lt;ul>
+&lt;li>We will use the &lt;a href="https://scratch.mit.edu/projects/898666614">Scratch Starter&lt;/a> to make a simple snowflake-catching game.&lt;/li>
+&lt;li>Then we will make cool shapes with the &lt;a href="https://www.bootstrapworld.org/materials/fall2023/en-us/lessons/hoc-wescheme-intro/index.shtml#">WeScheme Starter&lt;/a>.&lt;/li>
+&lt;/ul></description></item><item><title>Hungry Philos Problem</title><link>https://mdm508.github.io/post/hungry-philos-problem/</link><pubDate>Sat, 05 Apr 2025 16:48:07 -0700</pubDate><guid>https://mdm508.github.io/post/hungry-philos-problem/</guid><description>&lt;h2 id="hungry-philosophers-problem">Hungry Philosophers Problem&lt;/h2>
+&lt;p>A group of philosophers sit around a table. Each needs two forks (left and right) to eat. They alternate between &lt;strong>thinking&lt;/strong> and &lt;strong>eating&lt;/strong>, but no two neighbors can eat at the same time. Assume that there are n philosophers and n+1 forks.&lt;/p>
+&lt;p>The challenge:&lt;/p>
+&lt;ul>
+&lt;li>Prevent &lt;strong>deadlock&lt;/strong> (no one can eat)&lt;/li>
+&lt;li>Prevent &lt;strong>starvation&lt;/strong> (someone never eats)&lt;/li>
+&lt;li>Allow &lt;strong>fair and efficient&lt;/strong> access to forks&lt;/li>
+&lt;/ul>
+&lt;h2 id="how-to-solve-it">How to solve it?&lt;/h2>
+&lt;p>Only let 1 philosopher eat at a time. Everyone else must wait. Then move onto next guy who has not eaten.
+This is fair but not efficient. Can you come up with a better solution?&lt;/p></description></item><item><title>March</title><link>https://mdm508.github.io/months/25-03/</link><pubDate>Sun, 02 Mar 2025 12:00:22 -0700</pubDate><guid>https://mdm508.github.io/months/25-03/</guid><description>&lt;p>Week 13 Range: March 24, 2025 – March 30, 2025&lt;/p>
+&lt;h2 id="march-24---march-30">March 24 - March 30&lt;/h2>
+&lt;h3 id="monday">Monday&lt;/h3>
+&lt;ul>
+&lt;li>I like keeping track of the year using the current week number.&lt;/li>
+&lt;li>Lately I have been trying to learn the abacus. My goal this week is to improve my speed by continually adding the number 13.&lt;/li>
+&lt;li>My 30th is coming up and it would feel great to publish that update before saturday.&lt;/li>
+&lt;li>I have woke up for 4am for 5 days in a row. I have been sleeping around 6 hours lately. It is hard to get up but I am always happy I got up later.&lt;/li>
+&lt;li>It seems like my ideal morning routine is
+&lt;ul>
+&lt;li>make your bed&lt;/li>
+&lt;li>meditate&lt;/li>
+&lt;li>gym&lt;/li>
+&lt;li>program iOS&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>I am struggling to respect my new early bed time. Here I am at 9:46, 46 minutes late. I bought a 12 dollar doraemon alarm clock. You have to manually
+set it each night.&lt;/p></description></item><item><title>Waabl</title><link>https://mdm508.github.io/post/wabl_dev_log/</link><pubDate>Sat, 30 Dec 2023 15:29:38 -0800</pubDate><guid>https://mdm508.github.io/post/wabl_dev_log/</guid><description>&lt;ul>
 &lt;li>&lt;a href="https://apps.apple.com/us/app/waabl/id1671041620">Download Waabl&lt;/a>.&lt;/li>
 &lt;/ul>
 &lt;p>At the beggining of 2023 I started working on a Chinese Word of the Day
@@ -6,4 +39,23 @@ application in hopes of improving my iOS skills. A friend of mine
 and I were sitting in a coffee shop and I asked him to name my app. He
 came up with the name &amp;ldquo;Wobble&amp;rdquo;&amp;hellip;. but that was taken so I ended up having to
 name it &lt;a href="https://apps.apple.com/us/app/waabl/id1671041620">Waabl&lt;/a>.
-It&amp;rsquo;s a silly name devoid of meaning and yet I have ground fond of it.&lt;/p></description></item></channel></rss>
+It&amp;rsquo;s a silly name devoid of meaning and yet I have ground fond of it.&lt;/p></description></item><item><title>Links</title><link>https://mdm508.github.io/post/chinese_res/</link><pubDate>Mon, 24 Oct 2022 15:45:52 -0700</pubDate><guid>https://mdm508.github.io/post/chinese_res/</guid><description>&lt;h2 id="video">Video&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;a href="https://www.youtube.com/@comprehensiblechinese">Lazy Chinese&lt;/a>
+My old teachers channel. She posts interesting storys great for begginners and intermediate students.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://www.youtube.com/@user-sj2tq4lh9f">屏田說故事&lt;/a>
+Mom and daughter reading childrens storys. The collection is massive.
+Despite the books being for kids, I found them difficult.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="hanzi">Hanzi&lt;/h2>
+&lt;h3 id="character-sheets">&lt;a href="https://dohliam.github.io/chinese-character-worksheets/">Character Sheets&lt;/a>&lt;/h3>
+&lt;p>Tool to generate characters&lt;/p>
+&lt;h3 id="youglish">&lt;a href="https://youglish.com/">Youglish&lt;/a>&lt;/h3>
+&lt;p>Search a vocabulary word or phrase and see examples on youtube.&lt;/p>
+&lt;h3 id="chinese-charactersorg">Chinese-Characters.org&lt;/h3>
+&lt;p>You can learn about the etmology of Chinese characters. You can
+also see the decomposition of the characters which aids in memorizing them.&lt;/p></description></item></channel></rss>
