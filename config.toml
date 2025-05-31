@@ -24,8 +24,8 @@ url = "/post/"
 weight = 2
 
 [[menu.main]]
-name = "Weeks"
-url = "/week/"
+name = "Months"
+url = "/months/"
 weight = 3
 
 

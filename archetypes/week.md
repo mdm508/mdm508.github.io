@@ -35,6 +35,7 @@ Week {{ $weekNumber }} Range: {{ $monday | dateFormat "January 2, 2006" }} – {
 
 ## {{ $monday | dateFormat "January 2" }} - {{ $sunday | dateFormat "January 2" }}
 
+## Week //
 ### Monday
 
 ### Tuesday 
