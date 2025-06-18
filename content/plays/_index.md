@@ -1,4 +1,4 @@
 ---
-title: "劇本列表"
+title: "柯南迷你劇本"
 type: "plays"
 ---

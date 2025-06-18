@@ -1,7 +1,15 @@
 {{ define "main" }}
 <div class="play-page">
+  <section>
+    <p class="play-description">Here are some plays that ChatGPT wrote for me. They are based on
+      the japanese manga/anime Conan, which is a detective story. I am using them to learn
+      new vocabulary and practice reading comprehension.
+    </p>
+  </section>
+  <hr>
   <h1 class="play-title">{{ .Title }}</h1>
-
+  <img class="play-image" src="/conan.png" alt="Conan Image">
+  <hr>
   {{ range $filename, $play := site.Data.plays }}
     <section class="play-entry">
       <h2 class="play-entry-title">{{ $play.playTitle }}</h2>

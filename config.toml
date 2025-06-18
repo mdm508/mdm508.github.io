@@ -28,4 +28,9 @@ name = "Months"
 url = "/months/"
 weight = 3
 
+[[menu.main]]
+name = "Plays"
+url = "/plays/"
+weight = 4
+
 
