@@ -1,0 +1,45 @@
+{{ define "main" }}
+<div class="play-page">
+  <h1 class="play-title">{{ .Title }}</h1>
+
+  {{ range $filename, $play := site.Data.plays }}
+    <section class="play-entry">
+      <h2 class="play-entry-title">{{ $play.playTitle }}</h2>
+
+      <h3 class="play-characters-heading">角色</h3>
+      <p class="play-characters-line">
+        {{ range $index, $char := $play.characters }}
+          {{ if $index }}, {{ end }}{{ $char }}
+        {{ end }}
+      </p>
+
+      {{ range $scene := $play.scenes }}
+        <article class="play-scene">
+
+          <h5 class="scene-glossary-heading">詞彙</h5>
+          <div class="scene-glossary-box">
+            {{ range $scene.sceneGlossary }}
+              <div class="glossary-item">{{ . }}</div>
+            {{ end }}
+          </div>
+
+          <h4 class="scene-title">第 {{ $scene.sceneNumber }} 場：{{ $scene.sceneTitle }}</h4>
+          <p class="scene-location"><strong>場景：</strong>{{ $scene.sceneLocation }}</p>
+
+          <h5 class="scene-lines-heading">對話</h5>
+          <div class="scene-lines">
+            {{ range $scene.lines }}
+              <div class="dialogue-line">
+               <div class="dialogue-character">{{ .character }}：</div>
+               <div class="dialogue-text">{{ .line | markdownify }}</div>
+              </div>
+            {{ end }}
+          </div>
+        </article>
+      {{ end }}
+
+      <hr>
+    </section>
+  {{ end }}
+</div>
+{{ end }}
