@@ -1,0 +1,46 @@
+{{ define "main" }}
+<article class="project">
+
+  <!-- Title -->
+  <h1>{{ .Title }}</h1>
+
+  <!-- Summary -->
+  <p class="summary">{{ .Summary }}</p>
+
+  <!-- Features List -->
+  {{ with .Params.requirements }}
+  <section class="features">
+    <h2>✅ Features</h2>
+    <ul>
+      {{ range . }}
+        <li>{{ . }}</li>
+      {{ end }}
+    </ul>
+  </section>
+  {{ end }}
+
+  
+  <!-- Main Content -->
+  <section class="content">
+    {{ .Content }}
+  </section>
+
+  <!-- GitHub Link -->
+  {{ with .Params.github }}
+  <section class="github">
+    <p>
+      <a href="{{ . }}" target="_blank" rel="noopener">📂 View this project on GitHub. Try to solve it first though.</a>
+    </p>
+  </section>
+  {{ end }}
+
+
+  <!-- Screenshot -->
+{{ with .Resources.GetMatch .Params.screenshot }}
+<section class="screenshot">
+  <h2>📸 Screenshot</h2>
+  <img src="{{ .RelPermalink }}" alt="Screenshot" style="max-width: 400px; height: auto; border: 1px solid #ccc; border-radius: 8px;" />
+</section>
+{{ end }}
+</article>
+{{ end }}
