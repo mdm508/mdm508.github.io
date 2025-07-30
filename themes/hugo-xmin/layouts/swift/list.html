@@ -1,0 +1,23 @@
+{{ define "main" }}
+<article class="section-index">
+  <h1>{{ .Title }}</h1>
+    <!-- Main Content -->
+  <section class="content">
+    {{ .Content | safeHTML }}
+  </section>
+  <h2>Notes</h2>
+  <ul>
+    {{ range where .Site.RegularPages "File.Dir" "in" (slice "swiftnote/") }}
+      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+    {{ end }}
+  </ul>
+  <h2>Projects</h2>
+<ul>
+  {{ with site.GetPage "section" "swiftproj" }}
+    {{ range .Pages }}
+      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+    {{ end }}
+  {{ end }}
+</ul>
+</article>
+{{ end }}

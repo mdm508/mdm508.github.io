@@ -29,8 +29,8 @@ url = "/months/"
 weight = 3
 
 [[menu.main]]
-name = "Plays"
-url = "/plays/"
+name = "Swift"
+url = "/swift/"
 weight = 4
 
 

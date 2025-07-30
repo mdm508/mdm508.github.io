@@ -1,0 +1,20 @@
+{{ define "main" }}
+<article class="project">
+
+  <!-- Title -->
+  <h1>{{ .Title }}</h1>
+
+  <!-- Summary -->
+  <p class="summary">{{ .Summary | safeHTML }}</p>
+
+  <!-- Main Content -->
+  <section class="content">
+    {{ .Content | safeHTML }}
+  </section>
+
+  <!-- GitHub Link Partial -->
+  {{ partial "github.html" . }}
+
+
+</article>
+{{ end }}
