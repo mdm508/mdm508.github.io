@@ -1,0 +1,124 @@
+.play-page {
+  font-family: "Noto Serif TC", serif;
+  font-size: 1.55rem;
+  line-height: 1.8;
+  background: #f9f5ec; /* soft beige */
+  color: #3e2f1c;
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
+}
+.play-description {
+  font-size: 1.0rem;
+  margin-bottom: 2rem;
+  color: #000000; /* warm brown */
+}
+.play-title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #5c3a21; /* deeper brown */
+}
+
+.play-entry-title {
+  font-weight: bold;
+  color: #7d4f28; /* warm brown */
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 3rem;
+}
+
+.play-characters-heading,
+.scene-title,
+.scene-glossary-heading,
+.scene-lines-heading {
+  color: #a1673a; /* burnt caramel */
+  margin-top: 1.5rem;
+}
+
+.play-characters {
+  padding-left: 1.5rem;
+}
+
+.play-character {
+  margin-bottom: 0.5rem;
+}
+
+.play-scene {
+  margin-top: 1rem;
+  padding-left: 1rem;
+  border-left: 1px solid #b58d6b; /* warm sand tone */
+}
+
+.scene-location {
+  margin: 0.5rem 0;
+}
+
+.scene-glossary-box {
+  border: 2px solid #d8c6b3; /* soft border */
+  border-radius: 0.5rem;
+  background: #fefaf5; /* creamy white */
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  counter-reset: glossary;
+}
+
+.glossary-item {
+  flex: 1 1 30%;
+  font-size: 1.25rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.glossary-item::before {
+  content: counter(glossary) ". ";
+  counter-increment: glossary;
+  position: absolute;
+  left: 0;
+  color: #a89f91;
+}
+
+.scene-lines {
+  margin-top: 1rem;
+}
+
+.dialogue-line {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.dialogue-character {
+  flex: 0 0 6em; /* fixed width speaker column */
+  font-weight: bold;
+  color: #4a3b2d;
+  text-align: right;
+}
+
+.dialogue-text {
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.play-image{
+  max-width: 50%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+hr {
+  border: none;
+  border-top: 2px dashed #d8c6b3; /* soft beige tone */
+  margin: 3rem 0;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}

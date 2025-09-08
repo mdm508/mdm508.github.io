@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Coding With Matt</title><link>https://mdm508.github.io/</link><description>Recent content on Coding With Matt</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Sun, 10 Aug 2025 15:43:29 -0700</lastBuildDate><atom:link href="https://mdm508.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>01 Swift Tour</title><link>https://mdm508.github.io/swiftnote/01-swift-tour/</link><pubDate>Wed, 08 Jan 2025 00:00:00 +0000</pubDate><guid>https://mdm508.github.io/swiftnote/01-swift-tour/</guid><description>A comprehensive tour of Swift fundamentals covering statements, operators as functions, custom types (struct/class/enum), variables vs constants, scope and lifetime, namespaces, and access control with practical examples.</description></item><item><title>Variables and Types</title><link>https://mdm508.github.io/swiftnote/01-variables-and-types/</link><pubDate>Wed, 08 Jan 2025 00:00:00 +0000</pubDate><guid>https://mdm508.github.io/swiftnote/01-variables-and-types/</guid><description>Learn the fundamentals of variables and data types in Swift</description></item><item><title>Moody</title><link>https://mdm508.github.io/swiftproj/moody/</link><pubDate>Sun, 10 Aug 2025 15:43:29 -0700</pubDate><guid>https://mdm508.github.io/swiftproj/moody/</guid><description>Create a single-screen app that lets the user select their mood and displays an icon and label to match.</description></item><item><title>Cat Press</title><link>https://mdm508.github.io/swiftproj/cat-press/</link><pubDate>Wed, 23 Jul 2025 17:35:50 -0700</pubDate><guid>https://mdm508.github.io/swiftproj/cat-press/</guid><description>Create a single-screen app with a button that prints ‘Meow’ to the console when tapped.</description></item><item><title>Cinderella</title><link>https://mdm508.github.io/post/cinderella/</link><pubDate>Fri, 30 May 2025 22:51:11 -0700</pubDate><guid>https://mdm508.github.io/post/cinderella/</guid><description>&lt;p&gt;Here is a play a wrote for my Chinese Class. It is a modern adaption of Cinderella. We performed the play and Suyan played Cinderella and I played the prince. The stepmother was played by another class mate whose name escapes me, but she was physically perfect for the role. She was tall, skinny. sharp facial features and quick and strong willed. But her heart wasn&amp;rsquo;t really into the play unfortunately. Suyan on the other hand killed her monologue and I felt really happy with out performance. I did just okay. I should have rehearsed more than I did. But I guess towards the end of the class, me heart also wasnt in it, depsite having written this thing.&lt;/p&gt;</description></item><item><title>Self Guided Coding Lesson</title><link>https://mdm508.github.io/post/intro-lesson/</link><pubDate>Fri, 30 May 2025 22:10:37 -0700</pubDate><guid>https://mdm508.github.io/post/intro-lesson/</guid><description>&lt;p&gt;A while back I hosted a few coding demos online. I copy and pasted the original post below because I think these are still great introductory lessons that kids can use to help them break into the world of programming.&lt;/p&gt;
+&lt;p&gt;In the first half of the lesson, we will use &lt;a href="https://scratch.mit.edu/"&gt;Scratch&lt;/a&gt; and in the second, &lt;a href="https://www.wescheme.org/"&gt;WeScheme&lt;/a&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We will use the &lt;a href="https://scratch.mit.edu/projects/898666614"&gt;Scratch Starter&lt;/a&gt; to make a simple snowflake-catching game.&lt;/li&gt;
+&lt;li&gt;Then we will make cool shapes with the &lt;a href="https://www.bootstrapworld.org/materials/fall2023/en-us/lessons/hoc-wescheme-intro/index.shtml#"&gt;WeScheme Starter&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Hungry Philos Problem</title><link>https://mdm508.github.io/post/hungry-philos-problem/</link><pubDate>Sat, 05 Apr 2025 16:48:07 -0700</pubDate><guid>https://mdm508.github.io/post/hungry-philos-problem/</guid><description>&lt;h2 id="hungry-philosophers-problem"&gt;Hungry Philosophers Problem&lt;/h2&gt;
+&lt;p&gt;A group of philosophers sit around a table. Each needs two forks (left and right) to eat. They alternate between &lt;strong&gt;thinking&lt;/strong&gt; and &lt;strong&gt;eating&lt;/strong&gt;, but no two neighbors can eat at the same time. Assume that there are n philosophers and n+1 forks.&lt;/p&gt;
+&lt;p&gt;The challenge:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Prevent &lt;strong&gt;deadlock&lt;/strong&gt; (no one can eat)&lt;/li&gt;
+&lt;li&gt;Prevent &lt;strong&gt;starvation&lt;/strong&gt; (someone never eats)&lt;/li&gt;
+&lt;li&gt;Allow &lt;strong&gt;fair and efficient&lt;/strong&gt; access to forks&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="how-to-solve-it"&gt;How to solve it?&lt;/h2&gt;
+&lt;p&gt;Only let 1 philosopher eat at a time. Everyone else must wait. Then move onto next guy who has not eaten.
+This is fair but not efficient. Can you come up with a better solution?&lt;/p&gt;</description></item><item><title>March</title><link>https://mdm508.github.io/months/25-03/</link><pubDate>Sun, 02 Mar 2025 12:00:22 -0700</pubDate><guid>https://mdm508.github.io/months/25-03/</guid><description>&lt;p&gt;Week 13 Range: March 24, 2025 – March 30, 2025&lt;/p&gt;
+&lt;h2 id="march-24---march-30"&gt;March 24 - March 30&lt;/h2&gt;
+&lt;h3 id="monday"&gt;Monday&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;I like keeping track of the year using the current week number.&lt;/li&gt;
+&lt;li&gt;Lately I have been trying to learn the abacus. My goal this week is to improve my speed by continually adding the number 13.&lt;/li&gt;
+&lt;li&gt;My 30th is coming up and it would feel great to publish that update before saturday.&lt;/li&gt;
+&lt;li&gt;I have woke up for 4am for 5 days in a row. I have been sleeping around 6 hours lately. It is hard to get up but I am always happy I got up later.&lt;/li&gt;
+&lt;li&gt;It seems like my ideal morning routine is
+&lt;ul&gt;
+&lt;li&gt;make your bed&lt;/li&gt;
+&lt;li&gt;meditate&lt;/li&gt;
+&lt;li&gt;gym&lt;/li&gt;
+&lt;li&gt;program iOS&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I am struggling to respect my new early bed time. Here I am at 9:46, 46 minutes late. I bought a 12 dollar doraemon alarm clock. You have to manually
+set it each night.&lt;/p&gt;</description></item><item><title>Welcome to Swift Notes</title><link>https://mdm508.github.io/swiftnote/00-welcome/</link><pubDate>Wed, 08 Jan 2025 00:00:00 +0000</pubDate><guid>https://mdm508.github.io/swiftnote/00-welcome/</guid><description>An introduction to this collection of Swift notes designed to supplement Programming Fundamentals by Matt Nuenberg</description></item><item><title>Waabl</title><link>https://mdm508.github.io/post/wabl_dev_log/</link><pubDate>Sat, 30 Dec 2023 15:29:38 -0800</pubDate><guid>https://mdm508.github.io/post/wabl_dev_log/</guid><description>&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://apps.apple.com/us/app/waabl/id1671041620"&gt;Download Waabl&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;At the beggining of 2023 I started working on a Chinese Word of the Day
+application in hopes of improving my iOS skills. A friend of mine
+and I were sitting in a coffee shop and I asked him to name my app. He
+came up with the name &amp;ldquo;Wobble&amp;rdquo;&amp;hellip;. but that was taken so I ended up having to
+name it &lt;a href="https://apps.apple.com/us/app/waabl/id1671041620"&gt;Waabl&lt;/a&gt;.
+It&amp;rsquo;s a silly name devoid of meaning and yet I have ground fond of it.&lt;/p&gt;</description></item><item><title>Links</title><link>https://mdm508.github.io/post/chinese_res/</link><pubDate>Mon, 24 Oct 2022 15:45:52 -0700</pubDate><guid>https://mdm508.github.io/post/chinese_res/</guid><description>&lt;h2 id="video"&gt;Video&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://www.youtube.com/@comprehensiblechinese"&gt;Lazy Chinese&lt;/a&gt;
+My old teachers channel. She posts interesting storys great for begginners and intermediate students.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://www.youtube.com/@user-sj2tq4lh9f"&gt;屏田說故事&lt;/a&gt;
+Mom and daughter reading childrens storys. The collection is massive.
+Despite the books being for kids, I found them difficult.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="hanzi"&gt;Hanzi&lt;/h2&gt;
+&lt;h3 id="character-sheets"&gt;&lt;a href="https://dohliam.github.io/chinese-character-worksheets/"&gt;Character Sheets&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Tool to generate characters&lt;/p&gt;
+&lt;h3 id="youglish"&gt;&lt;a href="https://youglish.com/"&gt;Youglish&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Search a vocabulary word or phrase and see examples on youtube.&lt;/p&gt;
+&lt;h3 id="chinese-charactersorg"&gt;Chinese-Characters.org&lt;/h3&gt;
+&lt;p&gt;You can learn about the etmology of Chinese characters. You can
+also see the decomposition of the characters which aids in memorizing them.&lt;/p&gt;</description></item></channel></rss>
