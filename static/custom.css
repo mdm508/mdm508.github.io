@@ -377,7 +377,7 @@ img:hover {
 }
 
 .list-page li:hover {
-  background-color: var(--cream);
+  background-color: rgba(139, 69, 19, 0.08);
   box-shadow: var(--shadow-medium);
 }
 
@@ -386,6 +386,7 @@ img:hover {
   font-size: 0.9rem;
   font-weight: 500;
   min-width: 80px;
+  opacity: 0.7;
 }
 
 .list-page .post-info {
@@ -411,8 +412,7 @@ img:hover {
   color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.4;
-  font-style: italic;
-  margin-top: 0.25rem;
+  opacity: 0.8;
 }
 
 

@@ -23,14 +23,10 @@ name = "Posts"
 url = "/post/"
 weight = 2
 
-[[menu.main]]
-name = "Months"
-url = "/months/"
-weight = 3
 
 [[menu.main]]
 name = "Swift"
-url = "/swift/"
+url = "/swiftnote/"
 weight = 4
 
 

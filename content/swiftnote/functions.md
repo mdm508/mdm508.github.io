@@ -1,7 +1,7 @@
 ---
 title: "Functions"
 date: 2025-07-29T09:25:22-07:00
-draft: false
+draft: true
 tags: ["swift",]
 categories: ["Swift"]
 summary: 

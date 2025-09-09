@@ -11,7 +11,9 @@
       {{ $pages := sort (where .Pages "Section" "!=" "") "Date" "desc" }}
       {{ range $pages }}
         <li>
-          <span class="date">{{ .Date.Format "2006/01/02" }}</span>
+          {{ if ne .Parent.Params.show_date false }}
+            <span class="date">{{ .Date.Format "01-02" }}</span>
+          {{ end }}
           <div class="post-info">
             <a href="{{ .RelPermalink }}">{{ .Title | markdownify }}</a>
             {{ if .Params.summary }}
