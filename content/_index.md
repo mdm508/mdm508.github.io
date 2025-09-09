@@ -6,7 +6,7 @@ draft: false
 
 <div style="text-align: center; margin: 2rem 0; padding: 2rem; background-color: var(--light-orange); border-radius: 8px; box-shadow: var(--shadow-subtle);">
   <h1 style="margin-bottom: 0.5rem; color: var(--deep-brown);">Matthew McLaughlin</h1>
-  <h2 style="margin-bottom: 1.5rem; color: var(--rich-brown); font-style: italic;">Computer Science Tutor</h2>
+  <h2 style="margin-bottom: 1.5rem; color: var(--rich-brown); font-style: italic; font-size: 1rem;">Computer Science Tutor and Learning Enthusiast</h2>
   <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
     <span style="color: var(--text-secondary);">
       ✉️ <a href="mailto:matthedm@uci.edu" style="color: var(--rich-orange);">matthedm@uci.edu</a>

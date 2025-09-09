@@ -202,7 +202,19 @@ pre {
   border-radius: 6px;
   overflow-x: auto;
   box-shadow: var(--shadow-rich);
-  border-left: 4px solid var(--accent-orange);
+  border-left: 4px solid var(--rich-orange);
+  position: relative;
+}
+
+pre::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--rich-orange), var(--deep-orange));
+  border-radius: 6px 6px 0 0;
 }
 
 code {
@@ -216,7 +228,7 @@ code {
 
 pre code {
   background-color: transparent;
-  color: inherit;
+  color: white;
   padding: 0;
 }
 
@@ -251,15 +263,24 @@ thead {
 th, td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid var(--light-orange);
+  border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+  border-right: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+td:last-child {
+  border-right: none;
 }
 
 tbody tr:nth-child(even) {
   background-color: var(--cream);
 }
 
+tbody tr:nth-child(odd) {
+  background-color: var(--light-brown);
+}
+
 tbody tr:hover {
-  background-color: var(--light-orange);
+  background-color: rgba(139, 69, 19, 0.15);
 }
 
 /* Horizontal Rule - Subtle and Rounded */
@@ -393,3 +414,5 @@ img:hover {
   font-style: italic;
   margin-top: 0.25rem;
 }
+
+
