@@ -2,6 +2,7 @@
 title: "Cinderella"
 date: 2025-05-30T22:51:11-07:00
 draft: false
+summary: a modern take on Cinderella.
 ---
 
 Here is a play a wrote for my Chinese Class. It is a modern adaption of Cinderella. We performed the play and Suyan played Cinderella and I played the prince. The stepmother was played by another class mate whose name escapes me, but she was physically perfect for the role. She was tall, skinny. sharp facial features and quick and strong willed. But her heart wasn't really into the play unfortunately. Suyan on the other hand killed her monologue and I felt really happy with out performance. I did just okay. I should have rehearsed more than I did. But I guess towards the end of the class, me heart also wasnt in it, depsite having written this thing.

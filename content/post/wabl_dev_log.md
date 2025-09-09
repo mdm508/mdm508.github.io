@@ -3,6 +3,7 @@ title: "Waabl"
 date: 2023-12-30T15:29:38-08:00
 draft: false
 tags: ["ios"]
+summary: a rarely updated and poorly organized account of my progress on my first iOS app
 ---
 
 

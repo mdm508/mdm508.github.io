@@ -2,6 +2,7 @@
 title: "Self Guided Coding Lesson"
 date: 2025-05-30T22:10:37-07:00
 draft: false
+summary: if your new to writting code check out some of these pedagogical programming languages to get started
 ---
 
 A while back I hosted a few coding demos online. I copy and pasted the original post below because I think these are still great introductory lessons that kids can use to help them break into the world of programming.

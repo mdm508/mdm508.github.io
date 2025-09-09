@@ -1,7 +1,8 @@
 ---
-title: "Hungry Philos Problem"
+title: "The Hungry Philosophers Problem"
 date: 2025-04-05T16:48:07-07:00
 draft: false
+summary: cool puzzle related to synchronization issues in concurrent programming.
 ---
 
 ##  Hungry Philosophers Problem
@@ -162,3 +163,9 @@ class ViewController: UIViewController {
     }
 }
 ```
+
+---
+
+**References:**
+
+1. [Dining philosophers problem - Wikipedia](https://en.wikipedia.org/wiki/Dining_philosophers_problem)
