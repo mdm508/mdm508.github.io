@@ -4,17 +4,16 @@ date: 2022-08-05T14:25:37-07:00
 draft: false
 ---
 
-<div style="display: flex; align-items: center; margin-top: 3%">
-  <img style="width: 15%; height: auto; object-fit: cover; clip-path: circle()" src="me.jpeg"/>
-  <div style="display: flex; flex-direction: column; margin-left: 5%">
-    <font size="+3">Matthew McLaughlin</font>
-    <font size="+1"><i>Computer Science Tutor</i></font>
-    <span>✉️
-    <a href="mailto:matthedm@uci.edu">
-      matthedm@uci.edu
-    </a>
+<div style="text-align: center; margin: 2rem 0; padding: 2rem; background-color: var(--light-orange); border-radius: 8px; box-shadow: var(--shadow-subtle);">
+  <h1 style="margin-bottom: 0.5rem; color: var(--deep-brown);">Matthew McLaughlin</h1>
+  <h2 style="margin-bottom: 1.5rem; color: var(--rich-brown); font-style: italic;">Computer Science Tutor</h2>
+  <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+    <span style="color: var(--text-secondary);">
+      ✉️ <a href="mailto:matthedm@uci.edu" style="color: var(--rich-orange);">matthedm@uci.edu</a>
     </span>
-    <a href="https://github.com/mdm508">💻GitHub</a>
+    <span style="color: var(--text-secondary);">
+      💻 <a href="https://github.com/mdm508" style="color: var(--rich-orange);">GitHub</a>
+    </span>
   </div>
 </div>
 
@@ -42,19 +41,22 @@ At the core of my teaching philosophy are four key goals:
 
 4. **Learn with Enthusiasm**: Learning is most effective when it's enjoyable. I strive to create a dynamic and engaging learning environment, ensuring that lessons remain exciting and thought-provoking for my students.
 
-## Languages I Have Taught in the Past
+## Programming Languages & Technologies
 
-![Racket](racket-logo.png)
-![C++](Cpp-logo.png)
-![Python](python-logo.png)
-![Java](java-logo.png)
-![Swift](swift-logo.png)
-![JavaScript](js-logo.png)  
-![Scratch](scratch-logo.png)
+I have extensive teaching experience across multiple programming languages and platforms:
+
+- **Racket** - Functional programming fundamentals and computer science concepts
+- **C++** - Object-oriented programming, data structures, and system-level concepts  
+- **Python** - Beginner-friendly programming, data science, and web development
+- **Java** - Enterprise development, object-oriented design, and Android programming
+- **Swift** - iOS and macOS app development, modern mobile programming
+- **JavaScript** - Web development, frontend frameworks, and interactive programming
+- **Scratch** - Visual programming for beginners and computational thinking
 
 <hr>
 
 <div class="cta-box">
-    <img src="penguin.png" alt="Penguin">
-    <a href="mailto:matthedm@uci.edu" class="cta-button">Set up a lesson today</a>
+    <h3>Ready to Start Your Programming Journey?</h3>
+    <p>Whether you're a complete beginner or looking to advance your skills, I'm here to help you succeed. With personalized one-on-one tutoring, we'll work together to achieve your programming goals.</p>
+    <a href="mailto:matthedm@uci.edu" class="cta-button">Schedule Your First Lesson</a>
 </div>
