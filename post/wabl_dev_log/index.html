@@ -1,0 +1,15 @@
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Waabl</title><header><!doctype html><html lang=en-us><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Waabl | Coding With Matt</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=/custom.css><link rel=stylesheet href=/css/plays.css></head><body><nav><ul class=menu><li><a href=/>Home</a></li><li><a href=/post/>Posts</a></li><li><a href=/months/>Months</a></li><li><a href=/swift/>Swift</a></li></ul><hr></nav></header></head><body><main><div class=article-meta><h1><span class=title>Waabl</span></h1><h2 class=date>2023/12/30</h2></div><div class=content><ul><li><a href=https://apps.apple.com/us/app/waabl/id1671041620>Download Waabl</a>.</li></ul><p>At the beggining of 2023 I started working on a Chinese Word of the Day
+application in hopes of improving my iOS skills. A friend of mine
+and I were sitting in a coffee shop and I asked him to name my app. He
+came up with the name &ldquo;Wobble&rdquo;&mldr;. but that was taken so I ended up having to
+name it <a href=https://apps.apple.com/us/app/waabl/id1671041620>Waabl</a>.
+It&rsquo;s a silly name devoid of meaning and yet I have ground fond of it.</p><p>Apple accepted Waabl to the all mighty app
+store during WWDC23. Getting the app published was a major milestone but I
+still have a long ways to go until I&rsquo;m happy with it.</p><h2 id=2025-march-24th>2025 March 24th.</h2><ul><li>Can&rsquo;t believe I am still working on this app.</li><li>I want to ship this update before my birthday.</li></ul><h2 id=update-to-dev-branch-1019>Update to dev branch 10/19</h2><p>The app now has the following features</p><ul><li>Cloud sync with de-duplication.</li><li>Basic widget</li><li>An ugly green button that you press to update word status.</li></ul><p>It has taken quite a while to get here. In the end I had a realization when
+I sat down with a notepad and thought about why the widget was not updating.
+It was because the widget was doing a fetch request that relied on cloud kit
+yet I had set up the widget to only use a local version of the store. So
+it was not getting notified about the updates.</p><p>At that point I decided maybe my widget doesn&rsquo;t even need to do a fetch
+request at all. Instead I decided to make use of <code>UserDefaults</code>.</p><p>So now, whenever the main app updates the current word I</p><ol><li>encode and write the current word to <code>UserDefaults</code></li><li>reload the widget timeline.</li></ol><p>I&rsquo;m not sure why I resisted this solution originally. Next steps are to
+refactor the code for this current commit and get ready to publish to the
+app store :)</p></div></main><footer><footer></footer></body></html></footer></body></html>
