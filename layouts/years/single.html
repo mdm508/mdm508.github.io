@@ -1,0 +1,23 @@
+{{ define "main" }}
+  <div class="years-page">
+    <div class="article-meta">
+      <h1><span class="title">{{ .Title | markdownify }}</span></h1>
+    </div>
+
+    <div class="content">
+      <div class="years-grid">
+        <aside class="years-toc">
+          <div class="toc">
+            <h3>Months</h3>
+            {{ .TableOfContents | replaceRE "<ul>[[:space:]]*<li>[[:space:]]*<ul>" "<ul>" | replaceRE "</ul>[[:space:]]*</li>[[:space:]]*</ul>" "</ul>" | safeHTML }}
+          </div>
+        </aside>
+        <div class="years-body">
+          {{ .Content }}
+        </div>
+      </div>
+    </div>
+  </div>
+{{ end }}
+
+
