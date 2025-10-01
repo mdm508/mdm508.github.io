@@ -1,0 +1,21 @@
+.years-page .content .years-grid { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.years-toc { position: sticky; top: 1rem; align-self: start; max-height: calc(100vh - 2rem); overflow: auto; padding-right: .5rem; }
+.years-toc .toc { border-left: 3px solid #eee; padding-left: .75rem; }
+.years-toc h3 { margin-top: 0; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; opacity: 0.8; }
+/* Only show first nested level under Months; hide deeper levels */
+.years-toc .toc ul ul ul { display: none; }
+.years-body { min-width: 0; }
+.years-body, .years-body p, .years-body li {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.years-body a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+@media (max-width: 900px) {
+  .years-page .content .years-grid { display: block; }
+  .years-toc { position: static; max-height: none; margin-bottom: 1rem; }
+}
+
