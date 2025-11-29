@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atrament Sketch Pad</title>
+  <title>Art Therapy</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600&display=swap');
 
@@ -15,7 +15,7 @@
       --pen1: #ffffff;
       --pen2: #fcd34d;
       --pen3: #ffb3b3;
-      --btn-size: 56px;
+      --btn-size: 60px;
       --toolbar-span: 92px;
     }
 
@@ -349,9 +349,16 @@
       font-size: 20px;
       letter-spacing: 1px;
       text-align: center;
+      white-space: normal;
+      word-wrap: break-word;
+      line-height: 1.3;
     }
     .timer-card.finished .time {
       animation: blink 0.8s step-start infinite;
+    }
+    .timer-card.grow-mode.finished .time {
+      animation: none;
+      color: #ef4444 !important;
     }
     .timer-card.minimized {
       grid-template-columns: 1fr;
@@ -438,6 +445,25 @@
       box-sizing: border-box;
       background: #0b1a12;
     }
+    .image-window.text-window {
+      border-color: #fcd34d;
+    }
+    .image-window .text-body {
+      width: 100%;
+      height: calc(100% - 32px);
+      padding: 10px;
+      box-sizing: border-box;
+      background: #0f2418;
+      overflow: auto;
+      display: block;
+      color: #f8fafc;
+      font-family: "Baloo 2", "Inter", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.4;
+      outline: none;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
     .image-window img {
       max-width: 100%;
       max-height: 100%;
@@ -496,6 +522,67 @@
       box-shadow: 0 6px 18px rgba(0,0,0,0.3);
     }
 
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 2px solid #0ea5e9;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      font-size: 14px;
+      z-index: 60;
+      opacity: 0;
+      animation: fadeToast 3s ease forwards;
+    }
+    @keyframes fadeToast {
+      0% { opacity: 0; transform: translateY(6px); }
+      10% { opacity: 1; transform: translateY(0); }
+      80% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(6px); }
+    }
+
+    .kusc-player {
+      position: fixed;
+      bottom: 80px;
+      right: 16px;
+      z-index: 55;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.7);
+      color: #e5e7eb;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 2px solid #0ea5e9;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+      pointer-events: auto;
+    }
+    .kusc-player button {
+      width: auto;
+      height: auto;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      border: 2px solid #0ea5e9;
+      background: #0b1a12;
+      color: #e5e7eb;
+    }
+
+    .toolbar-sep {
+      width: 70%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.12);
+      margin: 6px 0;
+    }
+    body.toolbar-top .toolbar .toolbar-sep {
+      width: 1px;
+      height: 70%;
+      margin: 0 6px;
+    }
+
     .settings-footer button.active {
       background: #7c3aed;
       border-color: #c084fc;
@@ -514,12 +601,21 @@
           <path d="M22 40 32 50c2 2 6 2 8 0l6-6" fill="none" stroke="#be185d" stroke-width="4" stroke-linecap="round"/>
         </svg>
       </button>
+      <button id="image-tool" title="Image tool (5)">
+        <svg class="icon-window" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="3" ry="3" fill="#0ea5e9" stroke="#0c4a6e" stroke-width="2"/>
+          <line x1="3" y1="9" x2="21" y2="9" stroke="#0c4a6e" stroke-width="2"/>
+          <line x1="12" y1="9" x2="12" y2="20" stroke="#0c4a6e" stroke-width="2"/>
+        </svg>
+      </button>
+      <div class="toolbar-sep"></div>
       <button id="undo" title="Undo (Tab)">↩️</button>
       <button id="redo" title="Redo (~)">↪️</button>
       <button id="bomb" title="Bomb (Space)">💣</button>
+      <div class="toolbar-sep"></div>
+      <button id="timer-btn" title="Add timer (Alt+1-9/0, 6)">⏱️</button>
+      <button id="radio-btn" title="KUSC Radio">📻</button>
       <button id="toolbar-settings" title="Toolbar settings">⚙️</button>
-      <button id="timer-btn" title="Add timer (Alt+1-9/0)">⏱️</button>
-      <button id="image-tool" title="Image tool">🗔</button>
     </nav>
 
     <section class="canvas-wrap" id="canvas-wrap">
@@ -543,6 +639,7 @@
     const stabilizedSmoothing = 0.95;
 
     const resize = () => {
+      autoToolbarSize();
       const { clientWidth, clientHeight } = wrap;
       canvas.width = clientWidth * dpr;
       canvas.height = clientHeight * dpr;
@@ -581,7 +678,7 @@
     atrament.color = penSettings['pen-1'].color;
     atrament.mode = MODE_DRAW;
     let eraserSettings = { weight: 64, deleteWhole: true };
-    const toolbarSettings = { position: 'right', size: 84 };
+    const toolbarSettings = { position: 'right', size: 60, userSize: false };
     const backgroundSettings = { mode: 'plain', color: '#4ab578' };
     const textSettings = { color: '#ffffff', size: 32 };
     const timers = [];
@@ -594,18 +691,29 @@
     document.body.appendChild(imageDock);
     let imageMode = 'window'; // 'window' | 'paste'
     let imageActive = false;
+    let imageWindowId = 1;
+    const imageWindows = [];
+    let lastClipboardImage = null;
+    let lastClipboardText = '';
+    const toastContainer = document.createElement('div');
+    document.body.appendChild(toastContainer);
+    let radioAudio = null;
+    let radioOn = false;
+    let radioVolume = 0.4;
+    let radioPauseWhenTimer = false;
 
     const buttons = {
       pen1: document.getElementById('pen-1'),
       pen2: document.getElementById('pen-2'),
       pen3: document.getElementById('pen-3'),
       eraser: document.getElementById('eraser'),
+      image: document.getElementById('image-tool'),
+      radio: document.getElementById('radio-btn'),
       undo: document.getElementById('undo'),
       redo: document.getElementById('redo'),
       bomb: document.getElementById('bomb'),
       toolbar: document.getElementById('toolbar-settings'),
       timer: document.getElementById('timer-btn'),
-      image: document.getElementById('image-tool'),
     };
 
     // History (undo/redo) using image snapshots
@@ -709,6 +817,7 @@
       atrament.color = settings.color;
       syncStrokeSettings();
       setActive('pen', pen);
+      updateImageToolButton();
     };
 
     const useEraser = () => {
@@ -718,6 +827,7 @@
       atrament.eraseMode = 'eraseStroke';
       syncStrokeSettings();
       setActive('eraser');
+      updateImageToolButton();
     };
 
     const bomb = () => {
@@ -773,7 +883,25 @@
 
     const getExtras = (pen = currentPen) => penExtras[pen.id] ?? (penExtras[pen.id] = defaultExtras());
 
+    const autoToolbarSize = () => {
+      if (toolbarSettings.userSize) return;
+      if (document.body.classList.contains('toolbar-top')) return;
+      const toolbarEl = document.querySelector('.toolbar');
+      if (!toolbarEl) return;
+      const buttonCount = toolbarEl.querySelectorAll('button').length;
+      const sepCount = toolbarEl.querySelectorAll('.toolbar-sep').length;
+      const padding = 14 * 2;
+      const gap = 10;
+      const sepHeight = 13;
+      const available = window.innerHeight - 12;
+      const size = Math.max(44, Math.min(84, Math.floor((available - padding - gap * (buttonCount - 1) - sepHeight * sepCount) / buttonCount)));
+      toolbarSettings.size = size;
+    };
+
     const applyToolbarSettings = () => {
+      if (!toolbarSettings.userSize && toolbarSettings.position !== 'top') {
+        autoToolbarSize();
+      }
       const { position, size } = toolbarSettings;
       document.documentElement.style.setProperty('--btn-size', `${size}px`);
       document.documentElement.style.setProperty('--toolbar-span', `${size + 36}px`);
@@ -789,7 +917,11 @@
       const btn = buttons.image;
       if (!btn) return;
       if (!imageActive) {
-        btn.textContent = '🗔';
+        btn.innerHTML = `<svg class="icon-window" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="3" ry="3" fill="#0ea5e9" stroke="#0c4a6e" stroke-width="2"/>
+          <line x1="3" y1="9" x2="21" y2="9" stroke="#0c4a6e" stroke-width="2"/>
+          <line x1="12" y1="9" x2="12" y2="20" stroke="#0c4a6e" stroke-width="2"/>
+        </svg>`;
         btn.title = 'Image tool';
         btn.classList.remove('active');
         return;
@@ -798,7 +930,11 @@
         btn.innerHTML = `<svg class="icon-crosshair" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="2.5" fill="#ef4444"/></svg>`;
         btn.title = 'Image paste mode (click canvas to paste from clipboard)';
       } else {
-        btn.textContent = '🗔';
+        btn.innerHTML = `<svg class="icon-window" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="3" ry="3" fill="#0ea5e9" stroke="#0c4a6e" stroke-width="2"/>
+          <line x1="3" y1="9" x2="21" y2="9" stroke="#0c4a6e" stroke-width="2"/>
+          <line x1="12" y1="9" x2="12" y2="20" stroke="#0c4a6e" stroke-width="2"/>
+        </svg>`;
         btn.title = 'Image window mode';
       }
       setActive('image');
@@ -1123,6 +1259,7 @@
       sizeInput.oninput = () => {
         const val = Number(sizeInput.value);
         toolbarSettings.size = val;
+        toolbarSettings.userSize = true;
         sizeLabel.textContent = `${val}px`;
         applyToolbarSettings();
       };
@@ -1188,15 +1325,10 @@
       settingsPanel.innerHTML = `
         <h3>Timer</h3>
         <div class="row" title="Minutes">
-          <input type="number" id="timer-minutes" min="1" max="480" value="${defaultMinutes}" placeholder="Minutes" inputmode="numeric" pattern="[0-9]*" style="width:100%;border-radius:14px;padding:14px 12px;border:2px solid #16462e;background:#0b1a12;color:#e5e7eb;font-size:24px;text-align:center;">
+          <input type="number" id="timer-minutes" min="0.1" max="480" step="0.1" value="${defaultMinutes}" placeholder="Minutes" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" style="width:100%;border-radius:14px;padding:14px 12px;border:2px solid #16462e;background:#0b1a12;color:#e5e7eb;font-size:24px;text-align:center;">
         </div>
         <div class="row" title="Name">
           <input type="text" id="timer-name" placeholder="Label (optional)" style="width:100%;border-radius:12px;padding:10px 12px;border:2px solid #16462e;background:#0b1a12;color:#e5e7eb;">
-        </div>
-        <div class="row">
-          <label style="display:flex;align-items:center;gap:8px;">
-            <input type="checkbox" id="timer-loop"> Loop alarm
-          </label>
         </div>
         <div class="row" title="Quick">
           <div class="settings-grid" id="timer-presets" style="grid-template-columns: repeat(5, 1fr);"></div>
@@ -1209,6 +1341,16 @@
           </div>
         </div>
         <div class="row">
+          <label style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="timer-loop"> Loop alarm
+          </label>
+        </div>
+        <div class="row">
+          <label style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="timer-grow"> Gradual increase mode
+          </label>
+        </div>
+        <div class="row">
           <button id="add-timer-btn" style="width:100%;">Start timer</button>
         </div>
       `;
@@ -1217,10 +1359,10 @@
       const presetGrid = document.getElementById('timer-presets');
       const minsInput = document.getElementById('timer-minutes');
       minsInput.addEventListener('input', () => {
-        minsInput.value = minsInput.value.replace(/[^0-9]/g, '');
+        minsInput.value = minsInput.value.replace(/[^0-9.]/g, '');
       });
       minsInput.addEventListener('blur', () => {
-        const v = Math.max(1, Math.min(480, Number(minsInput.value) || defaultMinutes));
+        const v = Math.max(0.1, Math.min(480, Number(minsInput.value) || defaultMinutes));
         minsInput.value = v;
       });
       presets.forEach(m => {
@@ -1239,6 +1381,7 @@
       const addBtn = document.getElementById('add-timer-btn');
       const nameInput = document.getElementById('timer-name');
       const loopInput = document.getElementById('timer-loop');
+      const growInput = document.getElementById('timer-grow');
       let alarmSelection = 'beep';
 
       const alarmToggle = document.getElementById('alarm-toggle');
@@ -1256,12 +1399,77 @@
       });
       paintAlarm();
       addBtn.onclick = () => {
-        const mins = Math.min(480, Math.max(1, Number(minsInput.value) || defaultMinutes));
+          const mins = Math.min(480, Math.max(0.1, Number(minsInput.value) || defaultMinutes));
         const label = nameInput.value.trim();
         const loop = loopInput.checked;
-        addTimer(mins, label, loop, alarmSelection);
+        const grow = growInput.checked;
+        addTimer(mins, label, loop, alarmSelection, grow);
         hideSettings();
       };
+    };
+
+    const renderRadioSettings = () => {
+      settingsPanel.innerHTML = `
+        <h3>KUSC Radio</h3>
+        <div class="row">
+          <button id="radio-toggle" style="width:100%;">${radioOn ? 'Pause' : 'Play'} stream</button>
+        </div>
+        <div class="row" title="Volume">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Volume</span><span id="radio-vol-label">${Math.round(radioVolume * 100)}%</span>
+          </div>
+          <input type="range" id="radio-vol" min="0" max="1" step="0.01" value="${radioVolume}">
+        </div>
+        <div class="row">
+      <label style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="radio-pause-timer" ${radioPauseWhenTimer ? 'checked' : ''}>
+        Pause when timer alarm rings
+      </label>
+        </div>
+      `;
+      const toggleBtn = document.getElementById('radio-toggle');
+      toggleBtn.onclick = () => {
+        toggleRadio();
+        renderRadioSettings();
+      };
+      const volInput = document.getElementById('radio-vol');
+      const volLabel = document.getElementById('radio-vol-label');
+      volInput.oninput = () => {
+        setRadioVolume(Number(volInput.value));
+      };
+      const pauseChk = document.getElementById('radio-pause-timer');
+      pauseChk.onchange = () => {
+        radioPauseWhenTimer = pauseChk.checked;
+      };
+    };
+
+    const renderImageSettings = () => {
+      settingsPanel.innerHTML = `
+        <h3>Image tool</h3>
+        <div class="row" title="Mode">
+          <div class="settings-grid" id="image-mode-grid" style="grid-template-columns: repeat(2, 1fr);"></div>
+        </div>
+      `;
+      const grid = document.getElementById('image-mode-grid');
+      const modes = [
+        { key: 'window', label: 'Window' },
+        { key: 'paste', label: 'Paste on click' },
+      ];
+      const paint = () => {
+        grid.innerHTML = '';
+        modes.forEach(m => {
+          const btn = document.createElement('button');
+          btn.textContent = m.label;
+          btn.classList.toggle('active', imageMode === m.key);
+          btn.onclick = () => {
+            imageMode = m.key;
+            paint();
+            updateImageToolButton();
+          };
+          grid.appendChild(btn);
+        });
+      };
+      paint();
     };
 
     const togglePenSettings = (pen) => {
@@ -1290,6 +1498,15 @@
       }
       settingsMode = 'toolbar';
       renderToolbarSettings();
+      showSettings();
+    };
+    const toggleImageSettings = () => {
+      if (settingsMode === 'image') {
+        hideSettings();
+        return;
+      }
+      settingsMode = 'image';
+      renderImageSettings();
       showSettings();
     };
 
@@ -1339,6 +1556,12 @@
       }
       updateImageToolButton();
     };
+    buttons.radio.onclick = () => {
+      flashButton(buttons.radio);
+      settingsMode = 'radio';
+      renderRadioSettings();
+      showSettings();
+    };
 
     const handleShapeDown = (e) => {
       if (!isShapeMode()) return;
@@ -1378,8 +1601,9 @@
       if (imageActive) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        const pos = getPointerPos(e);
-        const ok = await tryClipboardImage(pos);
+        const canvasPos = getPointerPos(e);
+        const screenPos = { x: e.clientX, y: e.clientY };
+        const ok = await tryClipboardImage(canvasPos, screenPos);
         if (!ok) {
           console.warn('No image in clipboard for image tool');
         }
@@ -1397,29 +1621,104 @@
     // Keyboard shortcuts
     let spacePanning = false;
     let shiftLineMode = false;
-    async function tryClipboardImage(targetPos) {
-      if (!navigator.clipboard?.read) return false;
-      try {
-        const items = await navigator.clipboard.read();
-        for (const item of items) {
-          const type = item.types.find(t => t.startsWith('image/'));
-          if (type) {
-            const blob = await item.getType(type);
-            if (targetPos) {
-              if (imageMode === 'paste') {
-                pasteImageBlobAt(blob, targetPos.x, targetPos.y, 'Clipboard image');
+    async function tryClipboardImage(targetPosCanvas, targetPosScreen) {
+      if (navigator.clipboard?.read) {
+        try {
+          const items = await navigator.clipboard.read();
+          for (const item of items) {
+            const type = item.types.find(t => t.startsWith('image/'));
+            if (type) {
+              const blob = await item.getType(type);
+              if (targetPosCanvas || targetPosScreen) {
+                if (imageMode === 'paste') {
+                  const pos = targetPosCanvas ?? { x: canvas.width / 2, y: canvas.height / 2 };
+                  pasteImageBlobAt(blob, pos.x, pos.y, 'Clipboard image');
+                } else {
+                  const pos = targetPosScreen ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+                  addImageWindowFromBlob(blob, 'Clipboard image', { x: pos.x, y: pos.y });
+                }
               } else {
-                addImageWindowFromBlob(blob, 'Clipboard image', { x: targetPos.x, y: targetPos.y });
+                addImageWindowFromBlob(blob, 'Clipboard image');
+              }
+              return true;
+            }
+            const textType = item.types.find(t => t === 'text/plain');
+            if (textType) {
+              const blob = await item.getType(textType);
+              const text = await blob.text();
+              if (text.trim()) {
+                lastClipboardText = text;
+                if (targetPosCanvas || targetPosScreen) {
+                  if (imageMode === 'paste') {
+                    const pos = targetPosCanvas ?? { x: canvas.width / 2, y: canvas.height / 2 };
+                    pasteTextAt(text, pos.x, pos.y);
+                  } else {
+                    const pos = targetPosScreen ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+                    addTextWindow(text, pos, 'Text');
+                  }
+                } else {
+                  addTextWindow(text, null, 'Text');
+                }
+                return true;
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('Clipboard read not available', err);
+        }
+      }
+      if (navigator.clipboard?.readText) {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text.trim()) {
+            lastClipboardText = text;
+            if (targetPosCanvas || targetPosScreen) {
+              if (imageMode === 'paste') {
+                const pos = targetPosCanvas ?? { x: canvas.width / 2, y: canvas.height / 2 };
+                pasteTextAt(text, pos.x, pos.y);
+              } else {
+                const pos = targetPosScreen ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+                addTextWindow(text, pos, 'Text');
               }
             } else {
-              addImageWindowFromBlob(blob, 'Clipboard image');
+              addTextWindow(text, null, 'Text');
             }
             return true;
           }
+        } catch (err) {
+          console.warn('Clipboard readText failed', err);
         }
-      } catch (err) {
-        console.warn('Clipboard read not available', err);
       }
+      // fallback to last stored
+      if (lastClipboardImage) {
+        if (targetPosCanvas || targetPosScreen) {
+          if (imageMode === 'paste') {
+            const pos = targetPosCanvas ?? { x: canvas.width / 2, y: canvas.height / 2 };
+            pasteImageBlobAt(lastClipboardImage, pos.x, pos.y, 'Clipboard image');
+          } else {
+            const pos = targetPosScreen ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            addImageWindowFromBlob(lastClipboardImage, 'Clipboard image', { x: pos.x, y: pos.y });
+          }
+        } else {
+          addImageWindowFromBlob(lastClipboardImage, 'Clipboard image');
+        }
+        return true;
+      }
+      if (lastClipboardText) {
+        if (targetPosCanvas || targetPosScreen) {
+          if (imageMode === 'paste') {
+            const pos = targetPosCanvas ?? { x: canvas.width / 2, y: canvas.height / 2 };
+            pasteTextAt(lastClipboardText, pos.x, pos.y);
+          } else {
+            const pos = targetPosScreen ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            addTextWindow(lastClipboardText, pos, 'Text');
+          }
+        } else {
+          addTextWindow(lastClipboardText, null, 'Text');
+        }
+        return true;
+      }
+      showToast('Nothing on clipboard');
       return false;
     }
 
@@ -1429,10 +1728,10 @@
       if ((e.metaKey || e.ctrlKey) && (e.key?.toLowerCase?.() === 'v')) {
         void tryClipboardImage();
       }
-      if (e.altKey) {
+      if (e.shiftKey) {
         if (code === 'Digit0') {
           e.preventDefault();
-          const mins = Math.max(1, Math.floor(Math.random() * 60) + 1);
+          const mins = Math.max(0.1, Math.floor(Math.random() * 60) + 1);
           addTimer(mins, '', false, 'beep');
           return;
         }
@@ -1457,6 +1756,15 @@
         usePen(pens[2]);
       } else if (code === 'Digit4') {
         useEraser();
+      } else if (code === 'Digit5') {
+        imageActive = true;
+        imageMode = 'window';
+        updateImageToolButton();
+      } else if (code === 'Digit6') {
+        flashButton(buttons.timer);
+        settingsMode = 'timer';
+        renderTimerSettings();
+        showSettings();
       } else if (code === 'KeyQ') {
         if (!isEraser) {
           const extras = getExtras();
@@ -1514,7 +1822,9 @@
           syncStrokeSettings();
         }
       } else if (code === 'KeyG') {
-        if (isEraser) {
+        if (imageActive) {
+          toggleImageSettings();
+        } else if (isEraser) {
           toggleEraserSettings();
         } else {
           const idx = pens.findIndex(p => p.id === currentPen.id);
@@ -1522,20 +1832,36 @@
           else if (idx === 1) togglePenSettings(pens[1]);
           else if (idx === 2) togglePenSettings(pens[2]);
         }
-      } else if (code === 'KeyE') {
-        if (!isEraser) {
-          const extras = getExtras();
-          extras.shape = 'circle';
-          paintButtons();
-          syncStrokeSettings();
+      } else if (code === 'Digit6') {
+        flashButton(buttons.timer);
+        settingsMode = 'timer';
+        renderTimerSettings();
+        showSettings();
+      } else if (code === 'KeyC' && e.shiftKey && !isEraser) {
+        const randomColor = '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+        penSettings[currentPen.id].color = randomColor;
+        usePen(currentPen);
+        paintButtons();
+      } else if (code === 'KeyD' && e.shiftKey && !isEraser) {
+        penSettings[currentPen.id].weight = Math.min(48, (penSettings[currentPen.id].weight || 8) + 1);
+        usePen(currentPen);
+      } else if (code === 'KeyF' && e.shiftKey && !isEraser) {
+        penSettings[currentPen.id].weight = Math.max(2, (penSettings[currentPen.id].weight || 8) - 1);
+        usePen(currentPen);
+      } else if ((e.key === '+' || e.key === '=' )) {
+        setRadioVolume(radioVolume + 0.1);
+      } else if ((e.key === '-' || e.key === '_')) {
+        setRadioVolume(radioVolume - 0.1);
+      } else if (code === 'Delete' && imageActive) {
+        closeTopImageWindow();
+        return;
+      } else if ((code === 'KeyM' || code === 'KeyN') && imageActive) {
+        if (code === 'KeyM') {
+          closeTopImageWindow();
+        } else {
+          closeAllImageWindows();
         }
-      } else if (code === 'KeyR') {
-        if (!isEraser) {
-          const extras = getExtras();
-          extras.shape = 'outline-rect';
-          paintButtons();
-          syncStrokeSettings();
-        }
+        return;
       } else if (code === 'Tab') {
         e.preventDefault();
         undo();
@@ -1634,11 +1960,219 @@
       ctx.restore();
     }
 
+    function pasteTextAt(text, x, y) {
+      if (!text) return;
+      pushState();
+      const color = textSettings.color || '#ffffff';
+      const sizePx = (textSettings.size || 32) * dpr;
+      const lines = text.split(/\r?\n/);
+      const lineHeight = sizePx * 1.3;
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.font = `${sizePx}px "Baloo 2", "Inter", system-ui, sans-serif`;
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'center';
+      let maxWidth = 0;
+      lines.forEach(line => { maxWidth = Math.max(maxWidth, ctx.measureText(line).width); });
+      const padding = 12 * dpr;
+      const boxWidth = maxWidth + padding * 2;
+      const boxHeight = lineHeight * lines.length + padding * 1.2;
+      const boxX = x - boxWidth / 2;
+      const boxY = y - boxHeight / 2;
+      const radius = 12 * dpr;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+      ctx.beginPath();
+      ctx.moveTo(boxX + radius, boxY);
+      ctx.lineTo(boxX + boxWidth - radius, boxY);
+      ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+      ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+      ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+      ctx.lineTo(boxX + radius, boxY + boxHeight);
+      ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+      ctx.lineTo(boxX, boxY + radius);
+      ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = color;
+      lines.forEach((line, idx) => {
+        ctx.fillText(line, x, boxY + padding * 0.6 + idx * lineHeight);
+      });
+      ctx.restore();
+    }
+
+    function addTextWindow(text, pos = null, label = 'Text') {
+      const id = imageWindowId++;
+      const win = document.createElement('div');
+      win.className = 'image-window';
+      win.classList.add('text-window');
+      win.dataset.id = String(id);
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = label;
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const mini = document.createElement('div');
+      mini.className = 'mini';
+      mini.textContent = '–';
+      const close = document.createElement('div');
+      close.className = 'close';
+      close.textContent = '×';
+      const body = document.createElement('div');
+      body.className = 'body';
+      const textDiv = document.createElement('div');
+      textDiv.className = 'text-body';
+      textDiv.contentEditable = 'true';
+      textDiv.innerHTML = text.replace(/</g, '&lt;').replace(/\n/g, '<br>');
+      textDiv.addEventListener('input', () => {
+        record.text = textDiv.innerText;
+      });
+      body.appendChild(textDiv);
+      actions.appendChild(mini);
+      actions.appendChild(close);
+      title.appendChild(actions);
+      win.appendChild(title);
+      win.appendChild(body);
+      imageLayer.appendChild(win);
+      const viewportW = window.innerWidth;
+      const viewportH = window.innerHeight;
+      const w = Math.min(360, viewportW * 0.45);
+      const h = Math.min(260, viewportH * 0.4);
+      win.style.width = `${w}px`;
+      win.style.height = `${h}px`;
+      if (pos) {
+        win.style.left = `${pos.x - w / 2}px`;
+        win.style.top = `${pos.y - h / 2}px`;
+      } else {
+        win.style.left = `${(viewportW - w) / 2}px`;
+        win.style.top = `${(viewportH - h) / 2}px`;
+      }
+
+      let dragging = false;
+      let offsetX = 0, offsetY = 0;
+      title.addEventListener('pointerdown', (ev) => {
+        dragging = true;
+        offsetX = ev.clientX - win.offsetLeft;
+        offsetY = ev.clientY - win.offsetTop;
+        ev.preventDefault();
+      });
+      window.addEventListener('pointermove', (ev) => {
+        if (!dragging) return;
+        win.style.left = `${ev.clientX - offsetX}px`;
+        win.style.top = `${ev.clientY - offsetY}px`;
+      });
+      window.addEventListener('pointerup', () => { dragging = false; });
+
+      const record = { id, win, dock: null, url: null, text };
+      const dockIcon = document.createElement('div');
+      dockIcon.className = 'dock-icon';
+      dockIcon.textContent = label.slice(0, 8) || 'text';
+      dockIcon.onclick = () => {
+        dockIcon.remove();
+        win.style.display = 'block';
+        record.dock = null;
+      };
+      mini.onclick = () => {
+        win.style.display = 'none';
+        imageDock.appendChild(dockIcon);
+        record.dock = dockIcon;
+      };
+      close.onclick = () => {
+        win.remove();
+        dockIcon.remove();
+        const idx = imageWindows.findIndex(r => r.id === id);
+        if (idx >= 0) imageWindows.splice(idx, 1);
+      };
+      textDiv.addEventListener('focus', () => record.text = textDiv.innerText);
+      textDiv.addEventListener('blur', () => record.text = textDiv.innerText);
+      imageWindows.push(record);
+    }
+
     function formatTime(ms) {
       const totalSec = Math.max(0, Math.floor(ms / 1000));
       const m = Math.floor(totalSec / 60);
       const s = totalSec % 60;
       return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+    function formatOverrun(ms) {
+      const totalSec = Math.max(0, Math.floor(ms / 1000));
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return `+${m}:${s.toString().padStart(2, '0')}`;
+    }
+    function randomFractalText() {
+      const pieces = ['~', '*', '^', '/', '\\\\', '≈', '·', '°'];
+      const len = 6 + Math.floor(Math.random() * 6);
+      let out = '';
+      for (let i = 0; i < len; i++) {
+        out += pieces[Math.floor(Math.random() * pieces.length)];
+      }
+      return out;
+    }
+
+    let wordList = [];
+    fetch('unix-words.txt')
+      .then(r => r.text())
+      .then(t => {
+        wordList = t.split(/\s+/).filter(Boolean);
+      })
+      .catch(() => {
+        wordList = [];
+      });
+    function randomWord(seedOffset = 0) {
+      if (wordList.length === 0) {
+        const fallback = ['time','flows','quiet','soft','beyond','calm','river','clock','whisper','pattern'];
+        return fallback[Math.floor(Math.random() * fallback.length)];
+      }
+      const idx = Math.abs(Math.floor(Math.random() * wordList.length) + seedOffset) % wordList.length;
+      return wordList[idx];
+    }
+    function buildSentence(seed) {
+      const len = 5 + (seed % 6);
+      const parts = [];
+      for (let i = 0; i < len; i++) {
+        parts.push(randomWord(seed + i));
+      }
+      parts[0] = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+      return parts.join(' ') + '.';
+    }
+
+    function hashWordToIndex(word) {
+      let h = 0;
+      for (let i = 0; i < word.length; i++) {
+        h = (h * 31 + word.charCodeAt(i)) >>> 0;
+      }
+      return h;
+    }
+    function getWordByIndex(idx) {
+      if (!wordList.length) return 'time';
+      return wordList[idx % wordList.length];
+    }
+    function updateFractalWords(timer) {
+      if (!timer.elements?.time) return;
+      const card = timer.elements.card;
+      const textEl = timer.elements.time;
+      let fontSize = Math.max(12, Math.min(48, card.clientHeight / 2));
+      textEl.style.fontSize = `${fontSize}px`;
+      const seedBase = wordList.length ? Math.floor(Math.random() * wordList.length) : Math.floor(Math.random() * 1000);
+      let nextWord;
+      if (!timer.currentWord) {
+        nextWord = getWordByIndex(seedBase);
+      } else {
+        const idx = hashWordToIndex(timer.currentWord) + seedBase;
+        nextWord = getWordByIndex(idx);
+      }
+      timer.currentWord = nextWord;
+      textEl.textContent = nextWord;
+      textEl.style.color = '#ef4444';
+      // shrink-to-fit
+      const pad = 12;
+      const maxWidth = card.clientWidth - pad;
+      const maxHeight = card.clientHeight - pad;
+      while ((textEl.scrollWidth > maxWidth || textEl.scrollHeight > maxHeight) && fontSize > 10) {
+        fontSize -= 1;
+        textEl.style.fontSize = `${fontSize}px`;
+      }
+      timer.wordCount = 1;
     }
 
     function playBeep(loop) {
@@ -1700,7 +2234,7 @@
       timerLane.innerHTML = '';
       timers.forEach(t => {
         const card = document.createElement('div');
-        card.className = 'timer-card' + (t.finished ? ' finished' : '') + (t.minimized ? ' minimized' : '');
+        card.className = 'timer-card' + (t.finished ? ' finished' : '') + (t.minimized ? ' minimized' : '') + (t.grow ? ' grow-mode' : '');
         card.style.position = 'relative';
         const name = document.createElement('div');
         name.className = 'name';
@@ -1721,7 +2255,7 @@
         card.appendChild(remove);
         card.appendChild(time);
         timerLane.appendChild(card);
-        t.elements = { time, card };
+        t.elements = { time, card, baseW: t.baseW, baseH: t.baseH };
 
         card.addEventListener('click', (ev) => {
           if (ev.target === remove) return;
@@ -1731,7 +2265,7 @@
       });
     }
 
-    function addTimer(mins, name, loop, alarmType = 'beep') {
+    function addTimer(mins, name, loop, alarmType = 'beep', grow = false) {
       const now = Date.now();
       const duration = mins * 60 * 1000;
       const defaultLabel = `${mins} min`;
@@ -1749,21 +2283,54 @@
         alarmType,
         audio: null,
         minimized: !hasCustomLabel,
+        grow,
+        finishedAt: null,
+        baseW: null,
+        baseH: null,
+        wordCount: 0,
+        currentWord: null,
+        words: [],
       };
       timer.interval = setInterval(() => {
         const left = timer.end - Date.now();
         timer.remaining = Math.max(0, left);
-        if (timer.elements) {
+        if (timer.elements && !(timer.finished && timer.grow)) {
           timer.elements.time.textContent = formatTime(timer.remaining);
         }
         if (timer.remaining <= 0 && !timer.finished) {
           timer.finished = true;
+          timer.finishedAt = Date.now();
           if (timer.elements) {
             timer.elements.card.classList.add('finished');
+            timer.baseW = timer.elements.card.offsetWidth;
+            timer.baseH = timer.elements.card.offsetHeight;
+            if (timer.grow) {
+              timer.elements.time.style.animation = 'none';
+              timer.elements.time.style.color = '#ef4444';
+            }
           }
           playAlarm(timer.alarmType, timer.loop, timer);
-          if (!timer.loop) {
-            clearInterval(timer.interval);
+          if (radioPauseWhenTimer && radioOn) {
+            radioOn = false;
+            radioAudio?.pause();
+            updateRadioButton();
+          }
+        } else if (timer.finished) {
+          const overrun = Date.now() - timer.end;
+          if (timer.grow && timer.elements?.card) {
+            const elapsedSec = timer.finishedAt ? Math.floor((Date.now() - timer.finishedAt) / 1000) : 0;
+            if (elapsedSec % 3 === 0) {
+              const ticks = Math.floor(elapsedSec / 3);
+              const newW = Math.min((timer.baseW || 0) + ticks * 3, 360);
+              const newH = Math.min((timer.baseH || 0) + ticks * 3, 300);
+              timer.elements.card.style.width = `${newW}px`;
+              timer.elements.card.style.height = `${newH}px`;
+              if (ticks > timer.wordCount) {
+                updateFractalWords(timer);
+              }
+            }
+          } else if (timer.elements) {
+            timer.elements.time.textContent = formatOverrun(overrun);
           }
         }
       }, 500);
@@ -1772,9 +2339,13 @@
     }
 
     function addImageWindowFromBlob(blob, label = 'Pasted image', pos = null) {
-      const url = URL.createObjectURL(blob);
+      if (blob && blob.size) lastClipboardImage = blob;
+      const url = blob && blob.size ? URL.createObjectURL(blob) : '';
+      const id = imageWindowId++;
       const win = document.createElement('div');
       win.className = 'image-window';
+      win.dataset.id = String(id);
+      win.dataset.url = url;
       const title = document.createElement('div');
       title.className = 'title';
       title.textContent = label;
@@ -1829,27 +2400,123 @@
       });
       window.addEventListener('pointerup', () => { dragging = false; });
 
+      const record = { id, win, dock: null, url };
+
       const dockIcon = document.createElement('div');
       dockIcon.className = 'dock-icon';
       dockIcon.textContent = label.slice(0, 8) || 'img';
       dockIcon.onclick = () => {
         dockIcon.remove();
         win.style.display = 'block';
+        record.dock = null;
       };
 
       mini.onclick = () => {
         win.style.display = 'none';
         imageDock.appendChild(dockIcon);
+        record.dock = dockIcon;
       };
 
       close.onclick = () => {
-        URL.revokeObjectURL(url);
+        if (url) URL.revokeObjectURL(url);
         win.remove();
         dockIcon.remove();
+        const idx = imageWindows.findIndex(r => r.id === id);
+        if (idx >= 0) imageWindows.splice(idx, 1);
       };
+
+      imageWindows.push(record);
+    }
+
+    function closeTopImageWindow() {
+      const target = [...imageWindows].reverse().find(r => r.win?.isConnected || r.dock?.isConnected);
+      if (!target) return;
+      if (target.url) URL.revokeObjectURL(target.url);
+      target.win?.remove();
+      target.dock?.remove();
+      const idx = imageWindows.findIndex(r => r.id === target.id);
+      if (idx >= 0) imageWindows.splice(idx, 1);
+    }
+
+    function closeAllImageWindows() {
+      while (imageWindows.length) {
+        const rec = imageWindows.pop();
+        if (rec?.url) URL.revokeObjectURL(rec.url);
+        rec?.win?.remove();
+        rec?.dock?.remove();
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      toastContainer.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    const KUSC_STREAMS = [
+      'https://playerservices.streamtheworld.com/api/livestream-redirect/KUSCAAC96.aac',
+      'https://playerservices.streamtheworld.com/api/livestream-redirect/KUSCAAC32.aac',
+      'https://96.aac.pls.kusc.live',
+    ];
+    function ensureRadio() {
+      if (!radioAudio) {
+        radioAudio = new Audio();
+        radioAudio.crossOrigin = 'anonymous';
+        radioAudio.volume = radioVolume;
+      }
+    }
+    function toggleRadio() {
+      ensureRadio();
+      radioOn = !radioOn;
+      if (radioOn) {
+        let idx = 0;
+        const tryPlay = () => {
+          if (idx >= KUSC_STREAMS.length) {
+            radioOn = false;
+            showToast('Unable to start radio');
+            updateRadioButton();
+            return;
+          }
+          radioAudio.src = KUSC_STREAMS[idx++];
+          radioAudio.play().then(() => {
+            radioAudio.loop = false;
+          }).catch(() => {
+            tryPlay();
+          });
+        };
+        tryPlay();
+      } else {
+        radioAudio.pause();
+      }
+      updateRadioButton();
+    }
+
+    function setRadioVolume(vol) {
+      radioVolume = Math.max(0.01, Math.min(1, vol));
+      ensureRadio();
+      radioAudio.volume = radioVolume;
+      const volLabel = document.getElementById('radio-vol-label');
+      const volInput = document.getElementById('radio-vol');
+      if (volLabel) volLabel.textContent = `${Math.round(radioVolume * 100)}%`;
+      if (volInput) volInput.value = radioVolume;
+    }
+
+    function updateRadioButton() {
+      const btn = buttons.radio;
+      if (!btn) return;
+      if (radioOn) {
+        btn.innerHTML = '<span aria-hidden="true">📻🔊</span>';
+        btn.title = 'KUSC Radio (playing)';
+      } else {
+        btn.innerHTML = '<span aria-hidden="true">📻</span>';
+        btn.title = 'KUSC Radio';
+      }
     }
 
     function pasteImageBlobAt(blob, x, y, label = 'Clipboard image') {
+      lastClipboardImage = blob;
       const img = new Image();
       img.onload = () => {
         pushState();
@@ -1868,19 +2535,42 @@
     window.addEventListener('paste', (e) => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       const items = e.clipboardData?.items || [];
+      let handled = false;
       for (const item of items) {
         if (item.type?.startsWith('image/')) {
           const blob = item.getAsFile();
           if (!blob) continue;
+          lastClipboardImage = blob;
+          const rect = canvas.getBoundingClientRect();
+          const centerCanvas = { x: rect.width / 2, y: rect.height / 2 };
           if (imageMode === 'paste') {
-            const rect = canvas.getBoundingClientRect();
-            pasteImageBlobAt(blob, rect.width / 2, rect.height / 2, 'Clipboard image');
+            pasteImageBlobAt(blob, centerCanvas.x, centerCanvas.y, 'Clipboard image');
+          } else if (imageActive) {
+            addImageWindowFromBlob(blob, 'Clipboard image', { x: rect.width / 2, y: rect.height / 2 });
           } else {
             addImageWindowFromBlob(blob);
           }
+          handled = true;
+          break;
+        } else if (item.type === 'text/plain') {
+          item.getAsString(text => {
+            if (!text) return;
+            lastClipboardText = text;
+            const rect = canvas.getBoundingClientRect();
+            const centerCanvas = { x: rect.width / 2, y: rect.height / 2 };
+            if (imageMode === 'paste') {
+              pasteTextAt(text, centerCanvas.x, centerCanvas.y);
+            } else if (imageActive) {
+              addTextWindow(text, { x: rect.width / 2, y: rect.height / 2 }, 'Text');
+            } else {
+              addTextWindow(text, null, 'Text');
+            }
+          });
+          handled = true;
           break;
         }
       }
+      if (!handled) showToast('Nothing on clipboard');
     });
     function getCss(varName) {
       return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
@@ -1898,7 +2588,11 @@
     applyToolbarSettings();
     applyBackgroundSettings();
     paintButtons();
+    autoToolbarSize();
+    applyToolbarSettings();
+    paintButtons();
     updateImageToolButton();
+    updateRadioButton();
     requestAnimationFrame(() => usePen(pens[0])); // ensure default pen is active on load
     window.addEventListener('resize', resize);
     resize();
