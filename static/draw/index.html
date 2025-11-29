@@ -14,7 +14,7 @@
       --text: #e5e7eb;
       --pen1: #ffffff;
       --pen2: #fcd34d;
-      --pen3: #f472b6;
+      --pen3: #ffb3b3;
       --btn-size: 56px;
       --toolbar-span: 92px;
     }
@@ -70,34 +70,15 @@
         "toolbar"
         "canvas";
     }
-    body.toolbar-bottom main {
-      grid-template-columns: 1fr;
-      grid-template-rows: 1fr var(--toolbar-span);
-      grid-template-areas:
-        "canvas"
-        "toolbar";
-    }
-    body.toolbar-top .toolbar,
-    body.toolbar-bottom .toolbar {
+    body.toolbar-top .toolbar {
       flex-direction: row;
-      justify-content: flex-start;
+      justify-content: center;
       width: 100%;
       height: var(--toolbar-span);
       border-right: none;
       border-bottom: 1px solid var(--border);
       box-shadow: 0 6px 24px var(--shadow);
     }
-    body.toolbar-bottom .toolbar {
-      border-bottom: none;
-      border-top: 1px solid var(--border);
-      box-shadow: 0 -6px 24px var(--shadow);
-    }
-    body.toolbar-top .pill,
-    body.toolbar-bottom .pill {
-      width: auto;
-      max-width: none;
-    }
-
     .canvas-wrap {
       position: relative;
       background: #0f2418;
@@ -123,7 +104,7 @@
       width: var(--btn-size);
       height: var(--btn-size);
       border-radius: 18px;
-      border: 2px solid transparent;
+      border: 3px solid transparent;
       background: #123222;
       color: #f8fafc;
       box-shadow: 0 8px 16px var(--shadow);
@@ -142,24 +123,73 @@
     }
 
     button.active {
-      border: 3px solid #f87171;
+      border: 4px solid #f87171;
       background: #16462e;
+    }
+
+    button.flash {
+      animation: flashPulse 180ms ease;
+    }
+    button svg {
+      width: 26px;
+      height: 26px;
+      pointer-events: none;
+    }
+
+    .icon-crosshair {
+      width: 22px;
+      height: 22px;
+    }
+
+    .pen-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      width: 100%;
+      height: 100%;
+      font-size: 18px;
+    }
+
+    .pen-chip {
+      width: 70%;
+      height: 70%;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px;
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .pen-icon .shape-box {
+      width: 22px;
+      height: 22px;
+      border: 2px solid currentColor;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    @keyframes flashPulse {
+      from {
+        box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.6);
+        transform: scale(0.98);
+      }
+      to {
+        box-shadow: 0 0 0 12px rgba(248, 113, 113, 0);
+        transform: scale(1);
+      }
     }
 
     .pen {
       color: #fff;
-    }
-
-    .pill {
-      font-size: 0.85rem;
-      font-weight: 700;
-      padding: 8px 12px;
-      border-radius: 12px;
-      background: #f1f5f9;
-      width: 100%;
-      max-width: calc(var(--toolbar-span) - 16px);
-      text-align: center;
-      box-shadow: 0 6px 12px var(--shadow);
     }
 
     .settings-panel {
@@ -259,6 +289,213 @@
       text-overflow: ellipsis;
     }
 
+    .timer-lane {
+      position: fixed;
+      top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 45;
+      pointer-events: none;
+    }
+    .timer-lane.right { right: 12px; left: auto; }
+    .timer-lane.left { left: 12px; right: auto; }
+    .timer-card {
+      pointer-events: auto;
+      min-width: 120px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 2px solid #0ea5e9;
+      color: #e5e7eb;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+      font-size: 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      row-gap: 4px;
+      column-gap: 6px;
+      align-items: center;
+    }
+    .timer-card .name {
+      grid-column: 1 / 2;
+      font-weight: 700;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .timer-card .remove {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #f87171;
+      color: #f87171;
+      font-size: 12px;
+      line-height: 16px;
+      text-align: center;
+      cursor: pointer;
+      padding: 0;
+      opacity: 0;
+      transition: opacity 120ms ease;
+    }
+    .timer-card:hover .remove {
+      opacity: 1;
+    }
+    .timer-card .time {
+      grid-column: 1 / 3;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    .timer-card.finished .time {
+      animation: blink 0.8s step-start infinite;
+    }
+    .timer-card.minimized {
+      grid-template-columns: 1fr;
+      padding: 8px 10px;
+      min-width: 90px;
+    }
+    .timer-card.minimized .name {
+      display: none;
+    }
+    .timer-card.minimized .time {
+      grid-column: 1 / 2;
+      font-size: 18px;
+    }
+    @keyframes blink {
+      0% { color: #f87171; }
+      50% { color: #0ea5e9; }
+      100% { color: #f87171; }
+    }
+
+    .image-overlay-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+    .image-window {
+      position: absolute;
+      border: 2px solid #0ea5e9;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+      overflow: hidden;
+      resize: both;
+      min-width: 120px;
+      min-height: 120px;
+      pointer-events: auto;
+    }
+    .image-window .title {
+      background: rgba(14, 165, 233, 0.2);
+      padding: 6px 10px;
+      color: #e5e7eb;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: move;
+      user-select: none;
+    }
+    .image-window .title .actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .image-window .mini,
+    .image-window .close {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid #0ea5e9;
+      color: #e5e7eb;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 120ms ease;
+    }
+    .image-window .close {
+      border-color: #f87171;
+      color: #f87171;
+    }
+    .image-window:hover .mini,
+    .image-window:hover .close {
+      opacity: 1;
+    }
+    .image-window .body {
+      width: 100%;
+      height: calc(100% - 32px);
+      display: grid;
+      place-items: center;
+      padding: 6px;
+      box-sizing: border-box;
+      background: #0b1a12;
+    }
+    .image-window img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .alarm-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 2px solid #16462e;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0b1a12;
+    }
+    .alarm-toggle button {
+      border: none;
+      background: transparent;
+      color: #e5e7eb;
+      padding: 10px 8px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+    .alarm-toggle button.active {
+      background: #0ea5e9;
+      color: #0b1a12;
+    }
+
+    .image-dock {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 8px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 51;
+    }
+    .dock-icon {
+      pointer-events: auto;
+      width: 72px;
+      height: 64px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.5);
+      border: 2px solid #0ea5e9;
+      display: grid;
+      place-items: center;
+      color: #e5e7eb;
+      font-size: 12px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    }
+
     .settings-footer button.active {
       background: #7c3aed;
       border-color: #c084fc;
@@ -268,16 +505,21 @@
 <body>
   <main>
     <nav class="toolbar" aria-label="Tools">
-      <div class="pill" id="active-label">Pen 1</div>
-      <button id="bg-btn" title="Toggle background">🧇</button>
       <button id="pen-1" class="pen" title="Pen 1 (1)">🖊️</button>
       <button id="pen-2" class="pen" title="Pen 2 (2)">🖋️</button>
       <button id="pen-3" class="pen" title="Pen 3 (3)">✒️</button>
-      <button id="eraser" title="Eraser (Space)">🧽</button>
-      <button id="undo" title="Undo (←)">↩️</button>
-      <button id="redo" title="Redo (→)">↪️</button>
-      <button id="bomb" title="Bomb (Delete)">💣</button>
+      <button id="eraser" title="Eraser (4)" aria-label="Eraser">
+        <svg class="icon-eraser" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M38 8 58 28c2 2 2 6 0 8l-16 16c-2 2-6 2-8 0L14 32c-2-2-2-6 0-8L30 8c2-2 6-2 8 0Z" fill="#f9a8d4" stroke="#be185d" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M22 40 32 50c2 2 6 2 8 0l6-6" fill="none" stroke="#be185d" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button id="undo" title="Undo (Tab)">↩️</button>
+      <button id="redo" title="Redo (~)">↪️</button>
+      <button id="bomb" title="Bomb (Space)">💣</button>
       <button id="toolbar-settings" title="Toolbar settings">⚙️</button>
+      <button id="timer-btn" title="Add timer (Alt+1-9/0)">⏱️</button>
+      <button id="image-tool" title="Image tool">🗔</button>
     </nav>
 
     <section class="canvas-wrap" id="canvas-wrap">
@@ -308,6 +550,9 @@
       canvas.style.height = '100%';
       atrament?.clear();
       restore(initialBlank);
+      atrament.color = penSettings[currentPen.id]?.color || getCss('--pen1') || '#ffffff';
+      atrament.mode = isEraser ? MODE_ERASE : MODE_DRAW;
+      syncStrokeSettings();
     };
 
     // Atrament setup
@@ -322,9 +567,9 @@
 
     // Pens and state
     const pens = [
-      { id: 'pen-1', color: getCss('--pen1') },
-      { id: 'pen-2', color: getCss('--pen2') },
-      { id: 'pen-3', color: getCss('--pen3') },
+      { id: 'pen-1', color: getCss('--pen1') || '#ffffff' },
+      { id: 'pen-2', color: getCss('--pen2') || '#fcd34d' },
+      { id: 'pen-3', color: getCss('--pen3') || '#ffb3b3' },
     ];
     let currentPen = pens[0];
     let isEraser = false;
@@ -333,12 +578,24 @@
       'pen-2': { color: pens[1].color, weight: 8 },
       'pen-3': { color: pens[2].color, weight: 8 },
     };
-    let eraserSettings = { weight: 18 };
-    const toolbarSettings = { position: 'left', size: 56 };
+    atrament.color = penSettings['pen-1'].color;
+    atrament.mode = MODE_DRAW;
+    let eraserSettings = { weight: 64, deleteWhole: true };
+    const toolbarSettings = { position: 'right', size: 84 };
+    const backgroundSettings = { mode: 'plain', color: '#4ab578' };
+    const textSettings = { color: '#ffffff', size: 32 };
+    const timers = [];
+    let timerIdCounter = 1;
+    const imageLayer = document.createElement('div');
+    imageLayer.className = 'image-overlay-layer';
+    document.body.appendChild(imageLayer);
+    const imageDock = document.createElement('div');
+    imageDock.className = 'image-dock';
+    document.body.appendChild(imageDock);
+    let imageMode = 'window'; // 'window' | 'paste'
+    let imageActive = false;
 
-    const label = document.getElementById('active-label');
     const buttons = {
-      bg: document.getElementById('bg-btn'),
       pen1: document.getElementById('pen-1'),
       pen2: document.getElementById('pen-2'),
       pen3: document.getElementById('pen-3'),
@@ -347,6 +604,8 @@
       redo: document.getElementById('redo'),
       bomb: document.getElementById('bomb'),
       toolbar: document.getElementById('toolbar-settings'),
+      timer: document.getElementById('timer-btn'),
+      image: document.getElementById('image-tool'),
     };
 
     // History (undo/redo) using image snapshots
@@ -368,30 +627,79 @@
     const initialBlank = snapshot();
 
     // Toolbar visuals
+    const typeIcons = { marker: '🖌️', fountain: '✒️' };
+    const shapeIcons = {
+      freehand: '≈≈',
+      line: '─',
+      arrow: '➜',
+      'filled-rect': '▮',
+      'outline-rect': '▢',
+      circle: '◯',
+      'filled-circle': '●',
+      triangle: '△',
+    };
+    const shapeHotkeys = {
+      freehand: 'Q',
+      line: 'W',
+      arrow: 'E',
+      'filled-rect': 'R',
+      'outline-rect': 'A',
+      circle: 'S',
+      'filled-circle': 'D',
+      triangle: 'F',
+    };
     const paintButtons = () => {
       pens.forEach((pen, idx) => {
         const btn = [buttons.pen1, buttons.pen2, buttons.pen3][idx];
         const color = penSettings[pen.id]?.color ?? pen.color;
-        btn.style.background = color;
-        btn.style.color = contrastColor(color);
+        const extras = getExtras(pen);
+        const hasShape = extras.shape !== 'freehand';
+        const icon = hasShape ? '' : (typeIcons[extras.type] ?? '🖊️');
+        const shape = hasShape ? (shapeIcons[extras.shape] ?? '') : '';
+        const contrast = contrastColor(color);
+        btn.style.background = '#123222';
+        btn.style.color = contrast;
+        btn.title = `${pen.id.replace('pen-', 'Pen ')} (${extras.type}, ${extras.shape})`;
+        btn.innerHTML = '';
+        const wrap = document.createElement('div');
+        wrap.className = 'pen-icon';
+        wrap.style.color = contrast;
+        const chip = document.createElement('div');
+        chip.className = 'pen-chip';
+        chip.style.background = color;
+        chip.style.color = contrast;
+        if (icon) {
+          const typeSpan = document.createElement('div');
+          typeSpan.textContent = icon;
+          chip.appendChild(typeSpan);
+        }
+        if (shape) {
+          const shapeBox = document.createElement('div');
+          shapeBox.className = 'shape-box';
+          shapeBox.textContent = shape;
+          chip.appendChild(shapeBox);
+        }
+        wrap.appendChild(chip);
+        btn.appendChild(wrap);
       });
     };
 
     const setActive = (mode, pen = currentPen) => {
-      [buttons.pen1, buttons.pen2, buttons.pen3, buttons.eraser].forEach(b => b.classList.remove('active'));
+      [buttons.pen1, buttons.pen2, buttons.pen3, buttons.eraser, buttons.image].forEach(b => b.classList.remove('active'));
       if (mode === 'eraser') {
         buttons.eraser.classList.add('active');
-        label.textContent = 'Eraser';
+      } else if (mode === 'image') {
+        buttons.image.classList.add('active');
       } else {
         const idx = pens.findIndex(p => p.id === pen.id);
         if (idx >= 0) [buttons.pen1, buttons.pen2, buttons.pen3][idx].classList.add('active');
-        label.textContent = `Pen ${idx + 1}`;
       }
     };
 
     // Tool actions
     const usePen = (pen) => {
       isEraser = false;
+      imageActive = false;
       currentPen = pen;
       atrament.mode = MODE_DRAW;
       const settings = penSettings[pen.id] ?? { color: pen.color, weight: 8 };
@@ -405,7 +713,9 @@
 
     const useEraser = () => {
       isEraser = true;
+      imageActive = false;
       atrament.mode = MODE_ERASE;
+      atrament.eraseMode = 'eraseStroke';
       syncStrokeSettings();
       setActive('eraser');
     };
@@ -443,11 +753,11 @@
       settingsPanel.style.display = 'block';
     };
 
-    const penTypeOptions = ['flat', 'round', 'polyline'];
-    const shapeOptions = ['freehand', 'line', 'arrow', 'filled-rect', 'outline-rect', 'circle'];
-    const toolbarPositions = ['left', 'right', 'top', 'bottom'];
+    const penTypeOptions = ['marker', 'fountain'];
+    const shapeOptions = ['freehand', 'line', 'arrow', 'filled-rect', 'outline-rect', 'circle', 'filled-circle', 'triangle'];
+    const toolbarPositions = ['left', 'right', 'top'];
     const defaultExtras = () => ({
-      type: 'round',
+      type: 'marker',
       shape: 'freehand',
       stabilization: true,
       pressure: true,
@@ -455,8 +765,11 @@
     });
     const penExtras = {};
     pens.forEach(p => { penExtras[p.id] = defaultExtras(); });
-    const shapeTools = ['line', 'arrow', 'filled-rect', 'outline-rect', 'circle'];
+    const shapeTools = ['line', 'arrow', 'filled-rect', 'outline-rect', 'circle', 'filled-circle', 'triangle'];
     const shapeState = { start: null, snapshot: null, active: false, extras: null };
+    const timerLane = document.createElement('div');
+    timerLane.className = 'timer-lane right';
+    document.body.appendChild(timerLane);
 
     const getExtras = (pen = currentPen) => penExtras[pen.id] ?? (penExtras[pen.id] = defaultExtras());
 
@@ -464,26 +777,68 @@
       const { position, size } = toolbarSettings;
       document.documentElement.style.setProperty('--btn-size', `${size}px`);
       document.documentElement.style.setProperty('--toolbar-span', `${size + 36}px`);
-      document.body.classList.remove('toolbar-left', 'toolbar-right', 'toolbar-top', 'toolbar-bottom');
-      document.body.classList.add(`toolbar-${position}`);
+      const pos = toolbarPositions.includes(position) ? position : 'left';
+      toolbarSettings.position = pos;
+      document.body.classList.remove('toolbar-left', 'toolbar-right', 'toolbar-top');
+      document.body.classList.add(`toolbar-${pos}`);
+      timerLane.classList.remove('left', 'right');
+      timerLane.classList.add(pos === 'left' ? 'right' : 'left');
       resize();
+    };
+    const updateImageToolButton = () => {
+      const btn = buttons.image;
+      if (!btn) return;
+      if (!imageActive) {
+        btn.textContent = '🗔';
+        btn.title = 'Image tool';
+        btn.classList.remove('active');
+        return;
+      }
+      if (imageMode === 'paste') {
+        btn.innerHTML = `<svg class="icon-crosshair" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="2.5" fill="#ef4444"/></svg>`;
+        btn.title = 'Image paste mode (click canvas to paste from clipboard)';
+      } else {
+        btn.textContent = '🗔';
+        btn.title = 'Image window mode';
+      }
+      setActive('image');
+    };
+
+    const applyBackgroundSettings = () => {
+      wrap.style.backgroundColor = backgroundSettings.color;
+      if (backgroundSettings.mode === 'grid') {
+        wrap.classList.add('grid-on');
+        wrap.style.backgroundImage = `
+          linear-gradient(#e5e7eb 1px, transparent 1px),
+          linear-gradient(90deg, #e5e7eb 1px, transparent 1px)
+        `;
+        wrap.style.backgroundSize = '32px 32px';
+      } else {
+        wrap.classList.remove('grid-on');
+        wrap.style.backgroundImage = 'none';
+      }
     };
 
     const syncStrokeSettings = () => {
       const extras = getExtras();
       const baseWeight = penSettings[currentPen.id]?.weight || 8;
       let activeWeight = isEraser ? (eraserSettings.weight || 18) : baseWeight;
-      let adaptive = !!extras.pressure;
-      let smoothingValue = extras.stabilization ? stabilizedSmoothing : baseSmoothing;
+      let adaptive = false;
+      let smoothingValue = stabilizedSmoothing;
       let cap = 'round';
       if (!isEraser) {
-        if (extras.type === 'flat') {
-          cap = 'butt';
-          adaptive = false;
-        } else if (extras.type === 'polyline') {
-          cap = 'square';
-          adaptive = false;
-          smoothingValue = extras.stabilization ? 0.35 : 0.2;
+        switch (extras.type) {
+          case 'marker':
+            cap = 'butt';
+            smoothingValue = 0.45;
+            activeWeight = baseWeight * 1.35;
+            break;
+          case 'fountain':
+          default:
+            cap = 'round';
+            smoothingValue = 0.94;
+            activeWeight = baseWeight * 0.95;
+            break;
         }
       }
       ctx.lineCap = cap;
@@ -512,12 +867,12 @@
       let lineCap = 'round';
       let lineJoin = 'round';
 
-      if (extras.type === 'flat') {
+      if (extras.type === 'marker') {
         lineCap = 'butt';
-      } else if (extras.type === 'polyline') {
-        lineCap = 'square';
-        lineJoin = 'miter';
-        width = base.weight;
+        width = base.weight * 1.35;
+      } else if (extras.type === 'fountain') {
+        lineCap = 'round';
+        width = base.weight * 0.95;
       }
 
       return { stroke: base.color, fill: base.color, width, alpha, lineCap, lineJoin };
@@ -572,6 +927,24 @@
           ctx.stroke();
           break;
         }
+        case 'filled-circle': {
+          const radius = Math.hypot(dx, dy);
+          ctx.beginPath();
+          ctx.arc(start.x, start.y, radius, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+        }
+        case 'triangle': {
+          const p1 = { x: start.x, y: end.y };
+          const p2 = { x: end.x, y: end.y };
+          const p3 = { x: (start.x + end.x) / 2, y: start.y };
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.lineTo(p3.x, p3.y);
+          ctx.closePath();
+          ctx.stroke();
+          break;
+        }
         default:
           ctx.moveTo(start.x, start.y);
           ctx.lineTo(end.x, end.y);
@@ -589,8 +962,8 @@
       settingsPanel.innerHTML = `
         <h3>${pen.id.replace('pen-', 'Pen ')}</h3>
         <div class="row" title="Color">
-          <div class="settings-grid" style="grid-template-columns: 1fr 1fr; align-items:center;">
-            <span style="display:flex;align-items:center;justify-content:center;">🎨</span>
+          <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;">
+            <span>Color</span>
             <input type="color" id="pen-color" value="${settings.color}">
           </div>
         </div>
@@ -609,11 +982,6 @@
         <div class="row" title="Shape">
           <div style="margin-bottom:4px;">Shape</div>
           <div class="settings-grid" id="shape-grid"></div>
-        </div>
-        <div class="settings-footer">
-          <button id="toggle-stab" title="Stabilization">Stabilization</button>
-          <button id="toggle-auto" title="Autocorrect">Autocorrect</button>
-          <button id="toggle-pressure" title="Pressure">Pressure</button>
         </div>
       `;
 
@@ -638,32 +1006,39 @@
         grid.innerHTML = '';
         options.forEach(opt => {
           const btn = document.createElement('button');
-          btn.textContent = opt;
+          const iconMap = currentKey === 'type' ? typeIcons : shapeIcons;
+          const icon = iconMap[opt] ?? opt;
+          const hk = currentKey === 'shape' ? shapeHotkeys[opt] : null;
+          btn.textContent = icon;
+          btn.title = hk ? `${opt} (${hk})` : opt;
+          if (currentKey === 'shape' && opt === 'freehand') {
+            btn.style.color = '#ffffff';
+          }
           btn.classList.toggle('active', extrasObj[currentKey] === opt);
           btn.onclick = () => {
             penExtras[pen.id][currentKey] = opt;
             paintGrid(options, gridId, currentKey, penExtras[pen.id]);
             syncStrokeSettings();
+            paintButtons();
           };
           grid.appendChild(btn);
         });
+        if (gridId === 'pen-type-grid') {
+          const resetBtn = document.createElement('button');
+          resetBtn.textContent = 'Default';
+          resetBtn.title = 'Reset pen';
+          resetBtn.onclick = () => {
+            penSettings[pen.id] = { color: pen.color, weight: 8 };
+            penExtras[pen.id] = defaultExtras();
+            usePen(pen);
+            paintButtons();
+            renderPenSettings(pen);
+          };
+          grid.appendChild(resetBtn);
+        }
       };
       paintGrid(penTypeOptions, 'pen-type-grid', 'type', penExtras[pen.id]);
       paintGrid(shapeOptions, 'shape-grid', 'shape', penExtras[pen.id]);
-
-      const toggleBtn = (id, key) => {
-        const btn = document.getElementById(id);
-        const sync = () => btn.classList.toggle('active', penExtras[pen.id][key]);
-        btn.onclick = () => {
-          penExtras[pen.id][key] = !penExtras[pen.id][key];
-          sync();
-          syncStrokeSettings();
-        };
-        sync();
-      };
-      toggleBtn('toggle-stab', 'stabilization');
-      toggleBtn('toggle-auto', 'autocorrect');
-      toggleBtn('toggle-pressure', 'pressure');
     };
 
     const renderEraserSettings = () => {
@@ -672,9 +1047,9 @@
         <div class="row" title="Thickness">
           <div style="display:flex;flex-direction:column;gap:4px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span>🧽</span><span id="eraser-thickness-label">${eraserSettings.weight}px</span>
+              <span>Eraser size</span><span id="eraser-thickness-label">${eraserSettings.weight}px</span>
             </div>
-            <input type="range" min="6" max="48" step="1" value="${eraserSettings.weight}" id="eraser-thickness">
+            <input type="range" min="6" max="64" step="1" value="${eraserSettings.weight}" id="eraser-thickness">
           </div>
         </div>
       `;
@@ -697,13 +1072,32 @@
         <h3>Toolbar</h3>
         <div class="row" title="Placement">
           <div style="margin-bottom:4px;">Position</div>
-          <div class="settings-grid" id="toolbar-pos-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+          <div class="settings-grid" id="toolbar-pos-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
         </div>
         <div class="row" title="Size">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span>Icon size</span><span id="toolbar-size-label">${toolbarSettings.size}px</span>
           </div>
           <input type="range" min="44" max="84" step="2" value="${toolbarSettings.size}" id="toolbar-size">
+        </div>
+        <div class="row" title="Background">
+          <div style="margin-bottom:4px;">Background</div>
+          <div class="settings-grid" id="bg-mode-grid" style="grid-template-columns: repeat(2, 1fr);"></div>
+        </div>
+        <div class="row" title="Background color">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Color</span><input type="color" id="bg-color" value="${backgroundSettings.color}">
+          </div>
+        </div>
+        <div class="row" title="Text">
+          <div style="margin-bottom:4px;">Text color</div>
+          <div class="settings-grid" id="text-color-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+        </div>
+        <div class="row" title="Text size">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Text size</span><span id="text-size-label">${textSettings.size}px</span>
+          </div>
+          <input type="range" min="12" max="48" step="1" value="${textSettings.size}" id="text-size">
         </div>
       `;
 
@@ -731,6 +1125,142 @@
         toolbarSettings.size = val;
         sizeLabel.textContent = `${val}px`;
         applyToolbarSettings();
+      };
+
+      const paintBgGrid = () => {
+        const grid = document.getElementById('bg-mode-grid');
+        grid.innerHTML = '';
+        ['plain', 'grid'].forEach(mode => {
+          const btn = document.createElement('button');
+          btn.textContent = mode;
+          btn.classList.toggle('active', backgroundSettings.mode === mode);
+          btn.onclick = () => {
+            backgroundSettings.mode = mode;
+            paintBgGrid();
+            applyBackgroundSettings();
+          };
+          grid.appendChild(btn);
+        });
+      };
+      paintBgGrid();
+
+      const bgColor = document.getElementById('bg-color');
+      bgColor.oninput = () => {
+        backgroundSettings.color = bgColor.value;
+        applyBackgroundSettings();
+      };
+
+      const paintTextColors = () => {
+        const grid = document.getElementById('text-color-grid');
+        grid.innerHTML = '';
+        const colors = [
+          { val: '#ffffff', label: 'White' },
+          { val: '#f59e0b', label: 'Orange' },
+          { val: '#0b6b9c', label: 'Blue' },
+        ];
+        colors.forEach(c => {
+          const btn = document.createElement('button');
+          btn.textContent = '';
+          btn.style.background = c.val;
+          btn.style.color = contrastColor(c.val);
+          btn.title = c.label;
+          btn.classList.toggle('active', textSettings.color.toLowerCase() === c.val.toLowerCase());
+          btn.onclick = () => {
+            textSettings.color = c.val;
+            paintTextColors();
+          };
+          grid.appendChild(btn);
+        });
+      };
+      paintTextColors();
+
+      const textSizeInput = document.getElementById('text-size');
+      const textSizeLabel = document.getElementById('text-size-label');
+      textSizeInput.oninput = () => {
+        const val = Number(textSizeInput.value);
+        textSettings.size = val;
+        textSizeLabel.textContent = `${val}px`;
+      };
+    };
+
+    const renderTimerSettings = () => {
+      const defaultMinutes = 5;
+      settingsPanel.innerHTML = `
+        <h3>Timer</h3>
+        <div class="row" title="Minutes">
+          <input type="number" id="timer-minutes" min="1" max="480" value="${defaultMinutes}" placeholder="Minutes" inputmode="numeric" pattern="[0-9]*" style="width:100%;border-radius:14px;padding:14px 12px;border:2px solid #16462e;background:#0b1a12;color:#e5e7eb;font-size:24px;text-align:center;">
+        </div>
+        <div class="row" title="Name">
+          <input type="text" id="timer-name" placeholder="Label (optional)" style="width:100%;border-radius:12px;padding:10px 12px;border:2px solid #16462e;background:#0b1a12;color:#e5e7eb;">
+        </div>
+        <div class="row">
+          <label style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="timer-loop"> Loop alarm
+          </label>
+        </div>
+        <div class="row" title="Quick">
+          <div class="settings-grid" id="timer-presets" style="grid-template-columns: repeat(5, 1fr);"></div>
+        </div>
+        <div class="row" title="Alarm">
+          <div style="margin-bottom:4px;">Alarm</div>
+          <div class="alarm-toggle" id="alarm-toggle">
+            <button data-type="beep" class="active">Beep</button>
+            <button data-type="mozart">Mozart</button>
+          </div>
+        </div>
+        <div class="row">
+          <button id="add-timer-btn" style="width:100%;">Start timer</button>
+        </div>
+      `;
+
+      const presets = [1,2,3,5,7,10,15,20,30,45,60,90,105,120,'?'];
+      const presetGrid = document.getElementById('timer-presets');
+      const minsInput = document.getElementById('timer-minutes');
+      minsInput.addEventListener('input', () => {
+        minsInput.value = minsInput.value.replace(/[^0-9]/g, '');
+      });
+      minsInput.addEventListener('blur', () => {
+        const v = Math.max(1, Math.min(480, Number(minsInput.value) || defaultMinutes));
+        minsInput.value = v;
+      });
+      presets.forEach(m => {
+        const btn = document.createElement('button');
+        btn.textContent = `${m}`;
+        btn.onclick = () => {
+          if (m === '?') {
+            minsInput.value = Math.max(1, Math.floor(Math.random() * 60) + 1);
+          } else {
+            minsInput.value = m;
+          }
+        };
+        presetGrid.appendChild(btn);
+      });
+
+      const addBtn = document.getElementById('add-timer-btn');
+      const nameInput = document.getElementById('timer-name');
+      const loopInput = document.getElementById('timer-loop');
+      let alarmSelection = 'beep';
+
+      const alarmToggle = document.getElementById('alarm-toggle');
+      const paintAlarm = () => {
+        alarmToggle.querySelectorAll('button').forEach(btn => {
+          const t = btn.getAttribute('data-type');
+          btn.classList.toggle('active', t === alarmSelection);
+        });
+      };
+      alarmToggle.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => {
+          alarmSelection = btn.getAttribute('data-type') || 'beep';
+          paintAlarm();
+        };
+      });
+      paintAlarm();
+      addBtn.onclick = () => {
+        const mins = Math.min(480, Math.max(1, Number(minsInput.value) || defaultMinutes));
+        const label = nameInput.value.trim();
+        const loop = loopInput.checked;
+        addTimer(mins, label, loop, alarmSelection);
+        hideSettings();
       };
     };
 
@@ -795,11 +1325,20 @@
       }
       useEraser();
     };
-    buttons.undo.onclick = () => undo();
-    buttons.redo.onclick = () => redo();
-    buttons.bomb.onclick = () => bomb();
-    buttons.bg.onclick = () => wrap.classList.toggle('grid-on');
-    buttons.toolbar.onclick = () => toggleToolbarSettings();
+    buttons.undo.onclick = () => { flashButton(buttons.undo); undo(); };
+    buttons.redo.onclick = () => { flashButton(buttons.redo); redo(); };
+    buttons.bomb.onclick = () => { flashButton(buttons.bomb); bomb(); };
+    buttons.toolbar.onclick = () => { flashButton(buttons.toolbar); toggleToolbarSettings(); };
+    buttons.timer.onclick = () => { flashButton(buttons.timer); settingsMode = 'timer'; renderTimerSettings(); showSettings(); };
+    buttons.image.onclick = () => {
+      if (!imageActive) {
+        imageActive = true;
+        imageMode = 'window';
+      } else {
+        imageMode = imageMode === 'window' ? 'paste' : 'window';
+      }
+      updateImageToolButton();
+    };
 
     const handleShapeDown = (e) => {
       if (!isShapeMode()) return;
@@ -835,7 +1374,19 @@
       canvas.releasePointerCapture?.(e.pointerId);
     };
 
-    canvas.addEventListener('pointerdown', handleShapeDown, { capture: true });
+    canvas.addEventListener('pointerdown', async (e) => {
+      if (imageActive) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const pos = getPointerPos(e);
+        const ok = await tryClipboardImage(pos);
+        if (!ok) {
+          console.warn('No image in clipboard for image tool');
+        }
+        return;
+      }
+      handleShapeDown(e);
+    }, { capture: true });
     canvas.addEventListener('pointermove', handleShapeMove, { capture: true });
     canvas.addEventListener('pointerup', handleShapeUp, { capture: true });
     canvas.addEventListener('pointercancel', handleShapeUp, { capture: true });
@@ -844,17 +1395,166 @@
     });
 
     // Keyboard shortcuts
+    let spacePanning = false;
+    let shiftLineMode = false;
+    async function tryClipboardImage(targetPos) {
+      if (!navigator.clipboard?.read) return false;
+      try {
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+          const type = item.types.find(t => t.startsWith('image/'));
+          if (type) {
+            const blob = await item.getType(type);
+            if (targetPos) {
+              if (imageMode === 'paste') {
+                pasteImageBlobAt(blob, targetPos.x, targetPos.y, 'Clipboard image');
+              } else {
+                addImageWindowFromBlob(blob, 'Clipboard image', { x: targetPos.x, y: targetPos.y });
+              }
+            } else {
+              addImageWindowFromBlob(blob, 'Clipboard image');
+            }
+            return true;
+          }
+        }
+      } catch (err) {
+        console.warn('Clipboard read not available', err);
+      }
+      return false;
+    }
+
     window.addEventListener('keydown', (e) => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      if (e.code === 'Space') {
+      const code = e.code;
+      if ((e.metaKey || e.ctrlKey) && (e.key?.toLowerCase?.() === 'v')) {
+        void tryClipboardImage();
+      }
+      if (e.altKey) {
+        if (code === 'Digit0') {
+          e.preventDefault();
+          const mins = Math.max(1, Math.floor(Math.random() * 60) + 1);
+          addTimer(mins, '', false, 'beep');
+          return;
+        }
+        const digitMatch = code.match(/^Digit([1-9])$/);
+        if (digitMatch) {
+          e.preventDefault();
+          const idx = Number(digitMatch[1]);
+          const presetList = [1,2,3,5,7,10,15,20,30];
+          const mins = presetList[idx - 1] ?? 5;
+          addTimer(mins, '', false, 'beep');
+          return;
+        }
+      }
+      if (code === 'Space') {
         e.preventDefault();
-        isEraser ? usePen(currentPen) : useEraser();
-      } else if (e.key === '1') {
+        bomb();
+      } else if (code === 'Digit1') {
         usePen(pens[0]);
-      } else if (e.key === '2') {
+      } else if (code === 'Digit2') {
         usePen(pens[1]);
-      } else if (e.key === '3') {
+      } else if (code === 'Digit3') {
         usePen(pens[2]);
+      } else if (code === 'Digit4') {
+        useEraser();
+      } else if (code === 'KeyQ') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'freehand';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyW') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'line';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyE') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'arrow';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyR') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'filled-rect';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyA') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'outline-rect';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyS') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'circle';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyD') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'filled-circle';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyF') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'triangle';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyG') {
+        if (isEraser) {
+          toggleEraserSettings();
+        } else {
+          const idx = pens.findIndex(p => p.id === currentPen.id);
+          if (idx === 0) togglePenSettings(pens[0]);
+          else if (idx === 1) togglePenSettings(pens[1]);
+          else if (idx === 2) togglePenSettings(pens[2]);
+        }
+      } else if (code === 'KeyE') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'circle';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'KeyR') {
+        if (!isEraser) {
+          const extras = getExtras();
+          extras.shape = 'outline-rect';
+          paintButtons();
+          syncStrokeSettings();
+        }
+      } else if (code === 'Tab') {
+        e.preventDefault();
+        undo();
+      } else if (code === 'Backquote') {
+        e.preventDefault();
+        redo();
+      } else if (code === 'KeyT') {
+        e.preventDefault();
+        addTextAtCenter();
+      } else if (code === 'ShiftLeft' || code === 'ShiftRight') {
+        if (!shiftLineMode && !isEraser) {
+          const extras = getExtras();
+          if (extras.shape === 'freehand') {
+            shiftLineMode = true;
+            extras.shape = 'line';
+            paintButtons();
+            syncStrokeSettings();
+          }
+        }
       } else if (e.key === 'Delete') {
         bomb();
       } else if (e.key === 'ArrowLeft') {
@@ -865,11 +1565,323 @@
         redo();
       }
     });
+    window.addEventListener('keyup', (e) => {
+      const code = e.code;
+      if ((code === 'ShiftLeft' || code === 'ShiftRight') && shiftLineMode) {
+        const extras = getExtras();
+        extras.shape = 'freehand';
+        paintButtons();
+        syncStrokeSettings();
+        shiftLineMode = false;
+      }
+    });
 
     // History hooks for strokes
-    atrament.addEventListener('strokestart', () => pushState());
+    atrament.addEventListener('strokestart', () => {
+      atrament.color = penSettings[currentPen.id]?.color || '#ffffff';
+      if (spacePanning) return;
+      pushState();
+    });
 
     // Utilities
+    function flashButton(btn) {
+      if (!btn) return;
+      btn.classList.remove('flash');
+      // force reflow to restart animation
+      void btn.offsetWidth;
+      btn.classList.add('flash');
+      setTimeout(() => btn.classList.remove('flash'), 220);
+    }
+    function addTextAtCenter() {
+      const text = prompt('Enter text to place at top:');
+      if (!text) return;
+      pushState();
+      const color = textSettings.color || '#ffffff';
+      const sizePx = (textSettings.size || 32) * dpr;
+      ctx.save();
+      const padding = 10 * dpr;
+      ctx.font = `${sizePx}px "Baloo 2", "Inter", system-ui, sans-serif`;
+      const metrics = ctx.measureText(text);
+      const textWidth = metrics.width;
+      const textHeight = sizePx * 1.2;
+      const x = canvas.width / 2;
+      const y = sizePx * 0.2;
+      // background pill
+      const boxWidth = textWidth + padding * 2;
+      const boxHeight = textHeight + padding * 0.8;
+      const boxX = x - boxWidth / 2;
+      const boxY = y;
+      const radius = 12 * dpr;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.moveTo(boxX + radius, boxY);
+      ctx.lineTo(boxX + boxWidth - radius, boxY);
+      ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+      ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+      ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+      ctx.lineTo(boxX + radius, boxY + boxHeight);
+      ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+      ctx.lineTo(boxX, boxY + radius);
+      ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+      ctx.closePath();
+      ctx.fill();
+      // text
+      ctx.fillStyle = color;
+      ctx.font = `${sizePx}px "Baloo 2", "Inter", system-ui, sans-serif`;
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, x, y + padding * 0.4);
+      ctx.restore();
+    }
+
+    function formatTime(ms) {
+      const totalSec = Math.max(0, Math.floor(ms / 1000));
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function playBeep(loop) {
+      try {
+        const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctxAudio.createOscillator();
+        const gain = ctxAudio.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 880;
+        osc.connect(gain);
+        gain.connect(ctxAudio.destination);
+        gain.gain.setValueAtTime(0.2, ctxAudio.currentTime);
+        osc.start();
+        osc.stop(ctxAudio.currentTime + 0.25);
+        if (loop) {
+          const interval = setInterval(() => {
+            const o = ctxAudio.createOscillator();
+            const g = ctxAudio.createGain();
+            o.type = 'sine';
+            o.frequency.value = 880;
+            o.connect(g); g.connect(ctxAudio.destination);
+            g.gain.setValueAtTime(0.2, ctxAudio.currentTime);
+            o.start(); o.stop(ctxAudio.currentTime + 0.25);
+          }, 1200);
+          setTimeout(() => clearInterval(interval), 8000);
+        }
+      } catch (err) {
+        console.warn('Audio not available', err);
+      }
+    }
+    function playAlarm(alarmType, loop, timer) {
+      if (alarmType === 'mozart') {
+        try {
+          const audio = new Audio('adagio_amjr_clarinet_concerto.mp3');
+          audio.loop = loop;
+          audio.play().catch(err => {
+            console.warn('Mozart alarm failed, falling back to beep', err);
+            playBeep(loop);
+          });
+          if (loop) timer.audio = audio;
+        } catch (err) {
+          console.warn('Mozart alarm unavailable, falling back to beep', err);
+          playBeep(loop);
+        }
+      } else {
+        playBeep(loop);
+      }
+    }
+
+    function stopTimerAudio(t) {
+      if (t.audio) {
+        t.audio.pause();
+        t.audio.currentTime = 0;
+        t.audio = null;
+      }
+    }
+
+    function renderTimers() {
+      timerLane.innerHTML = '';
+      timers.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'timer-card' + (t.finished ? ' finished' : '') + (t.minimized ? ' minimized' : '');
+        card.style.position = 'relative';
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = t.name || 'Timer';
+        const remove = document.createElement('button');
+        remove.className = 'remove';
+        remove.textContent = '×';
+        remove.onclick = () => {
+          clearInterval(t.interval);
+          stopTimerAudio(t);
+          timers.splice(timers.indexOf(t), 1);
+          renderTimers();
+        };
+        const time = document.createElement('div');
+        time.className = 'time';
+        time.textContent = formatTime(t.remaining);
+        card.appendChild(name);
+        card.appendChild(remove);
+        card.appendChild(time);
+        timerLane.appendChild(card);
+        t.elements = { time, card };
+
+        card.addEventListener('click', (ev) => {
+          if (ev.target === remove) return;
+          t.minimized = !t.minimized;
+          renderTimers();
+        });
+      });
+    }
+
+    function addTimer(mins, name, loop, alarmType = 'beep') {
+      const now = Date.now();
+      const duration = mins * 60 * 1000;
+      const defaultLabel = `${mins} min`;
+      const hasCustomLabel = !!name && name !== defaultLabel;
+      const timer = {
+        id: timerIdCounter++,
+        name: name || defaultLabel,
+        duration,
+        remaining: duration,
+        end: now + duration,
+        loop,
+        finished: false,
+        interval: null,
+        elements: null,
+        alarmType,
+        audio: null,
+        minimized: !hasCustomLabel,
+      };
+      timer.interval = setInterval(() => {
+        const left = timer.end - Date.now();
+        timer.remaining = Math.max(0, left);
+        if (timer.elements) {
+          timer.elements.time.textContent = formatTime(timer.remaining);
+        }
+        if (timer.remaining <= 0 && !timer.finished) {
+          timer.finished = true;
+          if (timer.elements) {
+            timer.elements.card.classList.add('finished');
+          }
+          playAlarm(timer.alarmType, timer.loop, timer);
+          if (!timer.loop) {
+            clearInterval(timer.interval);
+          }
+        }
+      }, 500);
+      timers.push(timer);
+      renderTimers();
+    }
+
+    function addImageWindowFromBlob(blob, label = 'Pasted image', pos = null) {
+      const url = URL.createObjectURL(blob);
+      const win = document.createElement('div');
+      win.className = 'image-window';
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = label;
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const mini = document.createElement('div');
+      mini.className = 'mini';
+      mini.textContent = '–';
+      const close = document.createElement('div');
+      close.className = 'close';
+      close.textContent = '×';
+      const body = document.createElement('div');
+      body.className = 'body';
+      const img = document.createElement('img');
+      img.src = url;
+      body.appendChild(img);
+      actions.appendChild(mini);
+      actions.appendChild(close);
+      title.appendChild(actions);
+      win.appendChild(title);
+      win.appendChild(body);
+      imageLayer.appendChild(win);
+
+      // position center-ish
+      const viewportW = window.innerWidth;
+      const viewportH = window.innerHeight;
+      const w = Math.min(320, viewportW * 0.4);
+      const h = Math.min(240, viewportH * 0.35);
+      win.style.width = `${w}px`;
+      win.style.height = `${h}px`;
+      if (pos) {
+        win.style.left = `${pos.x - w / 2}px`;
+        win.style.top = `${pos.y - h / 2}px`;
+      } else {
+        win.style.left = `${(viewportW - w) / 2}px`;
+        win.style.top = `${(viewportH - h) / 2}px`;
+      }
+
+      // drag handling
+      let dragging = false;
+      let offsetX = 0, offsetY = 0;
+      title.addEventListener('pointerdown', (ev) => {
+        dragging = true;
+        offsetX = ev.clientX - win.offsetLeft;
+        offsetY = ev.clientY - win.offsetTop;
+        ev.preventDefault();
+      });
+      window.addEventListener('pointermove', (ev) => {
+        if (!dragging) return;
+        win.style.left = `${ev.clientX - offsetX}px`;
+        win.style.top = `${ev.clientY - offsetY}px`;
+      });
+      window.addEventListener('pointerup', () => { dragging = false; });
+
+      const dockIcon = document.createElement('div');
+      dockIcon.className = 'dock-icon';
+      dockIcon.textContent = label.slice(0, 8) || 'img';
+      dockIcon.onclick = () => {
+        dockIcon.remove();
+        win.style.display = 'block';
+      };
+
+      mini.onclick = () => {
+        win.style.display = 'none';
+        imageDock.appendChild(dockIcon);
+      };
+
+      close.onclick = () => {
+        URL.revokeObjectURL(url);
+        win.remove();
+        dockIcon.remove();
+      };
+    }
+
+    function pasteImageBlobAt(blob, x, y, label = 'Clipboard image') {
+      const img = new Image();
+      img.onload = () => {
+        pushState();
+        const maxW = canvas.width * 0.35;
+        const maxH = canvas.height * 0.35;
+        let w = img.width;
+        let h = img.height;
+        const scale = Math.min(1, maxW / w, maxH / h);
+        w *= scale;
+        h *= scale;
+        ctx.drawImage(img, x - w / 2, y - h / 2, w, h);
+      };
+      img.src = URL.createObjectURL(blob);
+    }
+
+    window.addEventListener('paste', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      const items = e.clipboardData?.items || [];
+      for (const item of items) {
+        if (item.type?.startsWith('image/')) {
+          const blob = item.getAsFile();
+          if (!blob) continue;
+          if (imageMode === 'paste') {
+            const rect = canvas.getBoundingClientRect();
+            pasteImageBlobAt(blob, rect.width / 2, rect.height / 2, 'Clipboard image');
+          } else {
+            addImageWindowFromBlob(blob);
+          }
+          break;
+        }
+      }
+    });
     function getCss(varName) {
       return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
     }
@@ -884,8 +1896,10 @@
 
     // Init
     applyToolbarSettings();
+    applyBackgroundSettings();
     paintButtons();
-    setActive('pen', currentPen);
+    updateImageToolButton();
+    requestAnimationFrame(() => usePen(pens[0])); // ensure default pen is active on load
     window.addEventListener('resize', resize);
     resize();
   </script>
