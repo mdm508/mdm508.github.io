@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atrament Sketch Pad</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600&display=swap');
+
+    :root {
+      --panel: #0f2418;
+      --shadow: rgba(15, 23, 42, 0.18);
+      --border: #123222;
+      --text: #e5e7eb;
+      --pen1: #ffffff;
+      --pen2: #fcd34d;
+      --pen3: #f472b6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #0f2418;
+      color: var(--text);
+      font-family: "Baloo 2", "Inter", system-ui, sans-serif;
+      height: 100vh;
+      display: flex;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      width: 100%;
+      height: 100vh;
+    }
+
+    .toolbar {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      box-shadow: 6px 0 24px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 10px;
+      z-index: 2;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      background: #0f2418;
+    }
+
+    .canvas-wrap.grid-on {
+      background-image:
+        linear-gradient(#e5e7eb 1px, transparent 1px),
+        linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      background: transparent;
+    }
+
+    button {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      border: 2px solid transparent;
+      background: #123222;
+      color: #f8fafc;
+      box-shadow: 0 8px 16px var(--shadow);
+      cursor: pointer;
+      font-size: 22px;
+      display: grid;
+      place-items: center;
+      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-1px);
+      outline: none;
+      box-shadow: 0 12px 20px var(--shadow);
+    }
+
+    button.active {
+      border: 3px solid #f87171;
+      background: #16462e;
+    }
+
+    .pen {
+      color: #fff;
+    }
+
+    .pill {
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 6px 12px var(--shadow);
+    }
+
+    .settings-panel {
+      position: fixed;
+      top: 80px;
+      left: 110px;
+      background: #0b1a12;
+      border: 2px solid #16462e;
+      border-radius: 12px;
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.25);
+      padding: 12px;
+      width: 230px;
+      z-index: 30;
+      display: none;
+      font-size: 0.9rem;
+      color: #f8fafc;
+    }
+
+    .settings-panel h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: #fef3c7;
+    }
+
+    .settings-panel label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0 6px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .settings-panel input[type="range"] {
+      width: 100%;
+    }
+
+    .settings-panel .row {
+      margin-bottom: 10px;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .settings-grid button {
+      width: auto;
+      height: auto;
+      padding: 10px;
+      border-radius: 10px;
+      background: #122d1f;
+      color: #f8fafc;
+      border: 2px solid #16462e;
+      box-shadow: none;
+      font-size: 14px;
+    }
+
+    .settings-grid button.active {
+      border: 2px solid #f87171;
+      background: #16462e;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav class="toolbar" aria-label="Tools">
+      <div class="pill" id="active-label">Pen 1</div>
+      <button id="bg-btn" title="Toggle background">🧇</button>
+      <button id="pen-1" class="pen" title="Pen 1 (1)">🖊️</button>
+      <button id="pen-2" class="pen" title="Pen 2 (2)">🖋️</button>
+      <button id="pen-3" class="pen" title="Pen 3 (3)">✒️</button>
+      <button id="eraser" title="Eraser (Space)">🧽</button>
+      <button id="undo" title="Undo (←)">↩️</button>
+      <button id="redo" title="Redo (→)">↪️</button>
+      <button id="bomb" title="Bomb (Delete)">💣</button>
+    </nav>
+
+    <section class="canvas-wrap" id="canvas-wrap">
+      <canvas id="board"></canvas>
+    </section>
+  </main>
+
+  <div class="settings-panel" id="settings-panel"></div>
+
+  <script type="module">
+    import Atrament, { MODE_DRAW, MODE_ERASE } from 'https://unpkg.com/atrament@5.1.0/dist/esm/index.js';
+
+    // Canvas and sizing
+    const wrap = document.getElementById('canvas-wrap');
+    const canvas = document.getElementById('board');
+    const dpr = window.devicePixelRatio || 1;
+
+    const resize = () => {
+      const { clientWidth, clientHeight } = wrap;
+      canvas.width = clientWidth * dpr;
+      canvas.height = clientHeight * dpr;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      atrament?.clear();
+      restore(initialBlank);
+    };
+
+    // Atrament setup
+    const atrament = new Atrament(canvas, {
+      width: canvas.clientWidth * dpr,
+      height: canvas.clientHeight * dpr,
+      color: getComputedStyle(document.documentElement).getPropertyValue('--pen1').trim(),
+      weight: 8,
+      adaptiveStroke: false,
+      smoothing: 0.85,
+    });
+    const ctx = canvas.getContext('2d');
+
+    // Pens and state
+    const pens = [
+      { id: 'pen-1', color: getCss('--pen1') },
+      { id: 'pen-2', color: getCss('--pen2') },
+      { id: 'pen-3', color: getCss('--pen3') },
+    ];
+    let currentPen = pens[0];
+    let isEraser = false;
+    const penSettings = {
+      'pen-1': { color: pens[0].color, weight: 8 },
+      'pen-2': { color: pens[1].color, weight: 8 },
+      'pen-3': { color: pens[2].color, weight: 8 },
+    };
+    let eraserSettings = { weight: 18 };
+
+    const label = document.getElementById('active-label');
+    const buttons = {
+      bg: document.getElementById('bg-btn'),
+      pen1: document.getElementById('pen-1'),
+      pen2: document.getElementById('pen-2'),
+      pen3: document.getElementById('pen-3'),
+      eraser: document.getElementById('eraser'),
+      undo: document.getElementById('undo'),
+      redo: document.getElementById('redo'),
+      bomb: document.getElementById('bomb'),
+    };
+
+    // History (undo/redo) using image snapshots
+    const undoStack = [];
+    const redoStack = [];
+    const snapshot = () => ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const restore = (img) => img && ctx.putImageData(img, 0, 0);
+    const pushState = () => {
+      try {
+        undoStack.push(snapshot());
+        if (undoStack.length > 50) undoStack.shift();
+        redoStack.length = 0;
+      } catch (err) {
+        console.warn('Snapshot failed', err);
+      }
+    };
+
+    // Initial blank
+    const initialBlank = snapshot();
+
+    // Toolbar visuals
+    const paintButtons = () => {
+      pens.forEach((pen, idx) => {
+        const btn = [buttons.pen1, buttons.pen2, buttons.pen3][idx];
+        const color = penSettings[pen.id]?.color ?? pen.color;
+        btn.style.background = color;
+        btn.style.color = contrastColor(color);
+      });
+    };
+
+    const setActive = (mode, pen = currentPen) => {
+      [buttons.pen1, buttons.pen2, buttons.pen3, buttons.eraser].forEach(b => b.classList.remove('active'));
+      if (mode === 'eraser') {
+        buttons.eraser.classList.add('active');
+        label.textContent = 'Eraser';
+      } else {
+        const idx = pens.findIndex(p => p.id === pen.id);
+        if (idx >= 0) [buttons.pen1, buttons.pen2, buttons.pen3][idx].classList.add('active');
+        label.textContent = `Pen ${idx + 1}`;
+      }
+    };
+
+    // Tool actions
+    const usePen = (pen) => {
+      isEraser = false;
+      currentPen = pen;
+      atrament.mode = MODE_DRAW;
+      const settings = penSettings[pen.id] ?? { color: pen.color, weight: 8 };
+      settings.color = settings.color || pen.color;
+      settings.weight = settings.weight || 8;
+      penSettings[pen.id] = settings;
+      atrament.color = settings.color;
+      atrament.weight = settings.weight;
+      setActive('pen', pen);
+    };
+
+    const useEraser = () => {
+      isEraser = true;
+      atrament.mode = MODE_ERASE;
+      atrament.weight = eraserSettings.weight || 18;
+      setActive('eraser');
+    };
+
+    const bomb = () => {
+      pushState();
+      atrament.clear();
+      if (isEraser) usePen(currentPen);
+    };
+
+    const undo = () => {
+      if (!undoStack.length) return;
+      redoStack.push(snapshot());
+      restore(undoStack.pop());
+    };
+
+    const redo = () => {
+      if (!redoStack.length) return;
+      undoStack.push(snapshot());
+      restore(redoStack.pop());
+    };
+
+    // Event wiring
+    const settingsPanel = document.getElementById('settings-panel');
+    let settingsMode = null; // 'pen' | 'eraser' | null
+
+    const hideSettings = () => {
+      settingsPanel.style.display = 'none';
+      settingsMode = null;
+    };
+
+    const penTypeOptions = ['freehand', 'marker', 'calligraphy'];
+    const shapeOptions = ['line', 'arrow', 'filled-rect', 'outline-rect', 'circle'];
+    let penExtras = {
+      type: 'freehand',
+      shape: 'line',
+      stabilization: false,
+      pressure: false,
+      autocorrect: false,
+    };
+
+    const renderPenSettings = (pen) => {
+      const settings = penSettings[pen.id] ?? { color: pen.color, weight: 8 };
+      settingsPanel.innerHTML = `
+        <h3>${pen.id.replace('pen-', 'Pen ')}</h3>
+        <div class="row" title="Color">
+          <div class="settings-grid" style="grid-template-columns: 1fr 1fr;">
+            <span style="display:flex;align-items:center;justify-content:center;">🎨</span>
+            <input type="color" id="pen-color" value="${settings.color}">
+          </div>
+        </div>
+        <div class="row" title="Thickness">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span>🖊️</span><span id="pen-thickness-label">${settings.weight}px</span>
+            </div>
+            <input type="range" min="2" max="24" step="1" value="${settings.weight}" id="pen-thickness">
+          </div>
+        </div>
+        <div class="row" title="Pen type">
+          <div class="settings-grid" id="pen-type-grid"></div>
+        </div>
+        <div class="row" title="Shape">
+          <div class="settings-grid" id="shape-grid"></div>
+        </div>
+        <div class="settings-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <button id="toggle-stab" title="Stabilization">〰️</button>
+          <button id="toggle-auto" title="Autocorrect">↩️</button>
+          <button id="toggle-pressure" title="Pressure">📈</button>
+        </div>
+      `;
+
+      const thicknessInput = document.getElementById('pen-thickness');
+      const colorInput = document.getElementById('pen-color');
+      const thicknessLabel = document.getElementById('pen-thickness-label');
+
+      thicknessInput.oninput = () => {
+        const val = Number(thicknessInput.value);
+        penSettings[pen.id].weight = val;
+        thicknessLabel.textContent = `${val}px`;
+        usePen(pen);
+      };
+      colorInput.oninput = () => {
+        penSettings[pen.id].color = colorInput.value;
+        usePen(pen);
+        paintButtons();
+      };
+
+      const paintGrid = (options, gridId, currentKey) => {
+        const grid = document.getElementById(gridId);
+        grid.innerHTML = '';
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.textContent = opt;
+          btn.classList.toggle('active', penExtras[currentKey] === opt);
+          btn.onclick = () => {
+            penExtras[currentKey] = opt;
+            paintGrid(options, gridId, currentKey);
+          };
+          grid.appendChild(btn);
+        });
+      };
+      paintGrid(penTypeOptions, 'pen-type-grid', 'type');
+      paintGrid(shapeOptions, 'shape-grid', 'shape');
+
+      const toggleBtn = (id, key) => {
+        const btn = document.getElementById(id);
+        const sync = () => btn.classList.toggle('active', penExtras[key]);
+        btn.onclick = () => {
+          penExtras[key] = !penExtras[key];
+          sync();
+        };
+        sync();
+      };
+      toggleBtn('toggle-stab', 'stabilization');
+      toggleBtn('toggle-auto', 'autocorrect');
+      toggleBtn('toggle-pressure', 'pressure');
+    };
+
+    const renderEraserSettings = () => {
+      settingsPanel.innerHTML = `
+        <h3>Eraser</h3>
+        <div class="row" title="Thickness">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span>🧽</span><span id="eraser-thickness-label">${eraserSettings.weight}px</span>
+            </div>
+            <input type="range" min="6" max="48" step="1" value="${eraserSettings.weight}" id="eraser-thickness">
+          </div>
+        </div>
+      `;
+      const thicknessInput = document.getElementById('eraser-thickness');
+      const thicknessLabel = document.getElementById('eraser-thickness-label');
+      thicknessInput.oninput = () => {
+        const val = Number(thicknessInput.value);
+        eraserSettings.weight = val;
+        thicknessLabel.textContent = `${val}px`;
+        if (isEraser) useEraser();
+      };
+      penExtras.pressure && (atrament.adaptiveStroke = true);
+    };
+
+    const togglePenSettings = (pen) => {
+      if (settingsMode === `pen-${pen.id}`) {
+        hideSettings();
+        return;
+      }
+      settingsMode = `pen-${pen.id}`;
+      renderPenSettings(pen);
+      settingsPanel.style.display = 'block';
+    };
+
+    const toggleEraserSettings = () => {
+      if (settingsMode === 'eraser') {
+        hideSettings();
+        return;
+      }
+      settingsMode = 'eraser';
+      renderEraserSettings();
+      settingsPanel.style.display = 'block';
+    };
+
+    buttons.pen1.onclick = () => {
+      if (currentPen.id === pens[0].id && !isEraser) {
+        togglePenSettings(pens[0]);
+      } else {
+        hideSettings();
+      }
+      usePen(pens[0]);
+    };
+    buttons.pen2.onclick = () => {
+      if (currentPen.id === pens[1].id && !isEraser) {
+        togglePenSettings(pens[1]);
+      } else {
+        hideSettings();
+      }
+      usePen(pens[1]);
+    };
+    buttons.pen3.onclick = () => {
+      if (currentPen.id === pens[2].id && !isEraser) {
+        togglePenSettings(pens[2]);
+      } else {
+        hideSettings();
+      }
+      usePen(pens[2]);
+    };
+    buttons.eraser.onclick = () => {
+      if (isEraser) {
+        toggleEraserSettings();
+      } else {
+        hideSettings();
+      }
+      useEraser();
+    };
+    buttons.undo.onclick = () => undo();
+    buttons.redo.onclick = () => redo();
+    buttons.bomb.onclick = () => bomb();
+    buttons.bg.onclick = () => wrap.classList.toggle('grid-on');
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        isEraser ? usePen(currentPen) : useEraser();
+      } else if (e.key === '1') {
+        usePen(pens[0]);
+      } else if (e.key === '2') {
+        usePen(pens[1]);
+      } else if (e.key === '3') {
+        usePen(pens[2]);
+      } else if (e.key === 'Delete') {
+        bomb();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        undo();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        redo();
+      }
+    });
+
+    // History hooks for strokes
+    atrament.addEventListener('strokestart', () => pushState());
+
+    // Utilities
+    function getCss(varName) {
+      return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    }
+    function contrastColor(hex) {
+      const c = hex.replace('#', '');
+      const r = parseInt(c.substr(0, 2), 16);
+      const g = parseInt(c.substr(2, 2), 16);
+      const b = parseInt(c.substr(4, 2), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.6 ? '#0f172a' : '#ffffff';
+    }
+
+    // Init
+    paintButtons();
+    setActive('pen', currentPen);
+    window.addEventListener('resize', resize);
+    resize();
+  </script>
+</body>
+</html>
