@@ -1,0 +1,40 @@
+{
+	"compilerOptions": {
+		"alwaysStrict": true,
+		"target": "ES2021",
+		"module": "CommonJS",
+		"outDir": "./dist/cjs",
+
+		"forceConsistentCasingInFileNames": true,
+		"listEmittedFiles": false,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitOverride": true,
+		"noUnusedLocals": true,
+
+		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
+		"esModuleInterop": true,
+		"moduleResolution": "Node",
+		"declaration": true,
+
+		"paths": {
+			"js-draw": ["./packages/js-draw/src/lib.ts"],
+			"@js-draw/*": ["./packages/*/src/lib.ts"]
+		}
+	},
+	"exclude": [
+		"**/node_modules",
+
+		// Files that don't need transpilation
+		// "**/*.test.ts", <- vscode requires .test.ts files to be transpiled for other settings to apply.
+		"./testing/__mocks__/*",
+
+		// Output files
+		"./dist/**"
+	],
+
+	"files": ["./testing/global.d.ts"]
+}

@@ -29,4 +29,8 @@ name = "Swift"
 url = "/swiftnote/"
 weight = 4
 
+[[menu.main]]
+name = "Draw"
+url = "/draw/"
+weight = 5
 

@@ -1,0 +1,10 @@
+.settings-save-button {
+	display: block;
+	width: 80%;
+
+	/* Center */
+	margin-left: auto;
+	margin-right: auto;
+
+	margin-top: 30px;
+}
