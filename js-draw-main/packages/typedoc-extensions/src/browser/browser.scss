@@ -1,0 +1,65 @@
+textarea.runnable-code {
+	width: 100%;
+	min-height: 400px;
+}
+
+.code-run-frame {
+	width: 100%;
+	display: block;
+
+	border-radius: 15px;
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+	border: none;
+}
+
+:root {
+	/* Inherit some styles from TypeDoc */
+	--cm-primary-text-color: var(--color-text, black);
+	--cm-primary-background-color: var(--code-background, white);
+
+	--cm-keyword-color: var(--hl-4, blue);
+	--cm-comment-color: var(--hl-7, green);
+	--cm-string-color: var(--hl-3, brown);
+	--cm-paren-color: var(--hl-1, gray);
+	--cm-varname-color: var(--hl-2, black);
+	--cm-tag-color: var(--hl-9, #500);
+	--cm-number-color: var(--hl-16, black);
+	--cm-integer-color: var(--hl-14, var(--cm-number-color));
+	--cm-typename-color: var(--hl-13, currentColor);
+	--cm-call-function-color: var(--hl-6, currentColor);
+
+	--cm-secondary-background-color: #ddd;
+	--cm-secondary-text-color: #300;
+
+	--cm-caret-color: var(--color-text);
+	--cm-selection-background: #0af;
+
+	--cm-shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+@media screen and (prefers-color-scheme: dark) {
+	:root {
+		--cm-secondary-background-color: #222;
+		--cm-secondary-text-color: #eee;
+
+		--cm-selection-background: #003388;
+
+		--cm-shadow-color: rgba(200, 200, 100, 0.5);
+	}
+}
+
+// Correct code block size within headers
+h1,
+h2,
+h3,
+h4,
+h5 {
+	code {
+		font-size: inherit;
+	}
+}
+
+// Fix video size
+video[controls] {
+	max-width: 100%;
+}
