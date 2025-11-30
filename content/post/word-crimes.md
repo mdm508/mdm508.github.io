@@ -5,7 +5,23 @@ draft: false
 summary: Crimes I Have Committed or Witnessed.
 ---
 
-## Quick hits
+<div class="wordcrime-submit">
+  <h3>Confess your word crimes</h3>
+  <form action="mailto:matthedm@uci.edu" method="post" enctype="text/plain">
+    <label>
+      Name
+      <input type="text" name="name" placeholder="name/nickname" />
+    </label>
+    <br>
+    <label>
+      Crime     
+      <textarea name="wordcrime" rows="3" required placeholder="confess"></textarea>
+    </label>
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+### Crimes
 
 {{< wordcrime
     crime="If it was me, I would have called sooner."
