@@ -5,21 +5,9 @@ draft: false
 summary: Crimes I Have Committed or Witnessed.
 ---
 
-<div class="wordcrime-submit">
-  <h3>Confess your word crimes</h3>
-  <form action="mailto:matthedm@uci.edu" method="post" enctype="text/plain">
-    <label>
-      Name
-      <input type="text" name="name" placeholder="name/nickname" />
-    </label>
-    <br>
-    <label>
-      Crime     
-      <textarea name="wordcrime" rows="3" required placeholder="confess"></textarea>
-    </label>
-    <button type="submit">Send</button>
-  </form>
-</div>
+
+
+
 
 ### Crimes
 
@@ -58,3 +46,7 @@ Some argue that “ten items or less” is so common that it should be accepted.
 >}}
 This one is now up for debate. “their” is traditionally plural, but widely used now as singular they.
 One way to avoid this by making the antecedent plural as in "People should bring their laptops". 
+
+
+
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSf8SUM1FRU4E4Vc6jxyYMWbTKz0gKX5_l1CF-h29CmbgJCZbw/viewform?embedded=true" width="640" height="554" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
