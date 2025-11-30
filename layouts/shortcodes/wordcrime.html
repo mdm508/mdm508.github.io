@@ -1,0 +1,154 @@
+{{- /* Shortcode: wordcrime
+     Usage (auto highlights differences by default):
+     {{< wordcrime crime="If it was me..." correction="If it were me..." >}}
+     Manual overrides (optional):
+     {{< wordcrime crime="If it was me..." correction="If it were me..." crimeHighlight="was" correctionHighlight="were" >}}
+     Positional arguments are also supported.
+*/ -}}
+
+{{- $crimeRaw := or (.Get "crime") (.Get 0) -}}
+{{- $correctionRaw := or (.Get "correction") (.Get 1) -}}
+
+{{- if not (and $crimeRaw $correctionRaw) -}}
+<p><strong>wordcrime shortcode:</strong> please provide both "crime" and "correction" text.</p>
+{{- else -}}
+
+  {{- $crime := htmlEscape $crimeRaw -}}
+  {{- $correction := htmlEscape $correctionRaw -}}
+
+  {{- /* Optional manual highlights */ -}}
+  {{- $crimeHighlight := .Get "crimeHighlight" -}}
+  {{- if not $crimeHighlight }}{{ $crimeHighlight = .Get "bad" }}{{ end -}}
+  {{- if not $crimeHighlight }}{{ $crimeHighlight = .Get 2 }}{{ end -}}
+
+  {{- $correctionHighlight := .Get "correctionHighlight" -}}
+  {{- if not $correctionHighlight }}{{ $correctionHighlight = .Get "good" }}{{ end -}}
+  {{- if not $correctionHighlight }}{{ $correctionHighlight = .Get 3 }}{{ end -}}
+
+  {{- $crimeRendered := "" -}}
+  {{- $correctionRendered := "" -}}
+
+  {{- if or $crimeHighlight $correctionHighlight -}}
+    {{- /* Manual highlight mode: replace provided fragments */ -}}
+    {{- $crimeRendered = $crime -}}
+    {{- if $crimeHighlight -}}
+      {{- $crimeRendered = replace $crime (htmlEscape $crimeHighlight) (printf `<span class="wordcrime-mark wordcrime-mark--crime">%s</span>` (htmlEscape $crimeHighlight)) -}}
+    {{- end -}}
+
+    {{- $correctionRendered = $correction -}}
+    {{- if $correctionHighlight -}}
+      {{- $correctionRendered = replace $correction (htmlEscape $correctionHighlight) (printf `<span class="wordcrime-mark wordcrime-mark--correction">%s</span>` (htmlEscape $correctionHighlight)) -}}
+    {{- end -}}
+  {{- else -}}
+    {{- /* Auto highlight mode: mark mismatching words */ -}}
+    {{- $crimeWords := split $crimeRaw " " -}}
+    {{- $correctionWords := split $correctionRaw " " -}}
+    {{- $lenCrime := len $crimeWords -}}
+    {{- $lenCorrection := len $correctionWords -}}
+
+    {{- $crimePieces := slice -}}
+    {{- range $i, $w := $crimeWords -}}
+      {{- $highlight := false -}}
+      {{- if lt $i $lenCorrection -}}
+        {{- if ne $w (index $correctionWords $i) -}}
+          {{- $highlight = true -}}
+        {{- end -}}
+      {{- else -}}
+        {{- $highlight = true -}}
+      {{- end -}}
+      {{- if $highlight -}}
+        {{- $crimePieces = $crimePieces | append (printf `<span class="wordcrime-mark wordcrime-mark--crime">%s</span>` (htmlEscape $w)) -}}
+      {{- else -}}
+        {{- $crimePieces = $crimePieces | append (htmlEscape $w) -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- $correctionPieces := slice -}}
+    {{- range $i, $w := $correctionWords -}}
+      {{- $highlight := false -}}
+      {{- if lt $i $lenCrime -}}
+        {{- if ne $w (index $crimeWords $i) -}}
+          {{- $highlight = true -}}
+        {{- end -}}
+      {{- else -}}
+        {{- $highlight = true -}}
+      {{- end -}}
+      {{- if $highlight -}}
+        {{- $correctionPieces = $correctionPieces | append (printf `<span class="wordcrime-mark wordcrime-mark--correction">%s</span>` (htmlEscape $w)) -}}
+      {{- else -}}
+        {{- $correctionPieces = $correctionPieces | append (htmlEscape $w) -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- $crimeRendered = delimit $crimePieces " " -}}
+    {{- $correctionRendered = delimit $correctionPieces " " -}}
+  {{- end -}}
+
+  {{- if not (.Page.Scratch.Get "wordcrime-style-added") -}}
+    <style>
+      .wordcrime {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        column-gap: 0.55rem;
+        row-gap: 0.2rem;
+        align-items: baseline;
+        margin: 1.25rem 0;
+        padding: 0.85rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #e5d8c7;
+        background: linear-gradient(120deg, rgba(244, 235, 226, 0.9), rgba(255, 248, 242, 0.95));
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        font-size: 1.05rem;
+        color: #2f241a;
+      }
+
+      .wordcrime-label {
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #7a5332;
+      }
+
+      .wordcrime-label--spacer {
+        visibility: hidden;
+      }
+
+      .wordcrime-text {
+        display: block;
+      }
+
+      .wordcrime-mark {
+        font-weight: 700;
+        text-decoration-line: underline;
+        text-decoration-thickness: 0.12em;
+        text-underline-offset: 3px;
+      }
+
+      .wordcrime-mark--crime {
+        color: #b3261e;
+        text-decoration-color: #b3261e;
+      }
+
+      .wordcrime-mark--correction {
+        color: #137b30;
+        text-decoration-color: #137b30;
+      }
+
+      @media (max-width: 640px) {
+        .wordcrime {
+          padding: 0.75rem 0.85rem;
+          font-size: 1rem;
+        }
+      }
+    </style>
+    {{- .Page.Scratch.Set "wordcrime-style-added" true -}}
+  {{- end -}}
+
+  <div class="wordcrime">
+    <span class="wordcrime-label">CRIME</span>
+    <span class="wordcrime-text wordcrime-text--crime">{{ $crimeRendered | safeHTML }}</span>
+    <span class="wordcrime-label wordcrime-label--spacer" aria-hidden="true"></span>
+    <span class="wordcrime-text wordcrime-text--correction">{{ $correctionRendered | safeHTML }}</span>
+  </div>
+{{- end -}}
