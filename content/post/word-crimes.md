@@ -11,6 +11,7 @@ summary: Crimes I Have Committed or Witnessed.
     crime="If it was me, I would have called sooner."
     correction="If it were me, I would have called sooner."
 >}}
+When is it correct to say “If it was me”? It's correct when you want to describe a real past situation you’re unsure about, as in “If it was me you heard on the stairs last night, I was just getting some water.” In this case, you are reasoning about a scenario that actually happened, so “was” is appropriate. Contrast that with “If it were me on the stairs, you would have heard something like the sound of stampeding elephants,” which is an imagined scenario that might occur but did not actually happen, hence the use of “were” instead of “was.”
 
 {{< wordcrime
     crime="Me and Michael go to the store on Tuesdays."
@@ -18,16 +19,22 @@ summary: Crimes I Have Committed or Witnessed.
 >}}
 If you frequently commit this crime read up on subject vs object pronouns.[Purdue OWL: Pronoun Case](https://owl.purdue.edu/owl/general_writing/grammar/pronouns/pronoun_case.html)
 You wouldn't say ~Me go to the store on Tuesdays~. 
+In standard English, me is used as the object of a verb or preposition, not as the subject of a sentence.
+E.g "Don't do that to me."
 
 {{< wordcrime
-    crime="There were less people at the concert than expected."
-    correction="There were fewer people at the concert than expected."
+    crime="Ten items or less"
+    correction="Ten items or fewer"
 >}}
+Use 'fewer' with countable nouns, e.g fewer cars and 'less' with uncountable nouns e.g less sand.
+Some argue that “ten items or less” is so common that it should be accepted. I look down on such people with great disdain and wish there were fewer of them.
 
 {{< wordcrime
     crime="I could of finished earlier if I had started on time."
     correction="I could have finished earlier if I had started on time."
 >}}
+“Could of” is a misspelling of the spoken contraction “could’ve,” which actually stands for “could have.” In standard English, we say “could have finished,” not “could of finished,” because “of” is a preposition, not a helping verb. So the correct sentence is “I could have finished earlier if I had started on time.”
+
 
 {{< wordcrime
     crime="Each person should bring their laptop."
