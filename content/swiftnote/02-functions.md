@@ -182,8 +182,7 @@ brew("Matcha", at: 75)  // override
 
 
 ### Programming Exercises
-- **E11 (starter):** `func repeatPrint(_ text: String, times: Int = 1)` prints `text` repeatedly on one line separated by spaces.
-- **E12 (from scratch):** `func announce(_ msg: String, newline: Bool = true)` prints with or without a trailing newline (use `terminator: ""` when `newline` is false).
+- **E11 (starter):** `func repeatPrint(_ text: String, times: Int = 1)` prints `text` a total of `times` times, on one line separated by spaces. Hint is to look at how the print function works. 
 
 ---
 
@@ -407,3 +406,330 @@ Show at least three calls demonstrating labels, defaults, variadic, and overload
 3) Explain how your **overloaded** `roll` functions differ by **signature**. Why can Swift tell them apart?
 4) Why is `sum(_:)` a good candidate for a **variadic** parameter?
 5) If you had to pass a function as a parameter later (e.g., a custom modifier), how would you write its **signature**?
+
+
+## Modifiable Parameters
+
+### Summary
+
+- Inside a function, each parameter acts like a **local constant** (`let`): you can *use* it, but you can’t assign a new value to it.
+
+  ```swift
+  func say(_ s: String, times: Int, loudly: Bool) {
+      // loudly = true   // ❌ error: cannot assign to parameter
+  }
+  ```
+
+- If you want a **working copy** you can change, make a new local `var` and copy the parameter into it (you can even reuse the same name):
+
+  ```swift
+  func say(_ s: String, times: Int, loudly: Bool) {
+      var loudly = loudly   // local shadow copy
+      loudly = true         // ✅ ok, this is the local var
+      // ...
+  }
+  ```
+
+- Changing this local `var` **does not** change anything outside the function. It’s just a copy that lives inside the function body.
+
+- If you want a function to **change the caller’s variable**, you must:
+  - Mark the parameter as `inout` in the function declaration,
+  - Pass a **`var`** from the caller,
+  - Use `&` in front of the variable when you call the function.
+
+  ```swift
+  func removeCharacter(_ c: Character, from s: inout String) -> Int {
+      var howMany = 0
+      while let ix = s.firstIndex(of: c) {
+          s.remove(at: ix)
+          howMany += 1
+      }
+      return howMany
+  }
+
+  var word = "hello"
+  let removed = removeCharacter("l", from: &word)
+  // removed == 2, word == "heo"
+  ```
+
+- Using `inout` means the function is allowed to **modify the caller’s storage** as a side effect. Swift forces you to write `&` so you see the “danger” clearly.
+
+---
+
+### Free-Response Questions (leave space to write)
+
+1) In your own words, why does Swift prevent you from assigning directly to a parameter inside a function?
+
+
+
+2) What does it mean to “shadow” a parameter with a local `var`? How is the shadow different from the original parameter?
+
+
+
+3) Look at this code:
+
+```swift
+func trimCopy(_ text: String) -> String {
+    var text = text
+    text = text.trimmingCharacters(in: .whitespaces)
+    return text
+}
+
+let original = " hello "
+let trimmed = trimCopy(original)
+```
+
+Explain why `original` keeps its spaces, even though `text` is changed inside the function.
+
+
+
+4) Imagine you want a function that both **changes** a string by removing all `"a"` characters and **returns** how many `"a"` characters were removed. Why might `inout` be useful here, instead of only returning a new string?
+
+
+
+5) When calling a function with an `inout` parameter, why does Swift require you to write `&myVar` instead of just `myVar`?
+
+
+
+6) Describe one situation where using `inout` is a **good idea**, and one situation where it would be **unnecessary or confusing**.
+
+
+
+---
+
+### Drills (short, focused tasks)
+
+- **D1 – Fix the compiler error (shadowing):**  
+  The function below doesn’t compile. Rewrite it using a local `var` shadow so it compiles and behaves as intended.
+
+  ```swift
+  func markExcited(_ message: String, excited: Bool) {
+      // goal: always make excited true inside this function
+      // excited = true   // ❌ error
+      // print(message, excited)
+  }
+  ```
+
+- **D2 – Working copy vs original:**  
+  Write a function `func trimmedCopy(_ text: String) -> String` that returns a version of `text` with leading and trailing spaces removed, without changing the caller’s variable. Then, in a comment, explain why the original string is unchanged.
+
+- **D3 – In your own words:**  
+  In 2–3 sentences, explain the difference between:
+  - **Changing a parameter’s shadow copy** inside the function, and  
+  - **Changing an `inout` parameter** that belongs to the caller.
+
+---
+
+### Programming Exercises
+
+#### E1 — Shadowing a parameter (starter)
+
+**Goal:** Practice creating a local `var` from a parameter.
+
+Write a function:
+
+```swift
+func shout(_ message: String, times: Int, loudly: Bool) {
+    // ...
+}
+```
+
+Requirements:
+
+- Inside the function, create a local `var loudly = loudly`.
+- Set the local `loudly` to `true`.
+- If `loudly` is `true`, print `message.uppercased()` `times` times.
+- If `times` is less than 1, print nothing.
+
+**Hint (API):**  
+Use a `for _ in 1...times` loop and `message.uppercased()`.
+
+---
+
+#### E2 — Remove a character in place with `inout` (book-style, starter)
+
+**Goal:** Use `inout` to change the caller’s `String` in place.
+
+Implement:
+
+```swift
+func removeCharacter(_ c: Character, from s: inout String) -> Int {
+    // ...
+}
+```
+
+Requirements:
+
+- Remove **all** occurrences of `c` from `s`.
+- Return how many characters were removed.
+- Test:
+
+  ```swift
+  var word = "hello"
+  let removed = removeCharacter("l", from: &word)
+  // Expect: removed == 2, word == "heo"
+  ```
+
+**Hints (API):**
+
+- Use `s.firstIndex(of: c)` to find the next index.
+- Use `s.remove(at: index)` to remove a character.
+- A `while let` loop is helpful here.
+
+---
+
+#### E3 — Count and strip spaces with `inout` (multi-result)
+
+**Goal:** Return one piece of information and also update the original string.
+
+Write:
+
+```swift
+func countAndStripSpaces(from text: inout String) -> Int {
+    // ...
+}
+```
+
+Requirements:
+
+- Remove **all spaces** (`" "`) from `text`.
+- Return how many spaces were removed.
+- Example:
+
+  ```swift
+  var title = "The  Well   Tempered   Clavier"
+  let removedSpaces = countAndStripSpaces(from: &title)
+  // Example result: removedSpaces == 6, title == "TheWellTemperedClavier"
+  ```
+
+**Hints (API):**
+
+- One approach: loop while `text.contains(" ")` and use `firstIndex(of:)` + `remove(at:)`.
+- Another approach: build a new string with `filter { $0 != " " }`, then compare lengths.
+  You can still use `inout` by assigning back to `text`.
+
+---
+
+#### E4 — Clamp a score with `inout` (safely modify numbers)
+
+**Goal:** Use `inout` on a simple numeric value.
+
+Write:
+
+```swift
+func clampScore(_ score: inout Int, min: Int = 0, max: Int = 100) {
+    // ...
+}
+```
+
+Requirements:
+
+- If `score` is less than `min`, set it to `min`.
+- If `score` is greater than `max`, set it to `max`.
+- Otherwise, leave it unchanged.
+- Test:
+
+  ```swift
+  var exam = -5
+  clampScore(&exam)        // exam should become 0
+
+  var bonus = 150
+  clampScore(&bonus)       // bonus should become 100
+
+  var midterm = 88
+  clampScore(&midterm)     // stays 88
+  ```
+
+**Hints (API):**
+
+- Use simple `if`/`else if` checks.
+- You can also use `score = max(min, min(score, max))` if that feels comfortable.
+
+---
+
+#### E5 — Decompose seconds into minutes and seconds (multiple `inout` parameters)
+
+**Goal:** Imitate a “multiple outputs” function using `inout`.
+
+Write:
+
+```swift
+func decompose(timeInSeconds: Int, minutes: inout Int, seconds: inout Int) {
+    // ...
+}
+```
+
+Requirements:
+
+- Compute how many full minutes and leftover seconds are in `timeInSeconds`.
+- Store the results in `minutes` and `seconds`.
+- Example:
+
+  ```swift
+  var mins = 0
+  var secs = 0
+  decompose(timeInSeconds: 125, minutes: &mins, seconds: &secs)
+  // mins == 2, secs == 5
+  ```
+
+**Hints (API):**
+
+- Use integer division `/` to get minutes: `timeInSeconds / 60`.
+- Use remainder `%` to get leftover seconds: `timeInSeconds % 60`.
+
+---
+
+#### E6 — Dog rename vs reset (reference type vs `inout`)
+
+**Goal:** See the difference between mutating a property and replacing an object.
+
+Start with:
+
+```swift
+class Dog {
+    var name: String = ""
+}
+```
+
+Tasks:
+
+1. Write a function:
+
+   ```swift
+   func rename(_ dog: Dog, to newName: String) {
+       // ...
+   }
+   ```
+
+   - This should set `dog.name` to `newName` without using `inout`.
+   - Test:
+
+     ```swift
+     let d = Dog()
+     d.name = "Fido"
+     rename(d, to: "Rover")
+     // d.name should now be "Rover"
+     ```
+
+2. Write a second function:
+
+   ```swift
+   func resetDog(_ dog: inout Dog) {
+       // ...
+   }
+   ```
+
+   - This should **replace** the existing `Dog` with a new one named `"Default"`.
+   - Test:
+
+     ```swift
+     var myDog = Dog()
+     myDog.name = "Chopin"
+     resetDog(&myDog)
+     // myDog.name should now be "Default"
+     ```
+
+**Concept reflection:**
+
+- In a short comment, explain why `rename(_:,to:)` didn’t need `inout`, but `resetDog(_:)` did.
+

@@ -3,6 +3,10 @@
 
   <!-- Title -->
   <h1>{{ .Title }}</h1>
+  Contents
+  {{ .Page.TableOfContents }}
+
+
 
   <!-- Summary -->
   <p class="summary">{{ .Summary | safeHTML }}</p>
