@@ -15,8 +15,8 @@
       --pen1: #ffffff;
       --pen2: #fcd34d;
       --pen3: #ffb3b3;
-      --btn-size: 60px;
-      --toolbar-span: 92px;
+      --btn-size: 44px;
+      --toolbar-span: 80px;
     }
 
     * { box-sizing: border-box; }
@@ -635,8 +635,16 @@
     const canvas = document.getElementById('board');
     const dpr = window.devicePixelRatio || 1;
     const ctx = canvas.getContext('2d');
+    const defaultDocumentTitle = document.title;
     const baseSmoothing = 0.88;
     const stabilizedSmoothing = 0.95;
+    const DEFAULT_PEN_WEIGHT = 4;
+    const DEFAULT_TOOLBAR_SIZE = 44;
+    const DEFAULT_TIMER_MINUTES = 5;
+    const MIN_TIMER_MINUTES = 1;
+    const MAX_TIMER_MINUTES = 480;
+    const TIMER_PRESETS = [1, 2, 3, 5, 10, 15, 20, 25, 30, 45, 60, 90, 105, 120, '?'];
+    const TIMER_HOTKEY_PRESETS = [1, 2, 3, 5, 10, 15, 20, 25, 30];
 
     const resize = () => {
       autoToolbarSize();
@@ -657,7 +665,7 @@
       width: canvas.clientWidth * dpr,
       height: canvas.clientHeight * dpr,
       color: getComputedStyle(document.documentElement).getPropertyValue('--pen1').trim(),
-      weight: 8,
+      weight: DEFAULT_PEN_WEIGHT,
       adaptiveStroke: true,
       smoothing: stabilizedSmoothing,
     });
@@ -671,14 +679,14 @@
     let currentPen = pens[0];
     let isEraser = false;
     const penSettings = {
-      'pen-1': { color: pens[0].color, weight: 8 },
-      'pen-2': { color: pens[1].color, weight: 8 },
-      'pen-3': { color: pens[2].color, weight: 8 },
+      'pen-1': { color: pens[0].color, weight: DEFAULT_PEN_WEIGHT },
+      'pen-2': { color: pens[1].color, weight: DEFAULT_PEN_WEIGHT },
+      'pen-3': { color: pens[2].color, weight: DEFAULT_PEN_WEIGHT },
     };
     atrament.color = penSettings['pen-1'].color;
     atrament.mode = MODE_DRAW;
     let eraserSettings = { weight: 64, deleteWhole: true };
-    const toolbarSettings = { position: 'right', size: 60, userSize: false };
+    const toolbarSettings = { position: 'right', size: DEFAULT_TOOLBAR_SIZE, userSize: true };
     const backgroundSettings = { mode: 'plain', color: '#4ab578' };
     const textSettings = { color: '#ffffff', size: 32 };
     const timers = [];
@@ -810,9 +818,9 @@
       imageActive = false;
       currentPen = pen;
       atrament.mode = MODE_DRAW;
-      const settings = penSettings[pen.id] ?? { color: pen.color, weight: 8 };
+      const settings = penSettings[pen.id] ?? { color: pen.color, weight: DEFAULT_PEN_WEIGHT };
       settings.color = settings.color || pen.color;
-      settings.weight = settings.weight || 8;
+      settings.weight = settings.weight || DEFAULT_PEN_WEIGHT;
       penSettings[pen.id] = settings;
       atrament.color = settings.color;
       syncStrokeSettings();
@@ -957,7 +965,7 @@
 
     const syncStrokeSettings = () => {
       const extras = getExtras();
-      const baseWeight = penSettings[currentPen.id]?.weight || 8;
+      const baseWeight = penSettings[currentPen.id]?.weight || DEFAULT_PEN_WEIGHT;
       let activeWeight = isEraser ? (eraserSettings.weight || 18) : baseWeight;
       let adaptive = false;
       let smoothingValue = stabilizedSmoothing;
@@ -997,7 +1005,7 @@
     };
 
     const applyStrokeStyle = (start, end, extras) => {
-      const base = penSettings[currentPen.id] ?? { color: getCss('--pen1'), weight: 8 };
+      const base = penSettings[currentPen.id] ?? { color: getCss('--pen1'), weight: DEFAULT_PEN_WEIGHT };
       let width = base.weight;
       let alpha = 1;
       let lineCap = 'round';
@@ -1093,7 +1101,7 @@
     };
 
     const renderPenSettings = (pen) => {
-      const settings = penSettings[pen.id] ?? { color: pen.color, weight: 8 };
+      const settings = penSettings[pen.id] ?? { color: pen.color, weight: DEFAULT_PEN_WEIGHT };
       const extras = getExtras(pen);
       settingsPanel.innerHTML = `
         <h3>${pen.id.replace('pen-', 'Pen ')}</h3>
@@ -1106,7 +1114,7 @@
         <div class="row" title="Thickness">
           <div style="display:flex;flex-direction:column;gap:4px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span>🖊️ Thickness</span><span id="pen-thickness-label">${settings.weight}px</span>
+              <span>🖊️ Thickness</span><span id="pen-thickness-label">${settings.weight}pt</span>
             </div>
             <input type="range" min="2" max="24" step="1" value="${settings.weight}" id="pen-thickness">
           </div>
@@ -1128,7 +1136,7 @@
       thicknessInput.oninput = () => {
         const val = Number(thicknessInput.value);
         penSettings[pen.id].weight = val;
-        thicknessLabel.textContent = `${val}px`;
+        thicknessLabel.textContent = `${val}pt`;
         usePen(pen);
       };
       colorInput.oninput = () => {
@@ -1164,7 +1172,7 @@
           resetBtn.textContent = 'Default';
           resetBtn.title = 'Reset pen';
           resetBtn.onclick = () => {
-            penSettings[pen.id] = { color: pen.color, weight: 8 };
+            penSettings[pen.id] = { color: pen.color, weight: DEFAULT_PEN_WEIGHT };
             penExtras[pen.id] = defaultExtras();
             usePen(pen);
             paintButtons();
@@ -1321,11 +1329,11 @@
     };
 
     const renderTimerSettings = () => {
-      const defaultMinutes = 5;
+      const defaultMinutes = DEFAULT_TIMER_MINUTES;
       settingsPanel.innerHTML = `
         <h3>Timer</h3>
         <div class="row" title="Minutes">
-          <input type="number" id="timer-minutes" min="0.1" max="480" step="0.1" value="${defaultMinutes}" placeholder="Minutes" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" style="width:100%;border-radius:14px;padding:14px 12px;border:2px solid #16462e;background:#0b1a12;color:#e5e7eb;font-size:24px;text-align:center;">
+          <input type="number" id="timer-minutes" min="${MIN_TIMER_MINUTES}" max="${MAX_TIMER_MINUTES}" step="1" value="${defaultMinutes}" placeholder="Minutes" inputmode="numeric" pattern="[0-9]*" style="width:100%;border-radius:14px;padding:14px 12px;border:2px solid #16462e;background:#0b1a12;color:#e5e7eb;font-size:24px;text-align:center;">
         </div>
         <div class="row" title="Name">
           <input type="text" id="timer-name" placeholder="Label (optional)" style="width:100%;border-radius:12px;padding:10px 12px;border:2px solid #16462e;background:#0b1a12;color:#e5e7eb;">
@@ -1355,25 +1363,59 @@
         </div>
       `;
 
-      const presets = [1,2,3,5,7,10,15,20,30,45,60,90,105,120,'?'];
       const presetGrid = document.getElementById('timer-presets');
       const minsInput = document.getElementById('timer-minutes');
+      let replaceMinutesOnNextEdit = true;
+      const normalizeTimerMinutes = (value, fallback = defaultMinutes) => {
+        const digitsOnly = String(value ?? '').replace(/\D/g, '');
+        const parsed = Number(digitsOnly || fallback);
+        const wholeMinutes = Math.floor(parsed);
+        return Math.max(MIN_TIMER_MINUTES, Math.min(MAX_TIMER_MINUTES, wholeMinutes || defaultMinutes));
+      };
+      const setMinutesValue = (value, allowReplace = true) => {
+        minsInput.value = String(normalizeTimerMinutes(value));
+        replaceMinutesOnNextEdit = allowReplace;
+      };
+      minsInput.addEventListener('focus', () => {
+        replaceMinutesOnNextEdit = true;
+        minsInput.select();
+      });
+      minsInput.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+          event.preventDefault();
+          replaceMinutesOnNextEdit = false;
+          const delta = event.key === 'ArrowUp' ? 1 : -1;
+          setMinutesValue(normalizeTimerMinutes(minsInput.value) + delta, false);
+          return;
+        }
+        const isPrintable = event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey;
+        const isClearingKey = event.key === 'Backspace' || event.key === 'Delete';
+        if (replaceMinutesOnNextEdit && (isPrintable || isClearingKey)) {
+          minsInput.value = '';
+          replaceMinutesOnNextEdit = false;
+          if (isClearingKey) {
+            event.preventDefault();
+          }
+        }
+      });
       minsInput.addEventListener('input', () => {
-        minsInput.value = minsInput.value.replace(/[^0-9.]/g, '');
+        minsInput.value = minsInput.value.replace(/\D/g, '');
+        replaceMinutesOnNextEdit = false;
       });
       minsInput.addEventListener('blur', () => {
-        const v = Math.max(0.1, Math.min(480, Number(minsInput.value) || defaultMinutes));
-        minsInput.value = v;
+        setMinutesValue(minsInput.value || defaultMinutes);
       });
-      presets.forEach(m => {
+      TIMER_PRESETS.forEach(m => {
         const btn = document.createElement('button');
         btn.textContent = `${m}`;
         btn.onclick = () => {
           if (m === '?') {
-            minsInput.value = Math.max(1, Math.floor(Math.random() * 60) + 1);
+            setMinutesValue(Math.floor(Math.random() * 60) + 1);
           } else {
-            minsInput.value = m;
+            setMinutesValue(m);
           }
+          minsInput.focus();
+          minsInput.select();
         };
         presetGrid.appendChild(btn);
       });
@@ -1399,7 +1441,7 @@
       });
       paintAlarm();
       addBtn.onclick = () => {
-          const mins = Math.min(480, Math.max(0.1, Number(minsInput.value) || defaultMinutes));
+        const mins = normalizeTimerMinutes(minsInput.value);
         const label = nameInput.value.trim();
         const loop = loopInput.checked;
         const grow = growInput.checked;
@@ -1731,7 +1773,7 @@
       if (e.shiftKey) {
         if (code === 'Digit0') {
           e.preventDefault();
-          const mins = Math.max(0.1, Math.floor(Math.random() * 60) + 1);
+          const mins = Math.floor(Math.random() * 60) + 1;
           addTimer(mins, '', false, 'beep');
           return;
         }
@@ -1739,8 +1781,7 @@
         if (digitMatch) {
           e.preventDefault();
           const idx = Number(digitMatch[1]);
-          const presetList = [1,2,3,5,7,10,15,20,30];
-          const mins = presetList[idx - 1] ?? 5;
+          const mins = TIMER_HOTKEY_PRESETS[idx - 1] ?? DEFAULT_TIMER_MINUTES;
           addTimer(mins, '', false, 'beep');
           return;
         }
@@ -1843,10 +1884,10 @@
         usePen(currentPen);
         paintButtons();
       } else if (code === 'KeyD' && e.shiftKey && !isEraser) {
-        penSettings[currentPen.id].weight = Math.min(48, (penSettings[currentPen.id].weight || 8) + 1);
+        penSettings[currentPen.id].weight = Math.min(48, (penSettings[currentPen.id].weight || DEFAULT_PEN_WEIGHT) + 1);
         usePen(currentPen);
       } else if (code === 'KeyF' && e.shiftKey && !isEraser) {
-        penSettings[currentPen.id].weight = Math.max(2, (penSettings[currentPen.id].weight || 8) - 1);
+        penSettings[currentPen.id].weight = Math.max(2, (penSettings[currentPen.id].weight || DEFAULT_PEN_WEIGHT) - 1);
         usePen(currentPen);
       } else if ((e.key === '+' || e.key === '=' )) {
         setRadioVolume(radioVolume + 0.1);
@@ -2099,6 +2140,30 @@
       const s = totalSec % 60;
       return `+${m}:${s.toString().padStart(2, '0')}`;
     }
+    function updateDocumentTitle() {
+      const activeTimers = timers.filter(timer => !timer.removed);
+      if (!activeTimers.length) {
+        document.title = defaultDocumentTitle;
+        return;
+      }
+      const nextTimer = activeTimers.reduce((best, timer) => {
+        if (!best) return timer;
+        if (best.finished !== timer.finished) {
+          return timer.finished ? best : timer;
+        }
+        if (!timer.finished && timer.remaining < best.remaining) {
+          return timer;
+        }
+        if (timer.finished && timer.end < best.end) {
+          return timer;
+        }
+        return best;
+      }, null);
+      const timerText = nextTimer.finished
+        ? formatOverrun(Date.now() - nextTimer.end)
+        : formatTime(nextTimer.remaining);
+      document.title = `${timerText} - ${defaultDocumentTitle}`;
+    }
     function randomFractalText() {
       const pieces = ['~', '*', '^', '/', '\\\\', '≈', '·', '°'];
       const len = 6 + Math.floor(Math.random() * 6);
@@ -2175,59 +2240,140 @@
       timer.wordCount = 1;
     }
 
-    function playBeep(loop) {
-      try {
-        const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctxAudio.createOscillator();
-        const gain = ctxAudio.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = 880;
-        osc.connect(gain);
-        gain.connect(ctxAudio.destination);
-        gain.gain.setValueAtTime(0.2, ctxAudio.currentTime);
-        osc.start();
-        osc.stop(ctxAudio.currentTime + 0.25);
-        if (loop) {
-          const interval = setInterval(() => {
-            const o = ctxAudio.createOscillator();
-            const g = ctxAudio.createGain();
-            o.type = 'sine';
-            o.frequency.value = 880;
-            o.connect(g); g.connect(ctxAudio.destination);
-            g.gain.setValueAtTime(0.2, ctxAudio.currentTime);
-            o.start(); o.stop(ctxAudio.currentTime + 0.25);
-          }, 1200);
-          setTimeout(() => clearInterval(interval), 8000);
+    let alarmAudioContext = null;
+    async function ensureAlarmAudioContext() {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      if (!alarmAudioContext) {
+        alarmAudioContext = new AudioCtor();
+      }
+      if (alarmAudioContext.state === 'suspended') {
+        try {
+          await alarmAudioContext.resume();
+        } catch (err) {
+          console.warn('Audio context resume failed', err);
         }
+      }
+      return alarmAudioContext;
+    }
+    function trackBeepNode(timer, osc, gain) {
+      timer.audioNodes ??= new Set();
+      const node = { osc, gain };
+      timer.audioNodes.add(node);
+      osc.onended = () => {
+        osc.onended = null;
+        try { osc.disconnect(); } catch {}
+        try { gain.disconnect(); } catch {}
+        timer.audioNodes?.delete(node);
+      };
+    }
+    function playBeepBurst(timer) {
+      if (timer.removed) {
+        return false;
+      }
+      if (!alarmAudioContext || alarmAudioContext.state !== 'running') {
+        return false;
+      }
+      const osc = alarmAudioContext.createOscillator();
+      const gain = alarmAudioContext.createGain();
+      const now = alarmAudioContext.currentTime;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      osc.connect(gain);
+      gain.connect(alarmAudioContext.destination);
+      trackBeepNode(timer, osc, gain);
+      osc.start(now);
+      osc.stop(now + 0.25);
+      return true;
+    }
+    async function playBeep(loop, timer) {
+      if (timer.removed) return false;
+      const ctxAudio = await ensureAlarmAudioContext();
+      if (timer.removed) return false;
+      if (!ctxAudio) return false;
+      const started = playBeepBurst(timer);
+      if (!started) return false;
+      if (loop) {
+        timer.beepInterval = window.setInterval(() => {
+          if (timer.removed) return;
+          void ensureAlarmAudioContext().then(() => {
+            if (!timer.removed) playBeepBurst(timer);
+          });
+        }, 1200);
+      }
+      return true;
+    }
+    async function primeMozartAlarm(timer) {
+      if (timer.removed || timer.alarmType !== 'mozart') return;
+      if (!timer.audio) {
+        timer.audio = new Audio('./adagio_amjr_clarinet_concerto.mp3');
+        timer.audio.preload = 'auto';
+      }
+      timer.audio.loop = timer.loop;
+      timer.audio.muted = true;
+      try {
+        await timer.audio.play();
+        timer.audio.pause();
       } catch (err) {
-        console.warn('Audio not available', err);
+        console.warn('Mozart alarm priming failed', err);
+      } finally {
+        timer.audio.currentTime = 0;
+        timer.audio.muted = false;
       }
     }
-    function playAlarm(alarmType, loop, timer) {
+    async function playAlarm(alarmType, loop, timer) {
+      if (timer.removed) return false;
+      stopTimerAudio(timer);
       if (alarmType === 'mozart') {
         try {
-          const audio = new Audio('adagio_amjr_clarinet_concerto.mp3');
+          const audio = timer.audio || new Audio('./adagio_amjr_clarinet_concerto.mp3');
+          audio.preload = 'auto';
           audio.loop = loop;
-          audio.play().catch(err => {
-            console.warn('Mozart alarm failed, falling back to beep', err);
-            playBeep(loop);
-          });
-          if (loop) timer.audio = audio;
+          audio.muted = false;
+          audio.currentTime = 0;
+          timer.audio = audio;
+          await audio.play();
+          return true;
         } catch (err) {
           console.warn('Mozart alarm unavailable, falling back to beep', err);
-          playBeep(loop);
+          timer.audio = null;
         }
-      } else {
-        playBeep(loop);
       }
+      return playBeep(loop, timer);
     }
 
     function stopTimerAudio(t) {
+      if (t.beepInterval) {
+        clearInterval(t.beepInterval);
+        t.beepInterval = null;
+      }
+      if (t.audioNodes) {
+        for (const node of t.audioNodes) {
+          try { node.osc.onended = null; } catch {}
+          try { node.osc.stop(); } catch {}
+          try { node.osc.disconnect(); } catch {}
+          try { node.gain.disconnect(); } catch {}
+        }
+        t.audioNodes.clear();
+      }
       if (t.audio) {
         t.audio.pause();
         t.audio.currentTime = 0;
-        t.audio = null;
       }
+    }
+
+    function removeTimer(timer) {
+      timer.removed = true;
+      clearInterval(timer.interval);
+      stopTimerAudio(timer);
+      timer.audio = null;
+      const idx = timers.indexOf(timer);
+      if (idx >= 0) timers.splice(idx, 1);
+      updateDocumentTitle();
+      renderTimers();
     }
 
     function renderTimers() {
@@ -2242,12 +2388,7 @@
         const remove = document.createElement('button');
         remove.className = 'remove';
         remove.textContent = '×';
-        remove.onclick = () => {
-          clearInterval(t.interval);
-          stopTimerAudio(t);
-          timers.splice(timers.indexOf(t), 1);
-          renderTimers();
-        };
+        remove.onclick = () => removeTimer(t);
         const time = document.createElement('div');
         time.className = 'time';
         time.textContent = formatTime(t.remaining);
@@ -2263,13 +2404,15 @@
           renderTimers();
         });
       });
+      updateDocumentTitle();
     }
 
     function addTimer(mins, name, loop, alarmType = 'beep', grow = false) {
+      const normalizedMinutes = Math.max(MIN_TIMER_MINUTES, Math.min(MAX_TIMER_MINUTES, Math.floor(Number(mins) || DEFAULT_TIMER_MINUTES)));
       const now = Date.now();
-      const duration = mins * 60 * 1000;
-      const defaultLabel = `${mins} min`;
-      const hasCustomLabel = !!name && name !== defaultLabel;
+      const duration = normalizedMinutes * 60 * 1000;
+      const defaultLabel = `${normalizedMinutes} min`;
+      void ensureAlarmAudioContext();
       const timer = {
         id: timerIdCounter++,
         name: name || defaultLabel,
@@ -2282,7 +2425,10 @@
         elements: null,
         alarmType,
         audio: null,
-        minimized: !hasCustomLabel,
+        beepInterval: null,
+        audioNodes: new Set(),
+        removed: false,
+        minimized: false,
         grow,
         finishedAt: null,
         baseW: null,
@@ -2291,9 +2437,13 @@
         currentWord: null,
         words: [],
       };
+      if (alarmType === 'mozart') {
+        void primeMozartAlarm(timer);
+      }
       timer.interval = setInterval(() => {
         const left = timer.end - Date.now();
         timer.remaining = Math.max(0, left);
+        updateDocumentTitle();
         if (timer.elements && !(timer.finished && timer.grow)) {
           timer.elements.time.textContent = formatTime(timer.remaining);
         }
@@ -2309,7 +2459,7 @@
               timer.elements.time.style.color = '#ef4444';
             }
           }
-          playAlarm(timer.alarmType, timer.loop, timer);
+          void playAlarm(timer.alarmType, timer.loop, timer);
           if (radioPauseWhenTimer && radioOn) {
             radioOn = false;
             radioAudio?.pause();
