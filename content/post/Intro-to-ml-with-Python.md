@@ -15,3 +15,5 @@ What makes this coures great and fantastic for learning python is that he has cr
 
 To get started, just open up "Lab01.ipynb" and select the "Open in Colab Button" (you will need a gmail account for this to work). Then you should see the notebook open. Go to FILE->SAVE A COPY TO DRIVE, and you are good to go.
 
+## Intro to Python Supplemental Notebook
+I thought Edmond's course could benefit from some additional supplemental resources for Python. I created my own [Jupyter Notebook Intro Lesson](https://github.com/mdm508/PythonNotebooks/blob/main/Intro_to_Python_for_C%2B%2B_Programmers.ipynb) to fill in some of the gaps I felt were in Lab0. This tutorial assumes c++, or a similar language.
