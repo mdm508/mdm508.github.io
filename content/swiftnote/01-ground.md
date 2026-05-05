@@ -1,5 +1,5 @@
 ---
-title: "Chapter 01 Ground of Being in Swift"
+title: "Ground of Being in Swift"
 date: 2025-01-08T00:00:00-00:00
 draft: false
 tags: ["swift"]
@@ -10,6 +10,7 @@ reading: "Chapter 1"
 ---
 
 # Chapter 1 
+
 
 ## How do I run my code?
 Since we are doing pure swift right now I reccomend creating a **command line app** instead of an iOS app. 

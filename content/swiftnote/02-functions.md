@@ -1,5 +1,5 @@
 ---
-title: "Chapter 02 Functions"
+title: "Functions"
 date: 2025-11-03T03:46:31-08:00
 draft: false
 tags: ["swift"]
@@ -13,6 +13,7 @@ reading: "Chapter 02-functions"
 # Chapter 2 — Functions (Part 1)
 
 ---
+
 
 ## Function Parameters and Return Value
 
