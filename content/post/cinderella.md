@@ -1,7 +1,7 @@
 ---
 title: "Cinderella"
 date: 2025-05-30T22:51:11-07:00
-draft: false
+draft: true
 summary: a modern take on Cinderella.
 ---
 

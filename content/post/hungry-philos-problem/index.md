@@ -2,7 +2,7 @@
 title: "The Hungry Philosophers Problem"
 date: 2025-04-05T16:48:07-07:00
 draft: false
-summary: cool puzzle related to synchronization issues in concurrent programming.
+summary: Cool puzzle related to synchronization issues in concurrent programming.
 ---
 
 ##  Hungry Philosophers Problem

@@ -1,0 +1,4 @@
+# List of tags I have used
+# i always go lowercase with - if we really need to seperate words
+
+python

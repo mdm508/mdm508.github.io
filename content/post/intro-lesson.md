@@ -1,13 +1,31 @@
 ---
-title: "Self Guided Coding Lesson"
+title: "Scratch Projects & WeScheme"
 date: 2025-05-30T22:10:37-07:00
 draft: false
-summary: if your new to writting code check out some of these pedagogical programming languages to get started
+summary: If your new to coding check out some of my Scratch Games.
 ---
+Scratch and WeScheme are pedagogical programming languages fantastic for begginers. I reccomend checking out both and seeing which one you like. I have used and enjoyed both.
 
-A while back I hosted a few coding demos online. I copy and pasted the original post below because I think these are still great introductory lessons that kids can use to help them break into the world of programming.
+## WeScheme
+Try out the 1 hour of code [WeScheme Starter](https://www.bootstrapworld.org/materials/fall2023/en-us/lessons/hoc-wescheme-intro/index.shtml#).
+You need to be able to type in order to follow along. 
+
+## Scratch
+As long as you can use a mouse, you can use Scratch. Scratch Starter](https://scratch.mit.edu/projects/781102539) to make a simple snowflake-catching game.
 
 
-In the first half of the lesson, we will use [Scratch](https://scratch.mit.edu/) and in the second, [WeScheme](https://www.wescheme.org/).
-- We will use the [Scratch Starter](https://scratch.mit.edu/projects/898666614) to make a simple snowflake-catching game.
-- Then we will make cool shapes with the [WeScheme Starter](https://www.bootstrapworld.org/materials/fall2023/en-us/lessons/hoc-wescheme-intro/index.shtml#).
+## Scratch Projects I made
+*These may take a while to load*
+For all my projects see [Matthew's Scratch Projects](https://scratch.mit.edu/search/projects?q=matthedm).
+
+### Dodge the Snowflakes
+Here is a remix of that game where you try and *avoid* the snowflakes.
+Control the Snowman with the arrowkeys
+<iframe src="https://scratch.mit.edu/projects/898666614/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+
+### Brickbreaker
+<iframe src="https://scratch.mit.edu/projects/353939621/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+
+### Dodgeball
+Another avoid stuff game but weirder and less polished.
+<iframe src="https://scratch.mit.edu/projects/321520971/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>

@@ -1,7 +1,7 @@
 ---
 title: "Word Crimes"
 date: 2025-11-30T12:15:49-08:00
-draft: false
+draft: true
 summary: Crimes I Have Committed or Witnessed.
 ---
 
