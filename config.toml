@@ -9,8 +9,8 @@ theme = 'hugo-xmin'
 
 [markup]
   [markup.tableOfContents]
-    endLevel = 2
-    startLevel = 1
+    endLevel = 4
+    startLevel = 2
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
@@ -31,6 +31,11 @@ weight = 2
 [[menu.main]]
 name = "MyWiki"
 url = "https://mdm508.github.io/vimwiki/"
+weight = 4
+
+[[menu.main]]
+name = "Swift"
+url = "/swift/"
 weight = 4
 
 [[menu.main]]
