@@ -1,0 +1,105 @@
+
+/* =========================
+   Base Typography
+========================= */
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #222;
+}
+
+/* Center content in Hugo layout */
+.lesson-section {
+  max-width: 900px;
+  margin: 0 auto 40px auto;
+  padding: 10px 0;
+}
+
+/* =========================
+   Section Headers
+========================= */
+
+.lesson-section h2 {
+  border-bottom: 2px solid #e5e5e5;
+  padding-bottom: 6px;
+  margin-bottom: 15px;
+}
+
+.lesson-section h3 {
+  margin-top: 20px;
+  color: #333;
+}
+
+/* =========================
+   Question Blocks
+========================= */
+
+.question {
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  border-left: 3px solid #0066cc;
+  background: #fafafa;
+}
+
+/* =========================
+   Details / Reveal Answers
+========================= */
+
+details {
+  margin-top: 8px;
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  color: #0066cc;
+}
+
+summary:hover {
+  color: #004a99;
+}
+
+/* =========================
+   Code Blocks
+========================= */
+
+pre {
+  background: #1e1e1e;
+  color: #f8f8f2;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-top: 10px;
+}
+
+code {
+  font-family: Menlo, Monaco, Consolas, monospace;
+  font-size: 0.95em;
+}
+
+/* =========================
+   Page Title
+========================= */
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+p {
+  max-width: 900px;
+  margin: 0 auto 20px auto;
+}
+
+/* =========================
+   Optional: Improve readability spacing
+========================= */
+
+.lesson-section p {
+  margin-bottom: 10px;
+}
