@@ -4,6 +4,7 @@ date: '{{ .Date }}'
 draft: false
 description: ''
 tags: []
-summary: ""
+summary: ''
+thumbnail: ''
+exclude_from_articles: false
 ---
-

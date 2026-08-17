@@ -1,7 +1,7 @@
 ---
 title: "Variables"
 date: 2026-05-05T10:28:48-07:00
-draft: false
+draft: true
 tags: ["swift"]
 categories: ["Swift"]
 summary: "Variable lifetime, decleration, and initialization."

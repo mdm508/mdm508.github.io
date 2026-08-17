@@ -20,26 +20,14 @@ custom_css = ["custom.css"]
 [[menu.main]]
 name = "Home"
 url = "/"
-weight = 1 
+weight = 1
 
 [[menu.main]]
 name = "Posts"
 url = "/post/"
 weight = 2
 
-
-[[menu.main]]
-name = "MyWiki"
-url = "https://mdm508.github.io/vimwiki/"
-weight = 4
-
-[[menu.main]]
-name = "Swift"
-url = "/swift/"
-weight = 4.5
-
 [[menu.main]]
 name = "Draw"
 url = "/draw/"
-weight = 5
-
+weight = 3

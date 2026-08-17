@@ -1,7 +1,7 @@
 ---
 title: "Ground of Being in Swift"
 date: 2025-01-08T00:00:00-00:00
-draft: false
+draft: true
 tags: ["swift"]
 categories: ["Swift"]
 summary: "A comprehensive tour of Swift fundamentals covering statements, operators as functions, custom types (struct/class/enum), variables vs constants, scope and lifetime, namespaces, and access control with practical examples."

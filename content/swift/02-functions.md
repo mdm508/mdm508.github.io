@@ -1,7 +1,7 @@
 ---
 title: "Functions"
 date: 2025-11-03T03:46:31-08:00
-draft: false
+draft: true
 tags: ["swift"]
 categories: ["Swift"]
 summary: "Functions are first class citizens"
