@@ -60,8 +60,8 @@ main::before {
 
 main {
   margin: 1.75rem 0;
-  background: rgba(255, 254, 250, 0.92);
-  border: 1px solid rgba(63, 88, 83, 0.12);
+  background: rgba(252, 245, 226, 0.95);
+  border: 1px solid rgba(139, 104, 62, 0.12);
   border-radius: 10px;
   box-shadow: var(--shadow-medium);
 }
@@ -123,13 +123,13 @@ pre::before {
 }
 
 code {
-  background: #e8ece5;
+  background: #f4e6bf;
   color: #263632;
 }
 
 blockquote {
-  background: rgba(234, 239, 231, 0.82);
-  border-left-color: var(--accent-brown);
+  background: rgba(248, 230, 183, 0.7);
+  border-left-color: var(--accent-orange);
   box-shadow: none;
 }
 

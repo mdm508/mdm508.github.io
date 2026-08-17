@@ -1,8 +1,8 @@
 .article-outline {
   margin: 1.5rem 0 2.25rem;
   padding: 1rem 1.2rem 1.1rem;
-  background: rgba(244, 243, 237, 0.82);
-  border: 1px solid rgba(63, 111, 105, 0.16);
+  background: rgba(248, 235, 201, 0.68);
+  border: 1px solid rgba(139, 104, 62, 0.14);
   border-left: 3px solid var(--accent-orange);
   border-radius: 7px;
 }
@@ -52,8 +52,8 @@
 
 .qa-answer {
   margin: 1rem 0 1.5rem;
-  background: rgba(239, 241, 235, 0.72);
-  border: 1px solid rgba(63, 111, 105, 0.16);
+  background: rgba(250, 239, 210, 0.72);
+  border: 1px solid rgba(139, 104, 62, 0.16);
   border-radius: 7px;
 }
 
@@ -82,7 +82,7 @@
 
 .qa-answer__content {
   padding: 0.25rem 0.95rem 1rem;
-  border-top: 1px solid rgba(63, 111, 105, 0.14);
+  border-top: 1px solid rgba(139, 104, 62, 0.14);
 }
 
 .qa-answer__content > :first-child {
