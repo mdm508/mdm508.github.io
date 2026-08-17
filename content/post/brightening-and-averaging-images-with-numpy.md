@@ -5,6 +5,7 @@ draft: false
 description: "Learn how NumPy brightens and averages RGB images while avoiding overflow, clipping safely, and working with array axes."
 tags: ["python", "numpy", "image-processing"]
 summary: "A question-and-answer introduction to safe image arithmetic, vectorization, clipping, stacking, axes, and image averages with NumPy."
+reading_time: 120
 ---
 
 An image looks like a picture to us, but to NumPy it is an array of numbers. Once you are comfortable moving between those two views, image processing becomes a practical way to learn data types, vectorization, Boolean masks, shapes, axes, and summary statistics.

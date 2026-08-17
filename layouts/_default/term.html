@@ -1,0 +1,14 @@
+{{ define "main" }}
+  <link rel="stylesheet" href="{{ "css/articles.css" | relURL }}">
+
+  <section class="articles-index">
+    <header class="articles-index__intro">
+      <p class="articles-index__eyebrow">Tag</p>
+      <h1>{{ .Title | markdownify }}</h1>
+      <p>Articles tagged <strong>{{ .Title }}</strong>.</p>
+    </header>
+
+    {{ $pages := where .Pages "Params.exclude_from_articles" "ne" true }}
+    {{ partial "article-list.html" (dict "pages" $pages.ByDate.Reverse "label" (printf "Articles tagged %s" .Title)) }}
+  </section>
+{{ end }}

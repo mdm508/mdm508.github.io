@@ -2,6 +2,7 @@
 title: "Scratch Projects & WeScheme"
 date: 2025-05-30T22:10:37-07:00
 draft: false
+tags: ["scratch", "wescheme", "beginner-programming"]
 summary: If your new to coding check out some of my Scratch Games.
 ---
 Scratch and WeScheme are pedagogical programming languages fantastic for begginers. I reccomend checking out both and seeing which one you like. I have used and enjoyed both.
