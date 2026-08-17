@@ -38,7 +38,8 @@ images/
 └── second.jpg
 ```
 
-**Answer.** Start with this setup code:
+{{< answer >}}
+Start with this setup code:
 
 ```python
 from pathlib import Path
@@ -63,6 +64,8 @@ print("Data type:", first.dtype)
 
 The examples below use images with shape `(825, 1100, 3)`, but your height and width may be different. The final `3` represents the red, green, and blue channels.
 
+{{< /answer >}}
+
 ## 1. Brightening Is Multiplication with a Boundary
 
 Brightening means multiplying each color channel by a factor greater than `1`. There is one important limit: an ordinary 8-bit RGB channel cannot store a value greater than `255`. If a calculation crosses that boundary, we need to clip it.
@@ -77,7 +80,8 @@ Apply a brightness factor of `1.5` to this pixel:
 
 What values do you calculate, and what pixel can actually be stored?
 
-**Answer.** Multiply each channel separately:
+{{< answer >}}
+Multiply each channel separately:
 
 ```text
 100 × 1.5 = 150
@@ -89,15 +93,20 @@ The calculated result is `[150, 270, 360]`. Because RGB channels stop at `255`, 
 
 Notice what was lost here. The green result was `270` and the blue result was `360`, but both became `255`. After clipping, their original difference is gone. Clipping keeps the image valid, but it cannot preserve detail that lies beyond the boundary.
 
+{{< /answer >}}
+
 ### Question 2: Why not store values such as 270 or 360?
 
-**Answer.** These image arrays use the `uint8` data type. The name means **unsigned 8-bit integer**:
+{{< answer >}}
+These image arrays use the `uint8` data type. The name means **unsigned 8-bit integer**:
 
 - unsigned means there are no negative values;
 - 8 bits provide 256 possible patterns; and
 - those patterns represent the integers `0` through `255`.
 
 A value such as `270` does not fit. Before we save the image, every channel must be returned to the legal range. This is not just an image-processing concern. Every numerical data type has limits, so choosing a type and converting at the right time are part of doing reliable data work.
+
+{{< /answer >}}
 
 ### Question 3 (P.R.E.): What will this print?
 
@@ -109,7 +118,8 @@ values = np.array([250], dtype=np.uint8)
 print(values + 10)
 ```
 
-**Answer.** The output is:
+{{< answer >}}
+The output is:
 
 ```text
 [4]
@@ -123,6 +133,8 @@ It is not `260`. A `uint8` value wraps around after `255`:
 ```
 
 This is called **integer overflow**. The surprising answer is a useful warning: do not perform image arithmetic in `uint8` when the intermediate result might leave the range `0` through `255`.
+
+{{< /answer >}}
 
 ## 2. Brighten the Image with Ordinary Loops
 
@@ -153,7 +165,8 @@ for row in range(height):
         ]
 ```
 
-**Answer.** Convert each channel to a regular Python integer, multiply it, round it, and cap it at `255`:
+{{< answer >}}
+Convert each channel to a regular Python integer, multiply it, round it, and cap it at `255`:
 
 ```python
 factor = 1.5
@@ -186,9 +199,12 @@ Image.fromarray(brightened_loop).save(
 
 You can read the traversal almost like a set of directions: visit a row, visit a column, unpack one pixel, calculate its three new channels, and place the result into the output array.
 
+{{< /answer >}}
+
 ### Question 5: What jobs do `int()`, `round()`, and `min()` perform?
 
-**Answer.** Each function handles a different part of the operation:
+{{< answer >}}
+Each function handles a different part of the operation:
 
 ```python
 int(red)
@@ -210,6 +226,8 @@ min(255, calculated_value)
 
 Together, the three steps say: calculate safely, produce a whole-number channel, and do not cross the image boundary.
 
+{{< /answer >}}
+
 ## 3. Replace the Loops with NumPy
 
 A **vectorized operation** asks NumPy to apply one rule across an entire array. Many calculations still happen, but NumPy handles the iteration internally instead of making us write a Python loop for every row and column.
@@ -227,7 +245,8 @@ print(first.dtype)
 print(working.dtype)
 ```
 
-**Answer.** The shapes are identical:
+{{< answer >}}
+The shapes are identical:
 
 ```text
 (825, 1100, 3)
@@ -245,6 +264,8 @@ float32
 
 The distinction between a value and its representation is important. A number may look the same when printed, but the data type determines which values can be represented and how arithmetic behaves.
 
+{{< /answer >}}
+
 ### Question 7: What does `working * 1.5` produce?
 
 Does this expression create one value, one pixel, or an entire image?
@@ -253,7 +274,8 @@ Does this expression create one value, one pixel, or an entire image?
 scaled = working * 1.5
 ```
 
-**Answer.** It creates an entire array with the same shape as `working`:
+{{< answer >}}
+It creates an entire array with the same shape as `working`:
 
 ```text
 (825, 1100, 3)
@@ -261,13 +283,16 @@ scaled = working * 1.5
 
 NumPy applies `1.5` to every red, green, and blue channel in every row and column. Applying one scalar value throughout a larger array is a simple example of **broadcasting**.
 
+{{< /answer >}}
+
 ### Question 8: What does an array comparison produce?
 
 ```python
 too_high = scaled > 255
 ```
 
-**Answer.** The comparison produces a Boolean array with the same shape as `scaled`. Every position contains either `True` or `False`.
+{{< answer >}}
+The comparison produces a Boolean array with the same shape as `scaled`. Every position contains either `True` or `False`.
 
 For example:
 
@@ -286,13 +311,16 @@ print("Channels requiring clipping:", number_clipped)
 
 `np.count_nonzero()` counts the `True` entries because `True` behaves like `1` in this context. This condition-mask-count pattern appears often in data analysis: state a condition, create a mask, and count or select the observations that satisfy it.
 
+{{< /answer >}}
+
 ### Question 9: What does `np.clip()` do?
 
 ```python
 clipped = np.clip(scaled, 0, 255)
 ```
 
-**Answer.** `np.clip()` applies a lower and upper boundary to every value:
+{{< answer >}}
+`np.clip()` applies a lower and upper boundary to every value:
 
 - values below `0` become `0`;
 - values from `0` through `255` stay unchanged; and
@@ -307,11 +335,14 @@ After:  [0, 80, 255]
 
 The clipped result is still a floating-point array. We wait until the arithmetic is finished before converting it back to `uint8`.
 
+{{< /answer >}}
+
 ### Question 10: What does a complete NumPy brightness function look like?
 
 How can we check that it agrees with the loop version?
 
-**Answer.** Put the safe conversion, multiplication, clipping, rounding, and final conversion into one function:
+{{< answer >}}
+Put the safe conversion, multiplication, clipping, rounding, and final conversion into one function:
 
 ```python
 def brighten_numpy(pixels, factor):
@@ -354,6 +385,8 @@ print("Brightened mean:", np.mean(brightened_numpy))
 
 The brightened mean will usually be higher. It cannot grow without limit, though, because clipping keeps every channel at or below `255`.
 
+{{< /answer >}}
+
 ## 4. Average Two Images
 
 To average two images, pair corresponding pixels. Red is averaged with red, green with green, and blue with blue. This only makes sense when the images have matching shapes.
@@ -365,7 +398,8 @@ print(first.shape)
 print(second.shape)
 ```
 
-**Answer.** Every position in the first image needs exactly one partner in the second:
+{{< answer >}}
+Every position in the first image needs exactly one partner in the second:
 
 ```python
 first[row, column, channel]
@@ -381,6 +415,8 @@ if first.shape != second.shape:
 
 Resizing is a separate image-processing task. For this lesson, use matching images so that we can focus on the arithmetic.
 
+{{< /answer >}}
+
 ### Question 12: How do we average two pixels?
 
 ```text
@@ -388,7 +424,8 @@ First:  [200,  50,  10]
 Second: [100, 150, 250]
 ```
 
-**Answer.** Average corresponding channels:
+{{< answer >}}
+Average corresponding channels:
 
 ```text
 Red:   (200 + 100) / 2 = 150
@@ -397,6 +434,8 @@ Blue:  ( 10 + 250) / 2 = 130
 ```
 
 The averaged pixel is `[150, 100, 130]`. We never mix the channels with one another; red is paired only with red, and so on.
+
+{{< /answer >}}
 
 ### Question 13 (P.R.E.): Is direct `uint8` addition safe?
 
@@ -409,7 +448,8 @@ b = np.array([100], dtype=np.uint8)
 print(a + b)
 ```
 
-**Answer.** The output is:
+{{< answer >}}
+The output is:
 
 ```text
 [44]
@@ -429,9 +469,12 @@ That means this natural-looking expression is unsafe:
 
 The overflow occurs during the addition. Dividing afterward cannot repair the information that was already lost.
 
+{{< /answer >}}
+
 ### Question 14: How can we average the images with loops?
 
-**Answer.** A triple loop makes all three array dimensions explicit:
+{{< answer >}}
+A triple loop makes all three array dimensions explicit:
 
 ```python
 average_loop = first.copy()
@@ -461,9 +504,12 @@ Image.fromarray(average_loop).save(
 
 The `int()` conversions prevent `uint8` overflow during addition. The loop is verbose, but it is useful while you are learning what every dimension represents.
 
+{{< /answer >}}
+
 ### Question 15: How can NumPy average the images safely?
 
-**Answer.** Convert both arrays before adding them:
+{{< answer >}}
+Convert both arrays before adding them:
 
 ```python
 first_working = first.astype(np.float32)
@@ -490,6 +536,8 @@ The comparison should return `True`.
 
 We do not need clipping here. The average of two values that are both between `0` and `255` must also be between `0` and `255`.
 
+{{< /answer >}}
+
 ## 5. Stack the Images and Choose an Axis
 
 Data work often involves organizing several related datasets into one larger array. We can stack two images, then tell NumPy to average across the new image axis.
@@ -502,7 +550,8 @@ Suppose both images have shape `(825, 1100, 3)`. What shape will this produce?
 pair = np.stack([first, second], axis=0)
 ```
 
-**Answer.** The new shape is:
+{{< answer >}}
+The new shape is:
 
 ```text
 (2, 825, 1100, 3)
@@ -519,6 +568,8 @@ axis 3 = color channel
 
 Nothing has been averaged yet. `np.stack()` has only organized two arrays inside a new, larger array.
 
+{{< /answer >}}
+
 ### Question 17: What does `axis=0` mean here?
 
 What does this operation average, and what shape will it return?
@@ -527,7 +578,8 @@ What does this operation average, and what shape will it return?
 average_values = np.mean(pair, axis=0)
 ```
 
-**Answer.** `axis=0` tells NumPy to average across the image axis. For each row, column, and channel, NumPy averages:
+{{< answer >}}
+`axis=0` tells NumPy to average across the image axis. For each row, column, and channel, NumPy averages:
 
 ```python
 pair[0, row, column, channel]
@@ -543,6 +595,8 @@ average_stack = np.rint(average_values).astype(np.uint8)
 ```
 
 When you work with an axis, try to name the dimension being removed. Saying “average the image axis” is more useful than memorizing the number `0` without its meaning.
+
+{{< /answer >}}
 
 ### Question 18: Do these two NumPy methods agree?
 
@@ -561,13 +615,16 @@ method_b = np.rint(
 ).astype(np.uint8)
 ```
 
-**Answer.** Yes. Both methods calculate the arithmetic mean of corresponding channels.
+{{< answer >}}
+Yes. Both methods calculate the arithmetic mean of corresponding channels.
 
 ```python
 print(np.array_equal(method_a, method_b))
 ```
 
 The result should be `True`. The first method states the two-image formula directly. The stack-and-mean method extends more naturally when you have three or more images.
+
+{{< /answer >}}
 
 ### Question 19: What do channel means tell us?
 
@@ -578,13 +635,16 @@ print(channel_means)
 print(channel_means.shape)
 ```
 
-**Answer.** This operation averages across all rows (`axis 0`) and all columns (`axis 1`). It leaves the RGB channel dimension, so the result has shape `(3,)`:
+{{< answer >}}
+This operation averages across all rows (`axis 0`) and all columns (`axis 1`). It leaves the RGB channel dimension, so the result has shape `(3,)`:
 
 ```text
 [mean red, mean green, mean blue]
 ```
 
 This is a small but genuine data-analysis operation. A large image has been reduced to three summary statistics. Look at your photograph and compare it with the numbers. Does the channel with the largest mean seem visually dominant?
+
+{{< /answer >}}
 
 ## 6. Does Transformation Order Matter?
 
@@ -603,7 +663,8 @@ Compare these two procedures:
 1. Average first, then brighten.
 2. Brighten each value first, then average.
 
-**Answer.** Start by averaging:
+{{< answer >}}
+Start by averaging:
 
 ```text
 (240 + 120) / 2 = 180
@@ -624,6 +685,8 @@ Now reverse the order:
 So **brighten, then average** gives `218`.
 
 The answers differ because clipping loses information. Once `360` has become `255`, the later calculation cannot recover the original value. In mathematical language, these transformations do not always **commute**: reversing their order can change the result.
+
+{{< /answer >}}
 
 ## What You Have Learned
 

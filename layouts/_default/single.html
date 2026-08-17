@@ -1,0 +1,49 @@
+{{ define "main" }}
+  {{ $tocItems := findRE "<a href=" .TableOfContents }}
+  {{ $showTOC := and (ge .WordCount 1200) (ge (len $tocItems) 4) }}
+  {{ if isset .Params "toc" }}
+    {{ $tocSetting := printf "%v" .Params.toc }}
+    {{ if ne $tocSetting "" }}
+      {{ $showTOC = eq $tocSetting "true" }}
+    {{ end }}
+  {{ end }}
+  {{ $tocHTML := .TableOfContents | replaceRE `id="TableOfContents"` `class="article-toc__links"` | safeHTML }}
+
+  <link rel="stylesheet" href="{{ "css/article.css" | relURL }}">
+
+  <article class="article-page{{ if $showTOC }} article-page--with-toc{{ end }}">
+    {{ if $showTOC }}
+      <aside class="article-toc article-toc--desktop" data-article-toc aria-label="On this page">
+        <h2>On this page</h2>
+        {{ $tocHTML }}
+      </aside>
+
+      <details class="article-toc article-toc--compact" data-article-toc>
+        <summary>
+          <span>On this page</span>
+          <span class="article-toc__current" aria-live="polite"></span>
+        </summary>
+        <div class="article-toc__compact-links">
+          {{ $tocHTML }}
+        </div>
+      </details>
+    {{ end }}
+
+    <div class="article-meta">
+      <h1><span class="title">{{ .Title | markdownify }}</span></h1>
+      {{ if .Date }}
+        <time class="date" datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+          {{ .Date.Format "January 2, 2006" }}
+        </time>
+      {{ end }}
+    </div>
+
+    <div class="content article-content">
+      {{ .Content }}
+    </div>
+  </article>
+
+  {{ if $showTOC }}
+    <script src="{{ "js/article-toc.js" | relURL }}" defer></script>
+  {{ end }}
+{{ end }}

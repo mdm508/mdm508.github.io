@@ -1,14 +1,7 @@
 {{ $pages := .pages }}
 {{ $label := .label | default "Articles" }}
 
-<div class="article-list" role="table" aria-label="{{ $label }}">
-  <div class="article-list__header" role="row">
-    <span role="columnheader">Article</span>
-    <span role="columnheader">Length</span>
-    <span role="columnheader">Tags</span>
-    <span role="columnheader">Date</span>
-  </div>
-
+<div class="article-list" aria-label="{{ $label }}">
   {{ range $pages }}
     {{ $page := . }}
     {{ $tags := .GetTerms "tags" }}
@@ -17,8 +10,8 @@
       {{ $readingTime = . }}
     {{ end }}
 
-    <article class="article-list__row" role="row">
-      <div class="article-list__cell article-list__article" role="cell" data-label="Article">
+    <article class="article-list__row">
+      <div class="article-list__cell article-list__article">
         {{ with .Params.thumbnail }}
           <a class="article-list__thumbnail" href="{{ $page.RelPermalink }}" tabindex="-1" aria-hidden="true">
             <img src="{{ . | relURL }}" alt="" loading="lazy" decoding="async">
@@ -34,12 +27,7 @@
         </div>
       </div>
 
-      <div class="article-list__cell article-list__length" role="cell" data-label="Length">
-        <span>{{ $readingTime }} min read</span>
-        <small>{{ .WordCount }} words</small>
-      </div>
-
-      <div class="article-list__cell article-list__tags" role="cell" data-label="Tags">
+      <div class="article-list__cell article-list__tags">
         {{ if $tags }}
           {{ range $tags }}
             <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
@@ -49,14 +37,12 @@
         {{ end }}
       </div>
 
-      <time
-        class="article-list__cell article-list__date"
-        role="cell"
-        data-label="Date"
-        datetime="{{ .Date.Format "2006-01-02" }}"
-      >
-        {{ .Date.Format "January 2, 2006" }}
-      </time>
+      <div class="article-list__cell article-list__meta">
+        <time class="article-list__date" datetime="{{ .Date.Format "2006-01-02" }}">
+          {{ .Date.Format "January 2, 2006" }}
+        </time>
+        <span class="article-list__reading-time">{{ $readingTime }} min read</span>
+      </div>
     </article>
   {{ else }}
     <p class="article-list__empty-state">No articles have been published yet.</p>
