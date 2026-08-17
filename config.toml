@@ -6,6 +6,7 @@ theme = 'hugo-xmin'
 [params]
   # Basic favicon (placed in /static/favicon.ico)
   favicon = "favicon.ico"
+  asset_version = "20260816-coffee"
 
 [markup]
   [markup.tableOfContents]

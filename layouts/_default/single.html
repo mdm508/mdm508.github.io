@@ -9,7 +9,7 @@
   {{ end }}
   {{ $tocHTML := .TableOfContents | replaceRE `id="TableOfContents"` `class="article-outline__links"` | safeHTML }}
 
-  <link rel="stylesheet" href="{{ "css/article.css" | relURL }}">
+  <link rel="stylesheet" href="{{ "css/article.css" | relURL }}?v={{ .Site.Params.asset_version }}">
 
   <article class="article-page">
     <div class="article-meta">
