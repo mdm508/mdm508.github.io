@@ -7,28 +7,11 @@
       {{ $showTOC = eq $tocSetting "true" }}
     {{ end }}
   {{ end }}
-  {{ $tocHTML := .TableOfContents | replaceRE `id="TableOfContents"` `class="article-toc__links"` | safeHTML }}
+  {{ $tocHTML := .TableOfContents | replaceRE `id="TableOfContents"` `class="article-outline__links"` | safeHTML }}
 
   <link rel="stylesheet" href="{{ "css/article.css" | relURL }}">
 
-  <article class="article-page{{ if $showTOC }} article-page--with-toc{{ end }}">
-    {{ if $showTOC }}
-      <aside class="article-toc article-toc--desktop" data-article-toc aria-label="On this page">
-        <h2>On this page</h2>
-        {{ $tocHTML }}
-      </aside>
-
-      <details class="article-toc article-toc--compact" data-article-toc>
-        <summary>
-          <span>On this page</span>
-          <span class="article-toc__current" aria-live="polite"></span>
-        </summary>
-        <div class="article-toc__compact-links">
-          {{ $tocHTML }}
-        </div>
-      </details>
-    {{ end }}
-
+  <article class="article-page">
     <div class="article-meta">
       <h1><span class="title">{{ .Title | markdownify }}</span></h1>
       {{ if .Date }}
@@ -38,12 +21,15 @@
       {{ end }}
     </div>
 
+    {{ if $showTOC }}
+      <aside class="article-outline" aria-labelledby="article-outline-title">
+        <h2 id="article-outline-title">Article Outline</h2>
+        {{ $tocHTML }}
+      </aside>
+    {{ end }}
+
     <div class="content article-content">
       {{ .Content }}
     </div>
   </article>
-
-  {{ if $showTOC }}
-    <script src="{{ "js/article-toc.js" | relURL }}" defer></script>
-  {{ end }}
 {{ end }}

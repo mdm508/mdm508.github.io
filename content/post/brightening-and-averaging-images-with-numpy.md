@@ -24,11 +24,11 @@ By the end, you should be able to:
 - calculate simple color-channel statistics; and
 - explain why changing the order of two transformations can change the result.
 
-When you see a **P.R.E.** question, pause and **Predict** the result, **Run** the code, and **Explain** what happened. The prediction matters. It gives you something concrete to compare with the computer's answer.
+Some questions ask you to **Predict, Run, and Explain**. Pause to predict the result first, run the code, and then explain what happened. The prediction matters because it gives you something concrete to compare with the computer's answer.
 
 ## Before You Begin
 
-### Question: What files and imports do I need?
+### Setup: What files and imports do I need?
 
 You will need two RGB images with identical dimensions. Put them in an `images` folder:
 
@@ -70,7 +70,7 @@ The examples below use images with shape `(825, 1100, 3)`, but your height and w
 
 Brightening means multiplying each color channel by a factor greater than `1`. There is one important limit: an ordinary 8-bit RGB channel cannot store a value greater than `255`. If a calculation crosses that boundary, we need to clip it.
 
-### Question 1: What happens when we brighten one pixel?
+### Q1: What happens when we brighten one pixel?
 
 Apply a brightness factor of `1.5` to this pixel:
 
@@ -95,7 +95,7 @@ Notice what was lost here. The green result was `270` and the blue result was `3
 
 {{< /answer >}}
 
-### Question 2: Why not store values such as 270 or 360?
+### Q2: Why not store values such as 270 or 360?
 
 {{< answer >}}
 These image arrays use the `uint8` data type. The name means **unsigned 8-bit integer**:
@@ -108,9 +108,9 @@ A value such as `270` does not fit. Before we save the image, every channel must
 
 {{< /answer >}}
 
-### Question 3 (P.R.E.): What will this print?
+### Q3: What will this print?
 
-Predict the output before running the code:
+Predict the output, run the code, and explain what happened:
 
 ```python
 values = np.array([250], dtype=np.uint8)
@@ -140,7 +140,7 @@ This is called **integer overflow**. The surprising answer is a useful warning: 
 
 Before using NumPy's shorter solution, it helps to write the long version. The loops make every step visible.
 
-### Question 4: How can we brighten every pixel with loops?
+### Q4: How can we brighten every pixel with loops?
 
 Complete the missing expressions:
 
@@ -201,7 +201,7 @@ You can read the traversal almost like a set of directions: visit a row, visit a
 
 {{< /answer >}}
 
-### Question 5: What jobs do `int()`, `round()`, and `min()` perform?
+### Q5: What jobs do `int()`, `round()`, and `min()` perform?
 
 {{< answer >}}
 Each function handles a different part of the operation:
@@ -232,9 +232,9 @@ Together, the three steps say: calculate safely, produce a whole-number channel,
 
 A **vectorized operation** asks NumPy to apply one rule across an entire array. Many calculations still happen, but NumPy handles the iteration internally instead of making us write a Python loop for every row and column.
 
-### Question 6 (P.R.E.): What changes when we call `astype()`?
+### Q6: What changes when we call `astype()`?
 
-Predict what will change and what will stay the same:
+Predict what will change and what will stay the same, run the code, and explain the result:
 
 ```python
 working = first.astype(np.float32)
@@ -266,7 +266,7 @@ The distinction between a value and its representation is important. A number ma
 
 {{< /answer >}}
 
-### Question 7: What does `working * 1.5` produce?
+### Q7: What does `working * 1.5` produce?
 
 Does this expression create one value, one pixel, or an entire image?
 
@@ -285,7 +285,7 @@ NumPy applies `1.5` to every red, green, and blue channel in every row and colum
 
 {{< /answer >}}
 
-### Question 8: What does an array comparison produce?
+### Q8: What does an array comparison produce?
 
 ```python
 too_high = scaled > 255
@@ -313,7 +313,7 @@ print("Channels requiring clipping:", number_clipped)
 
 {{< /answer >}}
 
-### Question 9: What does `np.clip()` do?
+### Q9: What does `np.clip()` do?
 
 ```python
 clipped = np.clip(scaled, 0, 255)
@@ -337,7 +337,7 @@ The clipped result is still a floating-point array. We wait until the arithmetic
 
 {{< /answer >}}
 
-### Question 10: What does a complete NumPy brightness function look like?
+### Q10: What does a complete NumPy brightness function look like?
 
 How can we check that it agrees with the loop version?
 
@@ -391,7 +391,7 @@ The brightened mean will usually be higher. It cannot grow without limit, though
 
 To average two images, pair corresponding pixels. Red is averaged with red, green with green, and blue with blue. This only makes sense when the images have matching shapes.
 
-### Question 11: Why must the image shapes match?
+### Q11: Why must the image shapes match?
 
 ```python
 print(first.shape)
@@ -417,7 +417,7 @@ Resizing is a separate image-processing task. For this lesson, use matching imag
 
 {{< /answer >}}
 
-### Question 12: How do we average two pixels?
+### Q12: How do we average two pixels?
 
 ```text
 First:  [200,  50,  10]
@@ -437,9 +437,9 @@ The averaged pixel is `[150, 100, 130]`. We never mix the channels with one anot
 
 {{< /answer >}}
 
-### Question 13 (P.R.E.): Is direct `uint8` addition safe?
+### Q13: Is direct `uint8` addition safe?
 
-Predict the result before running:
+Predict the result, run the code, and explain what happened:
 
 ```python
 a = np.array([200], dtype=np.uint8)
@@ -471,7 +471,7 @@ The overflow occurs during the addition. Dividing afterward cannot repair the in
 
 {{< /answer >}}
 
-### Question 14: How can we average the images with loops?
+### Q14: How can we average the images with loops?
 
 {{< answer >}}
 A triple loop makes all three array dimensions explicit:
@@ -506,7 +506,7 @@ The `int()` conversions prevent `uint8` overflow during addition. The loop is ve
 
 {{< /answer >}}
 
-### Question 15: How can NumPy average the images safely?
+### Q15: How can NumPy average the images safely?
 
 {{< answer >}}
 Convert both arrays before adding them:
@@ -542,7 +542,7 @@ We do not need clipping here. The average of two values that are both between `0
 
 Data work often involves organizing several related datasets into one larger array. We can stack two images, then tell NumPy to average across the new image axis.
 
-### Question 16: What shape does `np.stack()` create?
+### Q16: What shape does `np.stack()` create?
 
 Suppose both images have shape `(825, 1100, 3)`. What shape will this produce?
 
@@ -570,7 +570,7 @@ Nothing has been averaged yet. `np.stack()` has only organized two arrays inside
 
 {{< /answer >}}
 
-### Question 17: What does `axis=0` mean here?
+### Q17: What does `axis=0` mean here?
 
 What does this operation average, and what shape will it return?
 
@@ -598,7 +598,7 @@ When you work with an axis, try to name the dimension being removed. Saying “a
 
 {{< /answer >}}
 
-### Question 18: Do these two NumPy methods agree?
+### Q18: Do these two NumPy methods agree?
 
 ```python
 method_a = np.rint(
@@ -626,7 +626,7 @@ The result should be `True`. The first method states the two-image formula direc
 
 {{< /answer >}}
 
-### Question 19: What do channel means tell us?
+### Q19: What do channel means tell us?
 
 ```python
 channel_means = np.mean(first, axis=(0, 1))
@@ -648,7 +648,7 @@ This is a small but genuine data-analysis operation. A large image has been redu
 
 ## 6. Does Transformation Order Matter?
 
-### Question 20: Will averaging and brightening give the same result in either order?
+### Q20: Will averaging and brightening give the same result in either order?
 
 Consider one channel from each of two images:
 
@@ -733,7 +733,7 @@ Answer each question in complete sentences.
 7. In that stacked array, what would `np.mean(images, axis=0)` average? What would `np.mean(images, axis=3)` average?
 8. Henry says, “A full photograph makes the best first test because it checks millions of values.” Why can a one-pixel or two-pixel array be a better first test?
 
-### Part 2: P.R.E. Investigations
+### Part 2: Predict, Run, Explain Investigations
 
 For each investigation, predict the output without running the code, run it, and explain the result in your own words. Do not skip the prediction.
 
@@ -1117,7 +1117,7 @@ Before you finish, make sure you have:
 - `test_filters.py`;
 - your main program;
 - the six required output images;
-- your P.R.E. predictions and explanations;
+- your Predict, Run, Explain notes;
 - three corrected debugging examples;
 - your planning paragraph;
 - your final reflection; and
