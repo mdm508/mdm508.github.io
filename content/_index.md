@@ -84,7 +84,7 @@ Some students want to make their first Scratch game. Others need help getting pa
 <div class="expectations">
   <div>
     <h3>A real conversation first</h3>
-    <p>Email me with the student’s age or grade, experience, interests, and goals. I’ll reply personally and suggest a useful starting point.</p>
+    <p>Email me or give me a call with the student’s age or grade, experience, interests, and goals. I’ll answer your questions and suggest a useful starting point.</p>
   </div>
   <div>
     <h3>Focused one-on-one attention</h3>
