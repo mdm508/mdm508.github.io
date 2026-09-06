@@ -55,7 +55,7 @@ If you are unsure which language makes sense, describe the student’s interests
 
 ## About your tutor
 
-I’m Matthew McLaughlin. I have taught since 2019 and currently teach math at Art of Problem Solving. I earned a B.S. in Computer Science from UC Irvine, where I tutored the introductory Python series for first-year students. I have also taught with Girls Who Code and theCoderSchool in Irvine and work with private students online over Zoom.
+I’m Matthew McLaughlin. I have taught since 2019 and currently teach math at [Art of Problem Solving Academy in San Mateo](https://aopsacademy.org/campus/sanmateo). I believe in its focus on challenging problems, conceptual understanding, and learning how to think rather than relying on rote memorization. I earned a B.S. in Computer Science from UC Irvine, where I tutored the introductory Python series for first-year students. I have also taught with Girls Who Code and theCoderSchool in Irvine and work with private students online over Zoom.
 
 I have studied Chinese for over six years. I created [Waabl, an educational iPhone and iPad app](https://apps.apple.com/us/app/waabl/id1671041620), to help myself and other learners build vocabulary by learning a new Chinese word each day.
 

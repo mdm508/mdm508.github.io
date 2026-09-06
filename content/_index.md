@@ -27,7 +27,7 @@ images:
 </section>
 
 <section class="proof-strip" aria-label="Teaching experience">
-  <p><strong>Teaching since 2019</strong> · Current math teacher at Art of Problem Solving · Experience with Girls Who Code, theCoderSchool Irvine, UC Irvine, and college students.</p>
+  <p><strong>Teaching since 2019</strong> · Math teacher at <a href="https://aopsacademy.org/campus/sanmateo">Art of Problem Solving Academy in San Mateo</a> · Experience with Girls Who Code, theCoderSchool Irvine, UC Irvine, and college students.</p>
 </section>
 
 ## Lessons built around the student—not a one-size-fits-all course
@@ -98,7 +98,7 @@ Some students want to make their first Scratch game. Others need help getting pa
 
 ## Meet Matt
 
-I’m Matthew McLaughlin, a math and computer science educator based in Millbrae, California. I have been teaching since 2019 and currently teach math at Art of Problem Solving. I earned my B.S. in Computer Science from the University of California, Irvine in 2018, tutored UCI’s introductory Python series, and taught with Girls Who Code and theCoderSchool in Irvine. I teach online, and in-person lessons may also be available for students in the Bay Area.
+I’m Matthew McLaughlin, a math and computer science educator based in Millbrae, California. I have been teaching since 2019 and currently teach math at [Art of Problem Solving Academy in San Mateo](https://aopsacademy.org/campus/sanmateo). I believe in its mission of developing strong problem-solving skills through challenging, concept-focused learning. I earned my B.S. in Computer Science from the University of California, Irvine in 2018, tutored UCI’s introductory Python series, and taught with Girls Who Code and theCoderSchool in Irvine. I teach online, and in-person lessons may also be available for students in the Bay Area.
 
 I have studied Chinese for over six years. I created [Waabl, a Chinese word-of-the-day app published on the App Store](https://apps.apple.com/us/app/waabl/id1671041620), to help myself and other learners build vocabulary by learning a new word each day.
 

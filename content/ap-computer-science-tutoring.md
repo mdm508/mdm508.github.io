@@ -43,7 +43,7 @@ For Create performance task work, I can clarify course concepts and help a stude
 
 ## About Matt
 
-I have taught since 2019 and currently teach math at Art of Problem Solving. I earned a B.S. in Computer Science from UC Irvine, where I tutored the introductory Python series, and I have taught with Girls Who Code and theCoderSchool in Irvine. After studying Chinese for over six years, I created [Waabl](https://apps.apple.com/us/app/waabl/id1671041620) to help language learners study a new Chinese word each day.
+I have taught since 2019 and currently teach math at [Art of Problem Solving Academy in San Mateo](https://aopsacademy.org/campus/sanmateo), whose emphasis on deep problem-solving and conceptual understanding closely matches my own teaching philosophy. I earned a B.S. in Computer Science from UC Irvine, where I tutored the introductory Python series, and I have taught with Girls Who Code and theCoderSchool in Irvine. After studying Chinese for over six years, I created [Waabl](https://apps.apple.com/us/app/waabl/id1671041620) to help language learners study a new Chinese word each day.
 
 That mix of math teaching, computer science teaching, and real software development helps me explain both the abstract reasoning and the practical habits students need.
 
