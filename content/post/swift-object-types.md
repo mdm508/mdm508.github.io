@@ -409,3 +409,9 @@ Next, create a `Book` type with a title, a page count, an initializer, and a `de
 If you want a larger design problem, build a `GameCharacter` whose initializer always starts `level` at `1`. Give it a name, health, `describe()`, and `isAlive() -> Bool`. Decide which values belong to each character and whether the type needs a shared rule.
 
 Finally, design a `Spaceship` with at least three instance properties, one static property, a custom initializer, and two instance methods. One method should return a value. Create two ships and explain what the initializer guarantees, which member belongs to the type, and what `self` means inside each instance method.
+
+## Continue With SwiftUI
+
+The next lesson puts these same ideas on screen. You will use structs, properties, initializers, functions, and dot notation to build an interface whose state changes when someone presses a button.
+
+[Continue to From Swift Objects to SwiftUI →](/post/from-swift-objects-to-swiftui/)
