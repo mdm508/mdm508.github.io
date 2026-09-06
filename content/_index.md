@@ -27,7 +27,7 @@ images:
 </section>
 
 <section class="proof-strip" aria-label="Teaching experience">
-  <p><strong>Teaching since 2019</strong> · Current math teacher at Art of Problem Solving · Experience with Girls Who Code, theCoderSchool Irvine, and UC Irvine Python students.</p>
+  <p><strong>Teaching since 2019</strong> · Current math teacher at Art of Problem Solving · Experience with Girls Who Code, theCoderSchool Irvine, UC Irvine, and college students.</p>
 </section>
 
 ## Lessons built around the student—not a one-size-fits-all course
