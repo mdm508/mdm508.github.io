@@ -22,9 +22,7 @@ As long as you can use a mouse, you can use Scratch. Try this [Scratch starter p
 
 ## A Scratch project I made
 
-*These may take a while to load.*
-
-For all my projects, see [Matthew’s Scratch projects](https://scratch.mit.edu/search/projects?q=matthedm).
+*This may take a while to load.*
 
 ### Deadly Snowflakes
 
@@ -34,4 +32,4 @@ Here is a remix of the snowflake-catching game where you try to *avoid* the snow
   <iframe src="https://scratch.mit.edu/projects/898666614/embed" title="Play Deadly Snowflakes by Matthew McLaughlin" allowtransparency="true" width="485" height="402" scrolling="no" allowfullscreen loading="lazy"></iframe>
 </div>
 
-These are the kinds of small projects I enjoy using to explore programming ideas. If you want help making a Scratch project of your own, see my [tutoring page](/tutoring/).
+This is the kind of small project I enjoy using to explore programming ideas. If you want help making a Scratch project of your own, see my [tutoring page](/tutoring/).
