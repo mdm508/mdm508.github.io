@@ -1,6 +1,6 @@
 ---
 title: "Pictures as Data: Binary, Hex, and Bit Masks"
-date: 2026-09-06T13:00:00-07:00
+date: 2026-09-06T12:00:00-07:00
 draft: false
 description: "Represent monochrome OLED pixels as bits, translate bytes between binary and hexadecimal, and manipulate individual bits with Python masks."
 tags: ["python", "micropython", "raspberry-pi-pico", "electronics", "binary", "hexadecimal"]
