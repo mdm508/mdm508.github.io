@@ -1,0 +1,22 @@
+<div class="video-table-wrap">
+  <table class="video-links">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Date</th>
+        <th scope="col">Title</th>
+        <th scope="col">YouTube URL</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{- range hugo.Data.lele_tv_videos }}
+      <tr>
+        <td>{{ .position }}</td>
+        <td><time datetime="{{ .date }}">{{ .date }}</time></td>
+        <td lang="zh-Hant">{{ .title }}</td>
+        <td><a href="{{ .url }}">{{ .url }}</a></td>
+      </tr>
+      {{- end }}
+    </tbody>
+  </table>
+</div>

@@ -7,7 +7,7 @@ enableRobotsTXT = true
 [params]
   # Basic favicon (placed in /static/favicon.ico)
   favicon = "favicon.ico"
-  asset_version = "20260906-tutoring-v3"
+  asset_version = "20260906-video-table-v1"
   description = "Patient, project-based online coding and math tutoring for kids and teens, including AP Computer Science A and AP Computer Science Principles."
   email = "matthedm@uci.edu"
   images = ["/photo/matthew-mclaughlin-tutor.webp"]
