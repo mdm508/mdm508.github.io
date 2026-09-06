@@ -1,12 +1,16 @@
 baseURL = 'https://mdm508.github.io'
-languageCode = 'en-us'
+locale = 'en-US'
 title = 'Coding With Matt'
 theme = 'hugo-xmin'
+enableRobotsTXT = true
 
 [params]
   # Basic favicon (placed in /static/favicon.ico)
   favicon = "favicon.ico"
-  asset_version = "20260816-coffee"
+  asset_version = "20260906-tutoring-v2"
+  description = "Patient, project-based online coding and math tutoring for kids and teens, including AP Computer Science A and AP Computer Science Principles."
+  email = "matthedm@uci.edu"
+  images = ["/photo/matthew-mclaughlin-tutor.webp"]
 
 [markup]
   [markup.tableOfContents]
@@ -24,11 +28,16 @@ url = "/"
 weight = 1
 
 [[menu.main]]
+name = "Tutoring"
+url = "/tutoring/"
+weight = 2
+
+[[menu.main]]
 name = "Posts"
 url = "/post/"
-weight = 2
+weight = 3
 
 [[menu.main]]
 name = "Draw"
 url = "/draw/"
-weight = 3
+weight = 4

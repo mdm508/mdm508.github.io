@@ -1,0 +1,8 @@
+{{- $person := dict "@type" "Person" "name" "Matthew McLaughlin" "url" .Site.BaseURL "image" ("photo/matthew-mclaughlin-tutor.webp" | absURL) "jobTitle" "Math and Computer Science Tutor" "knowsAbout" (slice "Mathematics" "Scratch" "Python" "Java" "C++" "JavaScript" "Swift" "Racket" "AP Computer Science A" "AP Computer Science Principles") "sameAs" (slice "https://github.com/mdm508" "https://apps.apple.com/us/app/waabl/id1671041620") "alumniOf" (dict "@type" "CollegeOrUniversity" "name" "University of California, Irvine") -}}
+{{- $website := dict "@type" "WebSite" "name" .Site.Title "url" .Site.BaseURL "description" .Site.Params.description "publisher" (dict "@type" "Person" "name" "Matthew McLaughlin") -}}
+{{- $graph := slice $website -}}
+{{- if or .IsHome (eq .RelPermalink "/tutoring/") -}}
+  {{- $service := dict "@type" "Service" "name" "One-on-One Online Coding and Math Tutoring for Kids and Teens" "serviceType" (slice "Online computer science tutoring" "Online mathematics tutoring") "url" ("tutoring/" | absURL) "provider" (dict "@type" "Person" "name" "Matthew McLaughlin" "url" .Site.BaseURL) "areaServed" (dict "@type" "Country" "name" "United States") "audience" (dict "@type" "EducationalAudience" "educationalRole" "student") -}}
+  {{- $graph = $graph | append $person $service -}}
+{{- end -}}
+<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@graph" $graph | jsonify | safeJS }}</script>

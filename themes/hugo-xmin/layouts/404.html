@@ -1,5 +1,7 @@
-{{ partial "header.html" . }}
-
-404 Means Page Not Found. Sorrry you ended up here. 
-
-{{ partial "footer.html" . }}
+{{ define "main" }}
+  <section class="not-found">
+    <p class="eyebrow">404 error</p>
+    <h1>That page wandered off.</h1>
+    <p>Try the <a href="{{ "/" | relURL }}">homepage</a>, explore the <a href="{{ "/post/" | relURL }}">free programming articles</a>, or learn about <a href="{{ "/tutoring/" | relURL }}">one-on-one tutoring</a>.</p>
+  </section>
+{{ end }}

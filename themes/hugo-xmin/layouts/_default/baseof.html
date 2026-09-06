@@ -1,20 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ .Site.Language.Locale | default "en-US" }}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  {{- $description := .Description | default .Summary | plainify | htmlUnescape | strings.TrimSpace -}}
+  {{- if not $description }}{{ $description = .Site.Params.description }}{{ end }}
+  <meta name="description" content="{{ $description }}">
+  <link rel="canonical" href="{{ .Permalink }}">
+  <link rel="icon" href="{{ "favicon.ico" | relURL }}">
+  {{- if .IsHome }}
   <title>{{ .Title }}</title>
-  <header>
-    {{ partial "header.html" . }}
-  </header>
+  {{- else }}
+  <title>{{ .Title }} | {{ .Site.Title }}</title>
+  {{- end }}
+  {{ template "_internal/opengraph.html" . }}
+  {{ template "_internal/twitter_cards.html" . }}
+  {{ with .OutputFormats.Get "rss" -}}
+  <link rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}" href="{{ .Permalink }}">
+  {{- end }}
+  <link rel="stylesheet" href="{{ "css/fonts.css" | relURL }}">
+  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+  <link rel="stylesheet" href="{{ "custom.css" | relURL }}?v={{ .Site.Params.asset_version }}">
+  {{- if or (eq .Kind "term") (and (eq .Section "post") (not .IsPage)) }}
+  <link rel="stylesheet" href="{{ "css/articles.css" | relURL }}?v={{ .Site.Params.asset_version }}">
+  {{- else if and .IsPage (ne .Type "tutoring") }}
+  <link rel="stylesheet" href="{{ "css/article.css" | relURL }}?v={{ .Site.Params.asset_version }}">
+  {{- end }}
+  {{- if eq .Section "swift" }}
+  <link rel="stylesheet" href="{{ "css/quiz.css" | relURL }}?v={{ .Site.Params.asset_version }}">
+  {{- end }}
+  {{- if eq .Section "years" }}
+  <link rel="stylesheet" href="{{ "css/years.css" | relURL }}?v={{ .Site.Params.asset_version }}">
+  {{- end }}
+  {{ partial "structured-data.html" . }}
 </head>
 <body>
-
-  <main>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  {{ partial "header.html" . }}
+  <main id="main-content">
     {{ block "main" . }}{{ end }}
   </main>
-  <footer>
-    {{ partial "footer.html" . }}
-  </footer>
+  {{ partial "footer.html" . }}
 </body>
 </html>
