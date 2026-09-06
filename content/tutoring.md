@@ -14,7 +14,7 @@ images:
 Personalized lessons for kids, teens, and college students—from first projects in Scratch and Python to math support, AP Computer Science, college coursework, and more advanced programming.
 
 <div class="hero__actions">
-  <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Coding%20tutoring%20for%20my%20child&amp;body=Hi%20Matt%2C%0A%0AMy%20child%20is%20interested%20in%20coding.%20Their%20age%2Fgrade%20is%3A%0ATheir%20experience%20so%20far%20is%3A%0AThey%20would%20love%20to%20build%20or%20learn%3A%0A%0AWhat%20would%20you%20recommend%20as%20a%20next%20step%3F">Ask about availability</a>
+  <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Tutoring%20question">Ask about lessons</a>
   <a class="text-link" href="#questions">Read common questions ↓</a>
 </div>
 
@@ -28,17 +28,17 @@ Personalized lessons for kids, teens, and college students—from first projects
 - A young programmer with a game, website, app, or other project idea
 - A learner who knows some syntax but wants to become better at solving problems independently
 
-No prior coding experience is required. A parent does not need to know programming either.
+No prior coding experience is required. Family members do not need to know programming either.
 
 ## What a lesson is like
 
-Lessons are live and one-on-one over Zoom. We can begin with a guided project, explore an idea your child already has, review a difficult concept, or debug something that is not working. I ask questions, model useful problem-solving habits, and gradually hand more of the thinking back to the student.
+Lessons are live and one-on-one over Zoom. We can begin with a guided project, explore an idea the student already has, review a difficult concept, or debug something that is not working. I ask questions, model useful problem-solving habits, and gradually hand more of the thinking back to the student.
 
 The exact path is flexible because interest matters. A learner who loves stories may animate one in Scratch; a learner who likes puzzles may write a Python game; a student in a class may focus on the concept behind an assignment instead.
 
 ## Subjects I teach
 
-| Subject | A good fit for |
+| Subject | Useful for |
 | --- | --- |
 | **Scratch** | First coding experiences, games, animation, and visual problem-solving |
 | **Python** | Beginner text-based coding, schoolwork, games, data, and small applications |
@@ -48,21 +48,22 @@ The exact path is flexible because interest matters. A learner who loves stories
 | **JavaScript** | Interactive websites and browser-based projects |
 | **Swift** | iPhone, iPad, and Mac app development |
 | **Racket** | Functional programming and foundational computer science ideas |
+| **Other languages and tools** | This list is not exhaustive—ask me about the language or technology the student is using |
 | **Mathematics** | Conceptual understanding, problem-solving strategies, class support, and study habits |
 
-If you are unsure which language makes sense, describe your child’s interests and experience in your email. I can recommend a starting point.
+If you are unsure which language makes sense, describe the student’s interests and experience in your email. I can recommend a starting point.
 
 ## About your tutor
 
 I’m Matthew McLaughlin. I have taught since 2019 and currently teach math at Art of Problem Solving. I earned a B.S. in Computer Science from UC Irvine, where I tutored the introductory Python series for first-year students. I have also taught with Girls Who Code and theCoderSchool in Irvine and work with private students online over Zoom.
 
-Outside the classroom, I designed and published [Waabl, an educational iPhone and iPad app](https://apps.apple.com/us/app/waabl/id1671041620). That experience helps me connect programming concepts to the real process of turning an idea into working software.
+I have studied Chinese for over six years. I created [Waabl, an educational iPhone and iPad app](https://apps.apple.com/us/app/waabl/id1671041620), to help myself and other learners build vocabulary by learning a new Chinese word each day.
 
 My aim is to help students become confident, resourceful learners: people who can break down a hard problem, make a small experiment, learn from an error, and try again.
 
-<h2 id="questions">Questions parents often ask</h2>
+<h2 id="questions">Common questions</h2>
 
-### Does my child need coding experience?
+### Does the student need coding experience?
 
 No. Lessons can start from the very beginning. For a student who already codes, I first look at what they understand, what they have made, and where they tend to get stuck.
 
@@ -72,7 +73,7 @@ Tutoring is one-on-one. That makes it possible to adjust the pace, examples, and
 
 ### Are lessons online or in person?
 
-Lessons are online over Zoom, so students can join from home and share their code or screen in real time. I am based in Irvine, California.
+Lessons are available online over Zoom, so students can join from home and share their code or screen in real time. I am based in Millbrae, California, and in-person lessons may also be available for students in the Bay Area.
 
 ### Can you help with school assignments?
 
@@ -88,11 +89,11 @@ A computer that can run Zoom and the tools used for the chosen language, plus a 
 
 ### How do we get started?
 
-Email me with your child’s age or grade, current experience, interests, and what they hope to learn or create. I will reply personally with a suggested next step and current availability.
+Email me with the student’s age or grade, current experience, interests, and what they hope to learn or create. I will reply personally with a suggested next step and current availability.
 
 <section class="cta-panel">
-  <p class="eyebrow">Start with a conversation</p>
-  <h2>Is one-on-one tutoring a good fit?</h2>
-  <p>Tell me a little about your learner. I’ll suggest an appropriate starting point and answer your questions directly.</p>
-  <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Coding%20tutoring%20for%20my%20child&amp;body=Hi%20Matt%2C%0A%0AMy%20child%20is%20interested%20in%20coding.%20Their%20age%2Fgrade%20is%3A%0ATheir%20experience%20so%20far%20is%3A%0AThey%20would%20love%20to%20build%20or%20learn%3A%0A%0AWhat%20would%20you%20recommend%20as%20a%20next%20step%3F">Email Matt</a>
+  <p class="eyebrow">Get in touch</p>
+  <h2>Questions or ready to start?</h2>
+  <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Tutoring%20question">Email Matt</a>
+  <p class="contact-phone">Phone: six five zero · six nine seven · five seven six eight</p>
 </section>

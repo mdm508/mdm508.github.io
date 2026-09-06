@@ -11,7 +11,7 @@ images:
     <h1>Coding and math tutoring</h1>
     <p class="hero__lead">One-on-one Zoom lessons for kids, teens, and college students—from first projects to AP and college coursework.</p>
     <div class="hero__actions">
-      <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Coding%20tutoring%20for%20my%20child&amp;body=Hi%20Matt%2C%0A%0AMy%20child%20is%20interested%20in%20coding.%20Their%20age%2Fgrade%20is%3A%0ATheir%20experience%20so%20far%20is%3A%0AThey%20would%20love%20to%20build%20or%20learn%3A%0A%0AWhat%20would%20you%20recommend%20as%20a%20next%20step%3F">Ask about a first lesson</a>
+      <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Tutoring%20question">Ask about lessons</a>
       <a class="text-link" href="/tutoring/">See how tutoring works <span aria-hidden="true">→</span></a>
     </div>
     <ul class="trust-list" aria-label="Tutoring highlights">
@@ -30,9 +30,9 @@ images:
   <p><strong>Teaching since 2019</strong> · Current math teacher at Art of Problem Solving · Experience with Girls Who Code, theCoderSchool Irvine, and UC Irvine Python students.</p>
 </section>
 
-## Lessons built around your child—not a one-size-fits-all course
+## Lessons built around the student—not a one-size-fits-all course
 
-Some students want to make their first Scratch game. Others need help getting past Python errors, understanding a school assignment, or turning an ambitious app idea into manageable steps. We start with what your child knows, what interests them, and what would make them proud to create.
+Some students want to make their first Scratch game. Others need help getting past Python errors, understanding a school assignment, or turning an ambitious app idea into manageable steps. We start with what the student knows, what interests them, and what they would be proud to create.
 
 <div class="benefit-grid">
   <article>
@@ -67,7 +67,7 @@ Some students want to make their first Scratch game. Others need help getting pa
   </article>
   <article>
     <p class="path-grid__label">Coursework & deeper projects</p>
-    <h3>Java, C++, JavaScript, Swift & Racket</h3>
+    <h3>Java, C++, JavaScript, Swift, Racket & more</h3>
     <p>Strengthen fundamentals, understand assignments, or explore object-oriented, functional, web, and app development.</p>
   </article>
   <article>
@@ -77,18 +77,18 @@ Some students want to make their first Scratch game. Others need help getting pa
   </article>
 </div>
 
-<p class="section-link"><a href="/ap-computer-science-tutoring/">Explore AP Computer Science tutoring →</a> · <a href="/post/scratch-to-python-learning-path/">Read the Scratch-to-Python guide →</a></p>
+<p class="section-link"><a href="/ap-computer-science-tutoring/">Explore AP Computer Science tutoring →</a></p>
 
-## What parents can expect
+## What students and families can expect
 
 <div class="expectations">
   <div>
     <h3>A real conversation first</h3>
-    <p>Email me with your child’s age or grade, experience, interests, and goals. I’ll reply personally so we can decide whether I’m a good fit and choose a useful starting point.</p>
+    <p>Email me with the student’s age or grade, experience, interests, and goals. I’ll reply personally and suggest a useful starting point.</p>
   </div>
   <div>
     <h3>Focused one-on-one attention</h3>
-    <p>Lessons happen live over Zoom. Your child can ask questions as they arise, share their screen, and work through problems without being rushed by a group.</p>
+    <p>Lessons happen live over Zoom. Students can ask questions as they arise, share their screen, and work through problems without being rushed by a group.</p>
   </div>
   <div>
     <h3>Skills beyond syntax</h3>
@@ -98,18 +98,17 @@ Some students want to make their first Scratch game. Others need help getting pa
 
 ## Meet Matt
 
-I’m Matthew McLaughlin, a math and computer science educator based in Irvine, California. I have been teaching since 2019 and currently teach math at Art of Problem Solving. I earned my B.S. in Computer Science from the University of California, Irvine in 2018, tutored UCI’s introductory Python series, and taught with Girls Who Code and theCoderSchool in Irvine.
+I’m Matthew McLaughlin, a math and computer science educator based in Millbrae, California. I have been teaching since 2019 and currently teach math at Art of Problem Solving. I earned my B.S. in Computer Science from the University of California, Irvine in 2018, tutored UCI’s introductory Python series, and taught with Girls Who Code and theCoderSchool in Irvine. I teach online, and in-person lessons may also be available for students in the Bay Area.
 
-I’m also the developer of [Waabl, a Chinese word-of-the-day app published on the App Store](https://apps.apple.com/us/app/waabl/id1671041620). I bring that practical experience planning, building, debugging, and shipping software into my programming lessons.
+I have studied Chinese for over six years. I created [Waabl, a Chinese word-of-the-day app published on the App Store](https://apps.apple.com/us/app/waabl/id1671041620), to help myself and other learners build vocabulary by learning a new word each day.
 
 My teaching is guided by four ideas: build problem-solving skills, develop sustainable study habits, grow confidence, and keep learning enjoyable.
 
 <p class="section-link"><a href="/tutoring/">Learn more about lessons, subjects, and common questions →</a></p>
 
 <section class="cta-panel">
-  <p class="eyebrow">A simple next step</p>
-  <h2>Tell me what your child wants to make</h2>
-  <p>You don’t need to know which language or course to choose. Send me their age or grade, experience so far, and the kinds of projects they enjoy. I’ll suggest a sensible place to start.</p>
-  <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Coding%20tutoring%20for%20my%20child&amp;body=Hi%20Matt%2C%0A%0AMy%20child%20is%20interested%20in%20coding.%20Their%20age%2Fgrade%20is%3A%0ATheir%20experience%20so%20far%20is%3A%0AThey%20would%20love%20to%20build%20or%20learn%3A%0A%0AWhat%20would%20you%20recommend%20as%20a%20next%20step%3F">Email Matt about tutoring</a>
-  <p class="cta-panel__note">No form, mailing list, or sales funnel—just a direct email to Matt.</p>
+  <p class="eyebrow">Get in touch</p>
+  <h2>Questions about tutoring?</h2>
+  <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Tutoring%20question">Email Matt</a>
+  <p class="contact-phone">Phone: six five zero · six nine seven · five seven six eight</p>
 </section>
