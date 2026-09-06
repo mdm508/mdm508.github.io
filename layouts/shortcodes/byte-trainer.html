@@ -1,0 +1,296 @@
+<style>
+  .byte-trainer {
+    margin: 1.5rem 0 2rem;
+    padding: 1.1rem;
+    color: var(--text-primary);
+    background: var(--light-orange);
+    border: 1px solid rgba(104, 68, 33, 0.2);
+    border-left: 3px solid var(--accent-orange);
+    border-radius: 8px;
+  }
+
+  .byte-trainer__top,
+  .byte-trainer__answer,
+  .byte-trainer__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .byte-trainer__top {
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+  }
+
+  .byte-trainer__prompt {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .byte-trainer__score {
+    color: var(--text-light);
+    font-size: 0.86rem;
+  }
+
+  .byte-trainer__bits {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(2.15rem, 1fr));
+    gap: 0.4rem;
+    margin: 0.75rem 0 1rem;
+  }
+
+  .byte-trainer__bit {
+    min-width: 0;
+    text-align: center;
+  }
+
+  .byte-trainer__weight,
+  .byte-trainer__index {
+    display: block;
+    color: var(--text-light);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
+  .byte-trainer__bit button {
+    width: 100%;
+    min-height: 2.75rem;
+    margin: 0.25rem 0;
+    color: var(--deep-brown);
+    background: rgba(251, 247, 238, 0.92);
+    border: 1px solid rgba(104, 68, 33, 0.28);
+    border-radius: 6px;
+    cursor: pointer;
+    font: 700 1rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .byte-trainer__bit button[aria-pressed="true"] {
+    color: #fffaf0;
+    background: var(--rich-brown);
+    border-color: var(--deep-brown);
+  }
+
+  .byte-trainer__bit button:focus-visible,
+  .byte-trainer input:focus-visible,
+  .byte-trainer__actions button:focus-visible {
+    outline: 3px solid var(--accent-orange);
+    outline-offset: 2px;
+  }
+
+  .byte-trainer__answer label {
+    font-weight: 700;
+  }
+
+  .byte-trainer input {
+    width: 9rem;
+    padding: 0.55rem 0.65rem;
+    color: var(--text-primary);
+    background: rgba(251, 247, 238, 0.96);
+    border: 1px solid rgba(104, 68, 33, 0.32);
+    border-radius: 6px;
+    font: 1rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .byte-trainer__actions {
+    margin-top: 0.85rem;
+  }
+
+  .byte-trainer__actions button {
+    padding: 0.55rem 0.8rem;
+    color: #fffaf0;
+    background: var(--rich-orange);
+    border: 1px solid var(--deep-orange);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .byte-trainer__actions button[type="button"]:last-of-type {
+    color: var(--deep-brown);
+    background: transparent;
+    border-color: rgba(104, 68, 33, 0.3);
+  }
+
+  .byte-trainer__actions button:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .byte-trainer__feedback {
+    min-height: 1.5em;
+    margin: 0.8rem 0 0;
+    font-weight: 700;
+  }
+
+  .byte-trainer__feedback[data-result="correct"] {
+    color: #5b3a18;
+  }
+
+  @media (max-width: 520px) {
+    .byte-trainer {
+      padding: 0.85rem;
+    }
+
+    .byte-trainer__bits {
+      gap: 0.2rem;
+    }
+
+    .byte-trainer__weight,
+    .byte-trainer__index {
+      font-size: 0.62rem;
+    }
+
+    .byte-trainer__bit button {
+      min-height: 2.4rem;
+      padding: 0;
+    }
+  }
+</style>
+
+<section class="byte-trainer" data-byte-trainer aria-labelledby="byte-trainer-prompt">
+  <div class="byte-trainer__top">
+    <p class="byte-trainer__prompt" id="byte-trainer-prompt"></p>
+    <span class="byte-trainer__score" data-score>Score: 0 · Streak: 0</span>
+  </div>
+
+  <div class="byte-trainer__bits" aria-label="Eight-bit byte, from bit 7 through bit 0">
+    <div class="byte-trainer__bit"><span class="byte-trainer__weight">128</span><button type="button" data-bit="7" aria-pressed="false">0</button><span class="byte-trainer__index">bit 7</span></div>
+    <div class="byte-trainer__bit"><span class="byte-trainer__weight">64</span><button type="button" data-bit="6" aria-pressed="false">0</button><span class="byte-trainer__index">bit 6</span></div>
+    <div class="byte-trainer__bit"><span class="byte-trainer__weight">32</span><button type="button" data-bit="5" aria-pressed="false">0</button><span class="byte-trainer__index">bit 5</span></div>
+    <div class="byte-trainer__bit"><span class="byte-trainer__weight">16</span><button type="button" data-bit="4" aria-pressed="false">0</button><span class="byte-trainer__index">bit 4</span></div>
+    <div class="byte-trainer__bit"><span class="byte-trainer__weight">8</span><button type="button" data-bit="3" aria-pressed="false">0</button><span class="byte-trainer__index">bit 3</span></div>
+    <div class="byte-trainer__bit"><span class="byte-trainer__weight">4</span><button type="button" data-bit="2" aria-pressed="false">0</button><span class="byte-trainer__index">bit 2</span></div>
+    <div class="byte-trainer__bit"><span class="byte-trainer__weight">2</span><button type="button" data-bit="1" aria-pressed="false">0</button><span class="byte-trainer__index">bit 1</span></div>
+    <div class="byte-trainer__bit"><span class="byte-trainer__weight">1</span><button type="button" data-bit="0" aria-pressed="false">0</button><span class="byte-trainer__index">bit 0</span></div>
+  </div>
+
+  <div class="byte-trainer__answer">
+    <label data-answer-label for="byte-trainer-answer">Hexadecimal:</label>
+    <input id="byte-trainer-answer" data-answer type="text" inputmode="text" autocomplete="off" spellcheck="false">
+  </div>
+
+  <div class="byte-trainer__actions">
+    <button type="button" data-check>Check answer</button>
+    <button type="button" data-next>New round</button>
+  </div>
+
+  <p class="byte-trainer__feedback" data-feedback aria-live="polite"></p>
+  <noscript>This game requires JavaScript. You can still practice by choosing a number from 0 to 255 and writing its eight-bit binary and two-digit hexadecimal forms.</noscript>
+</section>
+
+<script>
+  (() => {
+    const root = document.currentScript.previousElementSibling;
+    if (!root || !root.matches("[data-byte-trainer]") || root.dataset.ready) return;
+    root.dataset.ready = "true";
+
+    const bits = Array.from(root.querySelectorAll("[data-bit]"));
+    const prompt = root.querySelector(".byte-trainer__prompt");
+    const scoreText = root.querySelector("[data-score]");
+    const answerLabel = root.querySelector("[data-answer-label]");
+    const answer = root.querySelector("[data-answer]");
+    const check = root.querySelector("[data-check]");
+    const next = root.querySelector("[data-next]");
+    const feedback = root.querySelector("[data-feedback]");
+
+    let target = 0;
+    let mode = "decimal";
+    let score = 0;
+    let streak = 0;
+    let solved = false;
+    let hasActiveRound = false;
+
+    const hex = value => value.toString(16).toUpperCase().padStart(2, "0");
+
+    const builtValue = () => bits.reduce((value, button) => {
+      return button.getAttribute("aria-pressed") === "true"
+        ? value | (1 << Number(button.dataset.bit))
+        : value;
+    }, 0);
+
+    const resetBits = () => bits.forEach(button => {
+      button.setAttribute("aria-pressed", "false");
+      button.textContent = "0";
+    });
+
+    const updateScore = () => {
+      scoreText.textContent = `Score: ${score} · Streak: ${streak}`;
+    };
+
+    const startRound = () => {
+      if (hasActiveRound && !solved) streak = 0;
+      target = Math.floor(Math.random() * 255) + 1;
+      mode = Math.random() < 0.5 ? "decimal" : "hex";
+      solved = false;
+      hasActiveRound = true;
+      resetBits();
+      answer.value = "";
+      feedback.textContent = "";
+      feedback.removeAttribute("data-result");
+      check.disabled = false;
+
+      if (mode === "decimal") {
+        prompt.textContent = `Build decimal ${target}, then enter its hexadecimal form.`;
+        answerLabel.textContent = "Hexadecimal:";
+        answer.placeholder = "for example, 2D";
+        answer.inputMode = "text";
+      } else {
+        prompt.textContent = `Build hexadecimal 0x${hex(target)}, then enter its decimal form.`;
+        answerLabel.textContent = "Decimal:";
+        answer.placeholder = "0–255";
+        answer.inputMode = "numeric";
+      }
+
+      updateScore();
+    };
+
+    bits.forEach(button => button.addEventListener("click", () => {
+      if (solved) return;
+      const on = button.getAttribute("aria-pressed") !== "true";
+      button.setAttribute("aria-pressed", String(on));
+      button.textContent = on ? "1" : "0";
+    }));
+
+    check.addEventListener("click", () => {
+      if (solved) return;
+      const built = builtValue();
+      const typed = answer.value.trim();
+      const conversion = mode === "decimal"
+        ? (/^(?:0x)?[0-9a-f]{1,2}$/i.test(typed) ? parseInt(typed.replace(/^0x/i, ""), 16) : NaN)
+        : (/^\d{1,3}$/.test(typed) ? Number(typed) : NaN);
+
+      if (built === target && conversion === target) {
+        solved = true;
+        score += 1;
+        streak += 1;
+        check.disabled = true;
+        feedback.dataset.result = "correct";
+        feedback.textContent = `Correct: ${target} = 0x${hex(target)} = ${target.toString(2).padStart(8, "0")}.`;
+        updateScore();
+        return;
+      }
+
+      streak = 0;
+      feedback.removeAttribute("data-result");
+      const bitHint = built === target
+        ? "Your bit pattern is correct."
+        : `Your bits currently make ${built} (0x${hex(built)}).`;
+      const conversionHint = conversion === target
+        ? "Your conversion is correct."
+        : "Recheck the conversion field.";
+      feedback.textContent = `Not yet. ${bitHint} ${conversionHint}`;
+      updateScore();
+    });
+
+    answer.addEventListener("keydown", event => {
+      if (event.key === "Enter") check.click();
+    });
+
+    next.addEventListener("click", startRound);
+    startRound();
+  })();
+</script>

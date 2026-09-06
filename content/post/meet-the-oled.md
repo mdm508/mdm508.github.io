@@ -392,3 +392,9 @@ pixel → bit → byte → frame buffer → display
 
 For now, the essential model is enough: drawing methods prepare an image in memory, and `show()` sends it to the screen.
 {{< /answer >}}
+
+## Continue to Phase 2
+
+The next lesson opens that prepared image just far enough to study its raw ingredients: bits, bytes, binary, hexadecimal, and masks.
+
+[Continue to Pictures as Data: Binary, Hex, and Bit Masks →](/post/pictures-as-data/)
