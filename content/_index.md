@@ -9,7 +9,7 @@ images:
   <div class="hero__copy">
     <p class="eyebrow">One-on-one online coding & math lessons</p>
     <h1>Coding and math tutoring</h1>
-    <p class="hero__lead">One-on-one Zoom lessons for kids and teens, from Scratch and school math to AP Computer Science.</p>
+    <p class="hero__lead">One-on-one Zoom lessons for kids, teens, and college students—from first projects to AP and college coursework.</p>
     <div class="hero__actions">
       <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Coding%20tutoring%20for%20my%20child&amp;body=Hi%20Matt%2C%0A%0AMy%20child%20is%20interested%20in%20coding.%20Their%20age%2Fgrade%20is%3A%0ATheir%20experience%20so%20far%20is%3A%0AThey%20would%20love%20to%20build%20or%20learn%3A%0A%0AWhat%20would%20you%20recommend%20as%20a%20next%20step%3F">Ask about a first lesson</a>
       <a class="text-link" href="/tutoring/">See how tutoring works <span aria-hidden="true">→</span></a>

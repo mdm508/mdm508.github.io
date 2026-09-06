@@ -1,6 +1,6 @@
 ---
 title: "Online Coding and Math Tutoring for Kids and Teens"
-description: "Learn how one-on-one online coding and math lessons with Matt work, including help with Scratch, Python, Java, AP Computer Science, and problem-solving."
+description: "One-on-one online coding and math tutoring for kids, teens, and college students, including Scratch, Python, Java, AP Computer Science, and problem-solving."
 type: "tutoring"
 exclude_from_articles: true
 images:
@@ -11,7 +11,7 @@ images:
 
 # Online coding and math tutoring
 
-Personalized lessons for young problem-solvers—from first projects in Scratch and Python to math support, AP Computer Science coursework, and more advanced programming.
+Personalized lessons for kids, teens, and college students—from first projects in Scratch and Python to math support, AP Computer Science, college coursework, and more advanced programming.
 
 <div class="hero__actions">
   <a class="cta-button" href="mailto:matthedm@uci.edu?subject=Coding%20tutoring%20for%20my%20child&amp;body=Hi%20Matt%2C%0A%0AMy%20child%20is%20interested%20in%20coding.%20Their%20age%2Fgrade%20is%3A%0ATheir%20experience%20so%20far%20is%3A%0AThey%20would%20love%20to%20build%20or%20learn%3A%0A%0AWhat%20would%20you%20recommend%20as%20a%20next%20step%3F">Ask about availability</a>
@@ -22,7 +22,7 @@ Personalized lessons for young problem-solvers—from first projects in Scratch 
 
 - A beginner who is curious about programming but does not know where to start
 - A Scratch creator ready to understand more advanced concepts or try Python
-- A student who wants patient help with a computer science course
+- A high school or college student who wants patient help with a computer science course
 - An AP Computer Science A or AP Computer Science Principles student who wants clearer explanations and deliberate practice
 - A student who wants to understand difficult math concepts and develop stronger problem-solving habits
 - A young programmer with a game, website, app, or other project idea
