@@ -294,7 +294,7 @@ An ordinary mutable property is also a poor fit. SwiftUI view structs are tempor
 
 ## Read the Whole View
 
-### Q10: How do the old and new ideas work together?
+### Q10: How should the complete view protect its state?
 
 Read the complete view before opening the answer:
 
@@ -305,6 +305,10 @@ struct PetView: View {
     let name: String
     @State private var energy = 5
 
+    init(name: String = "Cookie") {
+        self.name = name
+    }
+
     var body: some View {
         VStack(spacing: 12) {
             Text(name)
@@ -314,12 +318,14 @@ struct PetView: View {
 
             HStack {
                 Button("Feed") {
-                    energy += 1
+                    energy = min(energy + 1, 10)
                 }
+                .disabled(energy >= 10)
 
                 Button("Play") {
-                    energy -= 1
+                    energy = max(energy - 1, 0)
                 }
+                .disabled(energy <= 0)
             }
         }
         .padding()
@@ -327,18 +333,30 @@ struct PetView: View {
 }
 ```
 
-Identify the custom type, its three properties, the views composed inside `body`, the modifiers, and the two closures. Then explain what the interface does when either button is pressed.
+Identify the custom type, its initializer, its three properties, the views composed inside `body`, and the two closures. Why can the energy no longer become negative? What does `PetView()` display if its caller supplies no name?
 
 {{< answer >}}
 `PetView` is a struct that conforms to `View`. It has three properties with different roles:
 
 ```swift
-let name: String                 // information supplied from outside
-@State private var energy = 5   // changing local state
-var body: some View              // the interface description
+let name: String                // fixed information supplied from outside
+@State private var energy = 5  // local state with a default value
+var body: some View             // the interface description
 ```
 
-The body composes `VStack`, `HStack`, `Text`, and `Button` views. `.font(.title)` and `.padding()` are modifiers. Each button receives a closure: Feed adds one to `energy`, while Play subtracts one.
+The initializer also gives `name` a default without making it mutable:
+
+```swift
+init(name: String = "Cookie") {
+    self.name = name
+}
+```
+
+Both `PetView()` and `PetView(name: "Mochi")` are now valid. The first displays **Cookie**; the second displays **Mochi**. Energy begins at `5` in either view.
+
+The body composes `VStack`, `HStack`, `Text`, and `Button` views. `.font(.title)`, `.padding()`, and `.disabled(...)` are modifiers. Each button receives a closure. Feed raises energy but caps it at `10`; Play lowers energy but floors it at `0`.
+
+The assignments defend the `0...10` rule. The disabled states also show the user when an action has reached its limit. Keeping both matters: the interface communicates the boundary, and the state-changing code still protects it.
 
 Both labels read properties. `Text(name)` displays fixed input, while `Text("Energy: \(energy)")` displays changing state. When a closure changes `energy`, SwiftUI reevaluates the body and refreshes the energy label.
 
@@ -347,38 +365,88 @@ The bridge from the previous lesson is direct:
 ```text
 struct and protocol conformance → PetView: View
 properties                      → name, energy, body
-initializers                    → Text(...), Button(...)
+initializers                    → PetView(...), Text(...), Button(...)
 closures                        → button actions
 dot notation                    → view modifiers
-state                           → @State
+state and its valid range       → @State, min(...), max(...)
 ```
 {{< /answer >}}
 
 ## Practice: Extend the Pet View
 
-First add a **Sleep** button that increases energy by `2`. Keep Feed and Play, and arrange all three buttons in an `HStack`. Predict the energy after a short sequence of presses before testing it.
+### Q11: Can Sleep obey the same energy rule?
 
-Next add an ordinary property:
+Add a **Sleep** button that restores `2` energy. It must never raise energy above `10`, and it should be disabled when the pet is already fully rested. Keep all three buttons in the same `HStack`.
+
+Starting from `5`, predict the result of pressing Play, Sleep, Sleep, Sleep before you run the code.
+
+{{< answer >}}
+The sequence produces `4`, `6`, `8`, then `10`. The last increase stops at the upper boundary.
 
 ```swift
-let species: String
+Button("Sleep") {
+    energy = min(energy + 2, 10)
+}
+.disabled(energy >= 10)
 ```
 
-Display the name, species, and energy. Create `PetView` values with different names and species so you can distinguish information supplied by a caller from state owned by the view.
+This is the same rule used by Feed, but the change is larger. If energy were `9`, Sleep would still finish at `10`, not `11`.
+{{< /answer >}}
 
-For a separate exercise, build a counter with a `Text` label, a button that adds one, and a reset button. Then build a two-fighter screen from this model:
+### Q12: Should mood be another piece of state?
+
+Display **Tired** when energy is `0...2`, **Ready** when it is `3...7`, and **Energetic** when it is `8...10`.
+
+Do not add another `@State` property. Derive the mood from energy so it can never disagree with the number on screen.
+
+{{< answer >}}
+A computed property keeps one source of truth:
 
 ```swift
-struct Fighter {
-    let name: String
-    var health: Int
+var mood: String {
+    if energy <= 2 {
+        return "Tired"
+    }
+
+    if energy >= 8 {
+        return "Energetic"
+    }
+
+    return "Ready"
 }
 ```
 
-Let each fighter attack the other. Keep asking which code models a fighter and which code describes how a fighter appears.
+Then place this view beside the energy label:
+
+```swift
+Text("Mood: \(mood)")
+```
+
+Mood changes whenever SwiftUI reevaluates `body`. A second stored state value would create an avoidable bug: one button might change energy but forget to change mood.
+{{< /answer >}}
+
+### Q13: Can you learn one unfamiliar view from its documentation?
+
+Replace the plain energy display with a determinate `ProgressView` that runs from `0` to `10`. Keep the exact number visible as well.
+
+Begin with Apple's [`ProgressView` documentation](https://developer.apple.com/documentation/swiftui/progressview). Find an initializer that accepts a current value and a total. Determine why `Double(energy)` is useful even though the model stores an `Int`.
+
+{{< answer >}}
+One compact solution is:
+
+```swift
+ProgressView("Energy", value: Double(energy), total: 10)
+
+Text("\(energy) / 10")
+```
+
+This is a **determinate** progress view because it receives both the present value and the total. Its numeric initializer expects a floating-point value, so `Double(energy)` converts the `Int` without changing the stored state.
+
+Do not stop after the code compiles. Press each button at both boundaries and confirm that the bar, number, disabled buttons, and mood all describe the same state.
+{{< /answer >}}
 
 ## Prepare for the Next Lesson
 
-`PetView` currently owns its energy. That is enough for one small view, but larger interfaces raise new questions. What if a parent view owns the pet? How can a smaller child view display that value? How can the child change state it does not own? Where should rules such as minimum and maximum energy live?
+`PetView` currently owns its energy and protects the valid range itself. That is enough for one small view, but larger interfaces raise new questions. What if a parent view owns the pet? How can a smaller child view display that value? How can the child change state it does not own? Should every screen repeat the `0...10` rule, or should the model enforce it once?
 
 Those questions lead to SwiftUI data flow: passing values into views, separating model rules from presentation, and using bindings when one view needs to edit state owned by another.
