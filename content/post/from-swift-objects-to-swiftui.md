@@ -450,3 +450,5 @@ Do not stop after the code compiles. Press each button at both boundaries and co
 `PetView` currently owns its energy and protects the valid range itself. That is enough for one small view, but larger interfaces raise new questions. What if a parent view owns the pet? How can a smaller child view display that value? How can the child change state it does not own? Should every screen repeat the `0...10` rule, or should the model enforce it once?
 
 Those questions lead to SwiftUI data flow: passing values into views, separating model rules from presentation, and using bindings when one view needs to edit state owned by another.
+
+[Continue to Part 2: Data Flow and Bindings →](/post/from-swift-objects-to-swiftui-part-2/)
