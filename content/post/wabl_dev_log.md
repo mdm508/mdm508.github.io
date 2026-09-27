@@ -1,7 +1,7 @@
 ---
 title: "Waabl"
 date: 2023-12-30T15:29:38-08:00
-draft: true
+draft: false
 tags: ["ios"]
 summary: a rarely updated and poorly organized account of my progress on my first iOS app
 ---
@@ -46,3 +46,15 @@ So now, whenever the main app updates the current word I
 I'm not sure why I resisted this solution originally. Next steps are to
 refactor the code for this current commit and get ready to publish to the 
 app store :)
+
+## Version 2 released — April 30, 2025 at 11:53 a.m.
+
+Version 2 made it to the App Store. The update turned Waabl into a much more complete daily-learning app:
+
+* iCloud sync keeps learning progress available across devices.
+* A history view makes it possible to review previously learned words.
+* Simplified Chinese and pinyin are now supported.
+* A Lock Screen widget and two Home Screen widgets keep the current word visible throughout the day.
+* Waabl is available for both iPhone and iPad.
+
+The basic idea is still the same: learn one Chinese word at a time and use the phone checks already built into the day as small opportunities to review.
