@@ -8,6 +8,12 @@ Harmonizer is an iPad music app for exploring pitch relationships and developing
 
 The app supports traditional note names as well as **movable Do**, with a selectable tonic so musicians and students can practice in any key.
 
+## With thanks to Stephen
+
+Harmonizer was created by [Stephen Malinowski](https://www.musanim.com/Harmonizer/), who first developed it as an experimental iPad app in 2010. This is Stephen's project and idea; I am grateful for the opportunity to take over its maintenance and help keep it working on current devices.
+
+You can read about the app's history, design, and original musical ideas on [Stephen's Harmonizer page](https://www.musanim.com/Harmonizer/).
+
 ## Privacy Policy
 
 **Effective date:** September 26, 2026
