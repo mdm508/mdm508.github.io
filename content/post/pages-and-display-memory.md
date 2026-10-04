@@ -2,33 +2,140 @@
 title: "Phase 3: Memory Organization — Pages, Bytes, and Coordinates"
 date: 2026-10-04T08:00:00-07:00
 draft: false
-description: "Map SSD1306 screen coordinates to pages, bytes, and bits, then change individual pixels in a raw MicroPython framebuffer."
+description: "Map SSD1306 screen coordinates to pages, bytes, and bits, then change individual pixels in a raw MicroPython bytearray."
 tags: ["python", "micropython", "raspberry-pi-pico", "electronics", "binary", "hexadecimal"]
-summary: "Trace a pixel from (x, y) to its page, byte, and bit in the SSD1306 framebuffer—and test the mapping on the Pico."
+summary: "Trace a pixel from (x, y) to its page, byte, and bit in SSD1306 display memory."
 reading_time: 120
 ---
 
-This lesson continues [Phase 2: Pictures as Data](/post/pictures-as-data/). We know a 128 × 64 monochrome screen contains 8,192 pixels and needs 1,024 bytes. Now we need to discover how those bytes correspond to the picture.
+## Where This Lesson Fits
 
-Our driving question is concrete:
+In [Phase 1: Meet the OLED](/post/meet-the-oled/), we treated the 128 × 64 display as a coordinate grid. `x` moves across columns; `y` moves down rows. We used drawing commands and `show()` without opening the driver.
 
-> If the framebuffer is `bytearray(1024)`, which byte and which bit must we change to turn on pixel `(37, 29)`?
+In [Phase 2: Pictures as Data](/post/pictures-as-data/), we learned that a monochrome pixel needs one bit, a byte contains eight bits, and a full screen requires 1,024 bytes. We also practiced masks for changing individual bits.
 
-We will derive the answer, then test it against the display. The standard MicroPython SSD1306 driver uses a vertical, least-significant-bit-first layout (`MONO_VLSB`): bit 0 is the top pixel in each group of eight. A different driver or display rotation can change orientation, so the hardware experiment matters.
+So we know how much memory the picture needs and how to change a bit. We have not yet connected a screen coordinate to a particular byte.
 
-## Start with the Missing Information
+**Today's goal:** build that map, then answer one question: to turn on pixel `(37, 29)`, which byte do we change, and which bit inside it?
 
-### Q1: Is knowing the buffer size enough?
+Phase 4 will pick up after that. We will look at the frame waiting in the Pico's RAM and ask why drawing text does not immediately change the physical screen.
 
-**Problem:** You have `buffer = bytearray(1024)` and are asked to turn on pixel `(37, 29)`. Can you do it yet? What information is missing?
+## Build the Memory Model
+
+### Start with the screen coordinates
+
+The OLED is a grid 128 pixels wide and 64 pixels high. We name a pixel with `(x, y)`:
+
+- `x` is its column: 0 at the left edge, 127 at the right.
+- `y` is its row: 0 at the top, 63 at the bottom.
+
+For example, `(37, 29)` means column 37, row 29. These coordinates describe where the pixel is on the screen. They do not yet tell us where its information is stored.
+
+### What is the buffer?
+
+A **buffer** is a stretch of memory used to hold data. Here, the data describes the pixels that make up the image. In Python, `bytearray(1024)` creates 1,024 numbered, changeable byte slots, each starting at zero:
+
+```text
+buffer[0], buffer[1], buffer[2], ... buffer[1023]
+```
+
+Each slot stores one byte, a value from 0 through 255. The index tells us which byte slot we mean. It does not mean that one slot stores one screen pixel; the display packs several pixels into a byte.
+
+### One byte holds eight vertical pixels
+
+For the standard MicroPython SSD1306 layout used here, the eight bits of a byte control eight vertically stacked pixels in one screen column. The driver calls this arrangement `MONO_VLSB`: monochrome, vertical, least-significant bit first.
+
+```text
+one screen column         one byte
+row 0  pixel                 bit 0 (D0)
+row 1  pixel                 bit 1 (D1)
+row 2  pixel                 bit 2 (D2)
+row 3  pixel                 bit 3 (D3)
+row 4  pixel                 bit 4 (D4)
+row 5  pixel                 bit 5 (D5)
+row 6  pixel                 bit 6 (D6)
+row 7  pixel                 bit 7 (D7)
+```
+
+Within each group, bit 0 represents the top pixel and bit 7 the bottom. For example, `00000001` turns on the top pixel; `10000000` turns on the bottom one. The binary digits are usually written left-to-right as bit 7 down to bit 0, so the printed order runs opposite to the physical top-to-bottom order.
+
+### What is a page?
+
+A **page** is a horizontal band of eight screen rows. It stretches across the full 128-pixel width. Since one byte represents eight vertical pixels in one column, each column in that band uses one byte:
+
+```text
+Page 0: rows  0–7   → 128 bytes, one byte for each x-column
+Page 1: rows  8–15  → 128 bytes
+Page 2: rows 16–23  → 128 bytes
+Page 3: rows 24–31  → 128 bytes
+  ...
+Page 7: rows 56–63  → 128 bytes
+```
+
+A page is not a separate display or a single row. It is one eight-row-tall strip. The pages are stored consecutively in the buffer:
+
+| Page | Screen rows | Byte indices in the buffer |
+| ---: | --- | --- |
+| 0 | 0–7 | 0–127 |
+| 1 | 8–15 | 128–255 |
+| 2 | 16–23 | 256–383 |
+| 3 | 24–31 | 384–511 |
+| … | … | … |
+| 7 | 56–63 | 896–1023 |
+
+That also checks our memory count: 8 pages × 128 bytes per page = 1,024 bytes.
+
+### From `(x, y)` to page, byte, and bit
+
+Now each part of the mapping has a meaning:
+
+1. Divide `y` by 8 to find which page contains that row.
+2. The remainder after dividing `y` by 8 is the bit position inside the byte.
+3. Each page uses `width` bytes, so skip `page * width` bytes, then move `x` bytes across that page.
+4. Shift a `1` left by the bit number to make a mask for that pixel.
+
+That gives us four expressions:
+
+```python
+page = y // 8
+bit = y % 8
+index = page * width + x
+mask = 1 << bit
+```
+
+The standard display in this lesson is 128 pixels wide, so `width` is 128. Using the name `width` makes clear what that number means and lets the same formula work for another display width.
+
+### Walk through `(37, 29)` once
+
+The row is `y = 29`. Page 3 covers rows 24 through 31, so row 29 is in Page 3. It is the sixth row of that page when counting from zero:
+
+```text
+page = 29 // 8 = 3
+bit  = 29 % 8  = 5
+```
+
+Page 3 starts after three complete pages. Each page has 128 bytes, and column 37 is 37 bytes from the start of the page:
+
+```text
+index = 3 * 128 + 37 = 421
+mask  = 1 << 5 = 00100000 = 0x20
+```
+
+So the answer to our driving question is: change bit 5 of `buffer[421]`. We have not changed the display yet; we have only located the pixel's stored bit. The questions below give you practice deriving and using each part of this model.
+
+## Check the Model
+
+### Q1: Does the buffer size tell us a pixel's address?
+
+**Problem:** We know the display image needs 1,024 bytes. Does that number alone tell us which byte holds pixel `(37, 29)`? What other parts of the memory model do we need?
 
 {{< hints >}}
-- The buffer tells you how much memory exists, not what each position represents.
-- Ask what connects a screen coordinate to a byte and to one bit in that byte.
+- The size tells us how many byte slots are available.
+- We also need to know what a byte represents and how the screen is divided into pages.
 {{< /hints >}}
 
 {{< answer >}}
-Not yet. We know the image needs 1,024 bytes, but we do not know how the display organizes them. We still need to find the byte for this coordinate and the bit inside that byte. That mapping is the problem this lesson solves.
+No. The size tells us the buffer's capacity, not the meaning of each index. To locate a pixel, we need the page layout, the column's byte position within that page, and the bit's position inside that byte. The model above supplies those missing connections.
 {{< /answer >}}
 
 ## One Byte, Eight Vertical Pixels
