@@ -10,6 +10,8 @@ reading_time: 120
 
 An image looks like a picture to us, but to NumPy it is an array of numbers. Once you are comfortable moving between those two views, image processing becomes a practical way to learn data types, vectorization, Boolean masks, shapes, axes, and summary statistics.
 
+If you are new to NumPy arrays, start with [NumPy: Think in Arrays](/post/numpy-think-in-arrays/) and return here when you are ready to work with image data.
+
 The central question for this lesson is:
 
 > How can we translate an image-transformation rule from ordinary Python loops into a concise NumPy operation, and what numerical problems do we need to understand before doing it safely?

@@ -402,4 +402,6 @@ We can now read, construct, test, set, and clear any bit inside a byte. One prob
 
 Suppose we want pixel `(37, 29)`. Which byte contains it? Which bit inside that byte must change? We do not yet have enough information to answer.
 
-That is the next lesson: **Pages and Display Memory**. It will connect screen coordinates to the SSD1306's byte layout.
+That is the next lesson: **Pages and Display Memory**. It connects screen coordinates to the SSD1306's byte layout.
+
+[Continue to Phase 3: Pages and Display Memory →](/post/pages-and-display-memory/)

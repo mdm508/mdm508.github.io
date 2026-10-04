@@ -1,0 +1,144 @@
+<style>
+  .axis-explorer {
+    margin: 1.4rem 0 1.8rem;
+    padding: 1rem 1.1rem;
+    color: var(--text-primary);
+    background: var(--light-orange);
+    border: 1px solid rgba(104, 68, 33, 0.2);
+    border-left: 3px solid var(--accent-orange);
+    border-radius: 8px;
+  }
+
+  .axis-explorer__title {
+    margin: 0 0 0.4rem;
+    font-weight: 700;
+  }
+
+  .axis-explorer__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.8rem 0;
+  }
+
+  .axis-explorer__controls button {
+    padding: 0.45rem 0.7rem;
+    color: var(--deep-brown);
+    background: rgba(251, 247, 238, 0.96);
+    border: 1px solid rgba(104, 68, 33, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .axis-explorer__controls button[aria-pressed="true"] {
+    color: #fffaf0;
+    background: var(--rich-brown);
+    border-color: var(--deep-brown);
+  }
+
+  .axis-explorer button:focus-visible {
+    outline: 3px solid var(--accent-orange);
+    outline-offset: 2px;
+  }
+
+  .axis-explorer table {
+    width: auto;
+    margin: 0.7rem auto;
+    border-collapse: collapse;
+    text-align: center;
+  }
+
+  .axis-explorer th,
+  .axis-explorer td {
+    min-width: 2.8rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(104, 68, 33, 0.2);
+  }
+
+  .axis-explorer td.is-highlighted {
+    background: rgba(218, 179, 121, 0.45);
+  }
+
+  .axis-explorer[data-active-axis="0"] td.is-highlighted {
+    border-left: 2px solid var(--accent-orange);
+    border-right: 2px solid var(--accent-orange);
+  }
+
+  .axis-explorer[data-active-axis="1"] td.is-highlighted {
+    border-top: 2px solid var(--accent-orange);
+    border-bottom: 2px solid var(--accent-orange);
+  }
+
+  .axis-explorer__result {
+    min-height: 1.5em;
+    margin: 0.7rem 0 0;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  @media (max-width: 520px) {
+    .axis-explorer {
+      padding: 0.85rem;
+    }
+
+    .axis-explorer th,
+    .axis-explorer td {
+      min-width: 2.2rem;
+      padding: 0.4rem;
+    }
+  }
+</style>
+
+<section class="axis-explorer" data-axis-explorer aria-label="NumPy axis explorer">
+  <p class="axis-explorer__title">Try the axis explorer</p>
+  <p>Choose an axis to see which direction NumPy reduces:</p>
+
+  <table>
+    <caption>scores, with row and column indices</caption>
+    <thead>
+      <tr><th scope="col">row / col</th><th scope="col">0</th><th scope="col">1</th><th scope="col">2</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">0</th><td data-row="0" data-col="0">2</td><td data-row="0" data-col="1">5</td><td data-row="0" data-col="2">1</td></tr>
+      <tr><th scope="row">1</th><td data-row="1" data-col="0">7</td><td data-row="1" data-col="1">3</td><td data-row="1" data-col="2">4</td></tr>
+    </tbody>
+  </table>
+
+  <div class="axis-explorer__controls" role="group" aria-label="Choose a reduction axis">
+    <button type="button" data-axis="0" aria-pressed="false">axis=0 · one result per column</button>
+    <button type="button" data-axis="1" aria-pressed="false">axis=1 · one result per row</button>
+  </div>
+
+  <p class="axis-explorer__result" data-axis-result aria-live="polite">Choose an axis to see the maxima.</p>
+  <noscript>The grid is [[2, 5, 1], [7, 3, 4]]. `max(axis=0)` gives [7, 5, 4]; `max(axis=1)` gives [5, 7].</noscript>
+</section>
+
+<script>
+  (() => {
+    const root = document.currentScript.previousElementSibling;
+    if (!root || !root.matches("[data-axis-explorer]") || root.dataset.ready) return;
+    root.dataset.ready = "true";
+
+    const buttons = Array.from(root.querySelectorAll("[data-axis]"));
+    const cells = Array.from(root.querySelectorAll("td[data-row][data-col]"));
+    const result = root.querySelector("[data-axis-result]");
+    const values = [
+      [2, 5, 1],
+      [7, 3, 4],
+    ];
+
+    buttons.forEach(button => button.addEventListener("click", () => {
+      const axis = Number(button.dataset.axis);
+      const maxima = axis === 0
+        ? values[0].map((_, col) => Math.max(values[0][col], values[1][col]))
+        : values.map(row => Math.max(...row));
+
+      buttons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+      root.dataset.activeAxis = String(axis);
+      cells.forEach(cell => cell.classList.add("is-highlighted"));
+
+      result.textContent = `scores.max(axis=${axis}) → [${maxima.join(", ")}]`;
+    }));
+  })();
+</script>
