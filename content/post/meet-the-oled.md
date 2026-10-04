@@ -398,3 +398,19 @@ For now, the essential model is enough: drawing methods prepare an image in memo
 The next lesson opens that prepared image just far enough to study its raw ingredients: bits, bytes, binary, hexadecimal, and masks.
 
 [Continue to Pictures as Data: Binary, Hex, and Bit Masks →](/post/pictures-as-data/)
+
+## Glossary
+
+| Term | Definition | Example |
+| --- | --- | --- |
+| OLED | A display whose pixels produce their own light. | The SSD1306 OLED module. |
+| Pixel | One individually controlled point on the screen. | `oled.pixel(10, 5, 1)` turns on pixel `(10, 5)`. |
+| Resolution | The screen's width and height, measured in pixels. | `128 × 64` means 128 columns and 64 rows. |
+| Coordinate | An `(x, y)` position on the screen; `(0, 0)` is the top-left. | `(127, 63)` is the bottom-right on a 128 × 64 screen. |
+| I²C | A two-wire bus used by a controller and connected devices. | `I2C(0, scl=..., sda=...)` configures an I²C bus. |
+| SDA | The I²C data line. | The OLED's SDA pin connects to the Pico's chosen SDA GPIO. |
+| SCL | The I²C clock line. | The OLED's SCL pin connects to the Pico's chosen SCL GPIO. |
+| I²C address | The number that identifies a device on the bus. | `0x3C` (decimal `60`) is a common SSD1306 address. |
+| Driver | Code that translates convenient drawing calls into hardware operations. | `SSD1306_I2C(128, 64, i2c)` creates a display object. |
+| Frame buffer | Memory holding the image being prepared for the display. | `oled.text("Hi", 0, 0)` draws into the display's buffer. |
+| `show()` | A method that sends the prepared image to the physical screen. | `oled.show()` updates the OLED. |

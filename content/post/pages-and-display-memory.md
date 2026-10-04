@@ -580,3 +580,20 @@ We can now translate coordinates into bytes and bits, then change that data in a
 That is Phase 4: **The Frame Buffer**. We will follow a drawing operation from the Pico's RAM to the display and learn why drawing and displaying are separate steps.
 
 [Back to Phase 2: Pictures as Data ←](/post/pictures-as-data/)
+
+## Glossary
+
+| Term | Definition | Example |
+| --- | --- | --- |
+| Coordinate | A screen location written `(x, y)`, with `x` across and `y` down. | `(37, 29)` means column 37, row 29. |
+| Buffer | A region of memory holding the display's pixel data. | `bytearray(1024)` creates 1,024 editable byte slots. |
+| Byte | Eight bits; in this layout, one byte stores eight vertical pixels in one column. | `0b00100000` turns on the pixel at bit 5 in that group. |
+| Page | A horizontal band eight pixels tall. | Page 3 contains rows 24 through 31. |
+| Page number | The eight-row group containing row `y`. | `29 // 8` gives page 3. |
+| Bit position | The row's position within its page, numbered 0 through 7. | `29 % 8` gives bit 5. |
+| Byte index | The position of a byte in the buffer, starting at zero. | For `(37, 29)`, `3 * 128 + 37` is index 421. |
+| Integer division (`//`) | Division that keeps the whole-number quotient. | `29 // 8` is `3`. |
+| Modulo (`%`) | The remainder after division. | `29 % 8` is `5`. |
+| Bit mask | A value with a selected bit used to change or test that position. | `1 << 5` creates `00100000`. |
+| Bitwise OR (`\|=`) | Sets selected bits while preserving the other bits. | `buffer[421] |= 1 << 5` turns on bit 5. |
+| `MONO_VLSB` | A monochrome layout packed vertically, with the least-significant bit at the top of each group. | Bit 0 represents the top pixel; bit 7 the bottom. |

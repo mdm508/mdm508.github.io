@@ -405,3 +405,19 @@ Suppose we want pixel `(37, 29)`. Which byte contains it? Which bit inside that 
 That is the next lesson: **Pages and Display Memory**. It connects screen coordinates to the SSD1306's byte layout.
 
 [Continue to Phase 3: Pages and Display Memory →](/post/pages-and-display-memory/)
+
+## Glossary
+
+| Term | Definition | Example |
+| --- | --- | --- |
+| Bit | A binary digit: either `0` or `1`. | `1 << 3` makes the value `00001000`. |
+| Byte | A group of eight bits. | `0b00101101` is one byte. |
+| Binary | A base-2 way to write values using only `0` and `1`. | `0b00111100` is 60. |
+| Hexadecimal | A base-16 notation that writes each group of four bits as one digit. | `0x2D` represents `0010 1101`. |
+| Nibble | A group of four bits, or half a byte. | `1101` is the low nibble of `0x2D`. |
+| Monochrome | Having two pixel states: on and off. | One bit can represent one monochrome pixel. |
+| Bit position | A bit's numbered place in a byte, counting from 0 on the right. | In `00001000`, bit 3 is on. |
+| Bit mask | A bit pattern used to select or change chosen bit positions. | `1 << 5` creates a mask for bit 5. |
+| Bitwise OR (`\|`) | Combines bits so a `1` in either input produces a `1`; useful for setting a bit. | `value \|= 1 << 5` turns bit 5 on. |
+| Bitwise AND (`&`) | Combines bits so a result bit is `1` only when both inputs have `1`. | `value & (1 << 2)` tests bit 2. |
+| Bit shift (`<<`) | Moves a bit pattern left, adding zeroes on the right. | `1 << 3` is `00001000`. |

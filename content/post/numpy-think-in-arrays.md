@@ -199,9 +199,27 @@ values[(values > 3) & (values < 10)]
 The result is `[4, 8]`.
 {{< /answer >}}
 
-## Use an Axis to Summarize a Grid
+## Understand Axes Before Reducing
 
-A **reduction** takes many values and returns fewer—for example, `sum`, `mean`, or `max`.
+### What is an axis?
+
+An **axis** is one of an array's dimensions. A one-dimensional array has one axis. A two-dimensional grid has two: rows and columns. NumPy numbers dimensions from zero in the order they appear in the shape.
+
+This grid has shape `(2, 3)`: 2 rows, then 3 columns. That makes rows `axis=0` and columns `axis=1`:
+
+```text
+                  axis 1: columns →
+axis 0: rows ↓     [ 2  5  1 ]
+                   [ 7  3  4 ]
+```
+
+An axis number is not a row or column index. `axis=0` does not mean “choose row 0”; it names the entire row dimension. Likewise, `axis=1` names the column dimension.
+
+### What does it mean to reduce along an axis?
+
+A **reduction** combines several values into fewer values. `sum`, `mean`, and `max` are reductions. When we reduce along an axis, NumPy combines values in that direction and removes that dimension from the result. The other dimension remains.
+
+For the same 2 × 3 grid, reducing with `axis=0` combines values down the rows, leaving one result for each column:
 
 ```python
 scores = np.array([
@@ -210,11 +228,24 @@ scores = np.array([
 ])
 ```
 
-- `scores.max()` gives one maximum for the whole grid: `7`.
-- `scores.max(axis=1)` reduces across each row: `[5, 7]`.
-- `scores.max(axis=0)` reduces down each column: `[7, 5, 4]`.
+```text
+[2  5  1]       [7  5  4]
+  ↓  ↓  ↓
+[7  3  4]
+```
 
-Remember: `axis=1` gives one result per row; `axis=0` gives one result per column.
+So `scores.max(axis=0)` returns `[7, 5, 4]`, with shape `(3,)`: the row dimension was reduced, and the three columns remain.
+
+Reducing along `axis=1` combines values across each row, leaving one result for each row:
+
+```text
+[2  5  1] → 5
+[7  3  4] → 7
+```
+
+So `scores.max(axis=1)` returns `[5, 7]`, with shape `(2,)`: the column dimension was reduced, and the two rows remain. Without an axis argument, `scores.max()` reduces the whole grid to one value: `7`.
+
+In short: reducing `axis=0` leaves columns; reducing `axis=1` leaves rows. The axis you reduce is the dimension that disappears from the result.
 
 Use this small grid to watch each reduction direction. The highlighted bands show the values being reduced together.
 
@@ -449,3 +480,19 @@ The exact probability is `1 - (5/6)**4`, about `0.518`. The simulation should la
 For the next step, apply these ideas to real pictures: [Brightening and Averaging Images with NumPy →](/post/brightening-and-averaging-images-with-numpy/)
 
 For more examples beyond this introduction, see the [UC Irvine Math 9 NumPy notes](https://christopherdavisuci.github.io/UCI-Math-9-F22/Week2/NumPy.html).
+
+## Glossary
+
+| Term | Definition | Example |
+| --- | --- | --- |
+| Array | An ordered collection of values arranged in one or more dimensions. | `np.array([2, 4, 6])` |
+| Shape | The size of an array along each dimension. | `(2, 3)` means 2 rows and 3 columns. |
+| Index | A zero-based position used to access an array value. | `grid[1, 2]` selects row 1, column 2. |
+| Slice | A selection of positions; the start is included and the stop is excluded. | `grid[:2, 1:3]` selects two rows and columns 1–2. |
+| Vectorized operation | An operation NumPy applies element by element across an array. | `values * 3` multiplies every value by 3. |
+| Broadcasting | NumPy's rule for applying a smaller value or array across a compatible larger shape. | `grid + np.array([10, 20, 30])` adds by column. |
+| Boolean mask | An array of `True`/`False` values used to select entries. | `values[values > 5]` keeps values over 5. |
+| Axis | A numbered dimension of an array; in a 2-D grid, axis 0 is rows and axis 1 is columns. | `grid.shape == (2, 3)` has axes 0 and 1. |
+| Reduction | An operation that combines values, often along an axis. | `scores.max(axis=1)` finds one maximum per row. |
+| Random generator | An object that produces pseudo-random values; a seed makes a sequence repeatable. | `rng = np.random.default_rng(7)` |
+| Simulation | A model run repeatedly to estimate an outcome. | `success.mean()` estimates the success rate. |
