@@ -16,6 +16,8 @@ We will use a Raspberry Pi Pico and a 128 × 64 SSD1306 OLED. The driver file, `
 
 Start with this program in `main.py`:
 
+[Download the Phase 1 starter file](/downloads/pico/phase-1-main.py) and save it to the Pico as `main.py`, or copy the code below into Thonny. The `ssd1306.py` driver must also be on the Pico; this file does not include the driver.
+
 ```python
 from machine import Pin, I2C
 from ssd1306 import SSD1306_I2C

@@ -14,6 +14,8 @@ This lesson continues [Meet the OLED: Pixels, Coordinates, and `show()`](/post/m
 
 Our goal is not to memorize isolated conversions. It is to construct and change the exact bit patterns that will eventually control hardware.
 
+No OLED is needed for this phase. You can work through the examples in Thonny's Shell or run a small script on the Pico. [Download the Phase 2 byte lab](/downloads/pico/phase-2-byte-lab.py); fill in its `TODO` lines as you work through the questions.
+
 ## From Pixels to Bytes
 
 ### Q1: Does one monochrome pixel need a whole byte?

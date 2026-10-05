@@ -20,6 +20,8 @@ So we know how much memory the picture needs and how to change a bit. We have no
 
 Phase 4 will pick up after that. We will look at the frame waiting in the Pico's RAM and ask why drawing text does not immediately change the physical screen.
 
+You can test the mapping without an OLED. [Download the Phase 3 memory-mapping starter file](/downloads/pico/phase-3-memory-map.py). It creates the 1,024-byte buffer and leaves the coordinate and pixel functions for you to complete as the lesson develops them.
+
 ## Build the Memory Model
 
 ### Start with the screen coordinates
