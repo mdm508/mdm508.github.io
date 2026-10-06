@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#18233f" />
   <meta name="description" content="A challenging, tagged English grammar quiz with clear explanations and topic-by-topic results." />
-  <title>English Language Lab</title>
+  <title>English Quiz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,650;9..144,800&display=swap" rel="stylesheet">
@@ -54,19 +54,13 @@
     .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 30px; }
     .brand { display: flex; align-items: center; gap: 12px; color: inherit; font-weight: 800; letter-spacing: -.02em; text-decoration: none; }
     .brand-mark { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: white; background: var(--ink); box-shadow: 4px 4px 0 var(--yellow); }
-    .bank-stat { color: var(--ink-soft); font-size: .9rem; font-weight: 600; }
 
     .panel { background: rgba(255,255,255,.88); border: 1px solid rgba(24,35,63,.12); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-    .setup-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(290px, .85fr); min-height: 620px; }
-    .intro { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(32px, 6vw, 68px); background: var(--ink); color: white; overflow: hidden; }
-    .intro::after { content: "Aa"; position: absolute; right: -20px; bottom: -95px; color: rgba(255,255,255,.055); font: 800 18rem/1 "Fraunces", serif; letter-spacing: -.12em; }
+    .setup-grid { max-width: 720px; margin-inline: auto; }
     .eyebrow { display: inline-flex; align-items: center; gap: 8px; width: fit-content; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .13em; color: var(--yellow); }
     .eyebrow::before { content: ""; width: 22px; height: 3px; background: currentColor; border-radius: 9px; }
     h1, h2, h3 { font-family: "Fraunces", Georgia, serif; margin: 0; letter-spacing: -.035em; line-height: 1.04; }
-    h1 { max-width: 630px; margin: 22px 0; font-size: clamp(3rem, 7vw, 5.6rem); }
-    .intro p { max-width: 520px; margin: 0; color: #dbe1f0; font-size: clamp(1.03rem, 2vw, 1.2rem); }
-    .topic-ribbon { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 44px; }
-    .topic-ribbon span { border: 1px solid rgba(255,255,255,.22); border-radius: 999px; padding: 7px 11px; font-size: .78rem; color: #eef1fa; }
+    h1 { margin: 0; font-size: clamp(2rem, 4vw, 2.6rem); }
 
     .setup { padding: clamp(28px, 5vw, 52px); display: flex; flex-direction: column; justify-content: center; }
     .setup h2 { font-size: 2rem; margin-bottom: 8px; }
@@ -149,10 +143,6 @@
 
     @media (max-width: 800px) {
       .shell { width: min(100% - 20px, 680px); padding-top: 16px; }
-      .bank-stat { display: none; }
-      .setup-grid { grid-template-columns: 1fr; }
-      .intro { min-height: 410px; padding: 36px 28px; }
-      .intro::after { font-size: 12rem; bottom: -60px; }
       .setup { padding: 32px 24px 38px; }
       .quiz-panel { min-height: calc(100vh - 96px); padding: 22px 18px; }
       .question-wrap { margin-top: 30px; }
@@ -163,8 +153,7 @@
     @media (max-width: 520px) {
       .topbar { margin-bottom: 18px; }
       .brand-mark { width: 36px; height: 36px; }
-      h1 { font-size: 3.05rem; }
-      .topic-ribbon { margin-top: 34px; }
+      h1 { font-size: 2rem; }
       .question-wrap h2 { font-size: 2rem; }
       .option { grid-template-columns: 34px 1fr; padding: 13px; }
       .option-key { width: 32px; height: 32px; }
@@ -181,25 +170,12 @@
 <body>
   <main class="shell">
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Back to Coding With Matt"><span class="brand-mark">Aa</span><span>English Language Lab</span></a>
-      <div class="bank-stat" id="bank-stat">28 tagged questions · 8 topics</div>
+      <a class="brand" href="/" aria-label="Back to Coding With Matt"><span class="brand-mark">Aa</span><span>Coding With Matt</span></a>
     </header>
 
     <section class="panel setup-grid" id="setup-screen" aria-labelledby="main-title">
-      <div class="intro">
-        <div>
-          <span class="eyebrow">Grammar challenge</span>
-          <h1 id="main-title">Know what makes a sentence tick?</h1>
-          <p>Test clauses, sentence structure, punctuation, and more. Every answer comes with a clear explanation.</p>
-        </div>
-        <div class="topic-ribbon" aria-label="Available topics">
-          <span>Clauses</span><span>Fragments</span><span>Sentence types</span><span>Punctuation</span><span>Agreement</span>
-        </div>
-      </div>
-
       <form class="setup" id="quiz-form">
-        <h2>Build your quiz</h2>
-        <p class="muted">Choose a length and the topics you want to practice.</p>
+        <h1 id="main-title">English Quiz</h1>
 
         <fieldset class="field" style="border:0;padding:0;margin-inline:0">
           <legend class="field-title">Number of questions</legend>
@@ -214,7 +190,7 @@
           <div class="topics" id="topic-options"></div>
         </fieldset>
 
-        <button class="button button-primary" type="submit">Start challenge <span aria-hidden="true">↗</span></button>
+        <button class="button button-primary" type="submit">Start quiz</button>
       </form>
     </section>
 
@@ -267,34 +243,34 @@
 
   <script>
     const questionBank = [
-      {id:1,topic:"Fragments & Completeness",skill:"Dependent clauses",difficulty:"Challenging",prompt:"Is this a complete sentence or a fragment?",stimulus:"Because the violinist missed the entrance during rehearsal.",options:["Complete sentence","Fragment: it is a dependent clause","Fragment: it has no verb","Phrase: it has no subject"],answer:1,explanation:"It has a subject (the violinist) and verb (missed), but because makes the clause dependent. It cannot stand alone."},
-      {id:2,topic:"Phrases & Clauses",skill:"Prepositional phrases",difficulty:"Core",prompt:"How should the bold idea be classified?",stimulus:"Under the music stand",options:["Phrase","Dependent clause","Independent clause","Compound sentence"],answer:0,explanation:"This is a phrase because it has no subject–verb pair. It begins with the preposition under."},
-      {id:3,topic:"Phrases & Clauses",skill:"Dependent clauses",difficulty:"Core",prompt:"Classify this group of words.",stimulus:"When the lights went out",options:["Phrase","Dependent clause","Independent clause","Fragment with no verb"],answer:1,explanation:"Lights is the subject and went is the verb, so this is a clause. When makes it dependent."},
-      {id:4,topic:"Phrases & Clauses",skill:"Independent clauses",difficulty:"Core",prompt:"Classify this group of words.",stimulus:"The drummer counted too quickly.",options:["Phrase","Dependent clause","Independent clause","Participial phrase"],answer:2,explanation:"It has a subject (drummer), a complete verb (counted), and expresses a complete thought."},
-      {id:5,topic:"Subjects & Predicates",skill:"Noun clauses",difficulty:"Challenging",prompt:"What is the complete subject of this sentence?",stimulus:"What bothered Maya most was the silence after the announcement.",options:["Maya","What bothered Maya most","The silence","The announcement"],answer:1,explanation:"The noun clause What bothered Maya most acts as the complete subject. The main verb is was."},
-      {id:6,topic:"Fragments & Completeness",skill:"Subordinating conjunctions",difficulty:"Core",prompt:"Which revision correctly completes the fragment?",stimulus:"After the last bus left the station.",options:["After the last bus.","The last bus left after.","After the last bus left the station, we called a taxi.","Leaving the station after the last bus."],answer:2,explanation:"The original is dependent because it begins with after. Adding we called a taxi supplies an independent clause."},
-      {id:7,topic:"Sentence Types",skill:"Compound sentences",difficulty:"Core",prompt:"Which option correctly combines the ideas into a compound sentence?",stimulus:"The pitcher lost focus. The runner stole third base.",options:["When the pitcher lost focus, the runner stole third base.","The pitcher lost focus, and the runner stole third base.","The pitcher, losing focus, allowed third base.","Because the pitcher lost focus and the runner stole third."],answer:1,explanation:"A compound sentence joins two independent clauses with a comma and a coordinating conjunction such as and."},
-      {id:8,topic:"Sentence Types",skill:"Compound-complex sentences",difficulty:"Challenging",prompt:"Which sentence is compound-complex?",options:["Although Leo practiced, he missed the note, but he kept singing.","Leo practiced and sang every night.","Because Leo practiced every night.","Leo missed the note, but kept singing."],answer:0,explanation:"It contains one dependent clause (Although Leo practiced) and two independent clauses joined by but."},
-      {id:9,topic:"Punctuation",skill:"Comma splices",difficulty:"Challenging",prompt:"Which sentence correctly repairs the comma splice?",stimulus:"The storm ended, the players returned to the field.",options:["The storm ended the players returned to the field.","The storm ended, and the players returned to the field.","The storm, ended the players returned to the field.","The storm ended, because the players returned."],answer:1,explanation:"Two independent clauses may be joined with a comma plus a coordinating conjunction: comma + and."},
-      {id:10,topic:"Punctuation",skill:"Introductory clauses",difficulty:"Core",prompt:"Which sentence uses the comma correctly?",options:["Before the concert began we found our seats.","Before, the concert began we found our seats.","Before the concert began, we found our seats.","Before the concert, began we found our seats."],answer:2,explanation:"A comma follows the introductory dependent clause Before the concert began."},
-      {id:11,topic:"Agreement",skill:"Subject–verb agreement",difficulty:"Core",prompt:"Choose the verb that agrees with the subject.",stimulus:"The stack of old programs ___ beside the piano.",options:["sit","sits","were sitting","have sat"],answer:1,explanation:"The subject is the singular noun stack, not the plural noun programs, so the singular verb sits is correct."},
-      {id:12,topic:"Agreement",skill:"Indefinite pronouns",difficulty:"Challenging",prompt:"Choose the verb that completes the sentence correctly.",stimulus:"Neither of the answers ___ convincing.",options:["are","were","seem","is"],answer:3,explanation:"In formal usage, neither is singular, so it takes the singular verb is."},
-      {id:13,topic:"Pronouns",skill:"Pronoun case",difficulty:"Core",prompt:"Which sentence uses pronoun case correctly?",options:["The coach spoke to Maya and I.","The coach spoke to Maya and me.","The coach spoke to she and I.","The coach spoke to me and she."],answer:1,explanation:"The pronouns are objects of the preposition to, so the objective form me is required."},
-      {id:14,topic:"Pronouns",skill:"Clear antecedents",difficulty:"Challenging",prompt:"Which revision removes the unclear pronoun reference?",stimulus:"When Nina called Ava, she was already late.",options:["When Nina called Ava, she was late already.","Nina called Ava because she was late.","Already late, she called Ava.","Nina was already late when she called Ava."],answer:3,explanation:"The revision names Nina directly, making it clear who was late."},
-      {id:15,topic:"Modifiers",skill:"Dangling modifiers",difficulty:"Challenging",prompt:"Which sentence corrects the dangling modifier?",stimulus:"Running to class, the bell rang loudly.",options:["Running to class, the bell was loud.","The bell, running to class, rang loudly.","Running to class, I heard the bell ring loudly.","The loudly ringing bell ran to class."],answer:2,explanation:"The person running must appear immediately after the opening modifier. In the correction, I is the runner."},
-      {id:16,topic:"Modifiers",skill:"Misplaced modifiers",difficulty:"Core",prompt:"Which sentence most clearly means that the backpack was on the bench?",options:["Jules found the backpack walking past the bench.","Walking past the bench, Jules found the backpack on it.","Jules found the backpack on the bench.","On the bench, Jules was walking past the backpack."],answer:2,explanation:"Placing on the bench directly after backpack clearly shows where the backpack was."},
-      {id:17,topic:"Sentence Types",skill:"Complex sentences",difficulty:"Core",prompt:"Which sentence is complex?",options:["The rain stopped, and the game resumed.","The game resumed after the rain stopped.","The rain stopped; the game resumed.","The rain stopped, the game resumed."],answer:1,explanation:"It contains an independent clause (The game resumed) and a dependent clause (after the rain stopped)."},
-      {id:18,topic:"Fragments & Completeness",skill:"Participial phrases",difficulty:"Challenging",prompt:"Why is this group of words a fragment?",stimulus:"Hoping to finish before midnight.",options:["It has no noun at all.","Hoping is a complete main verb.","It has no subject or complete main verb.","Before always creates a complete sentence."],answer:2,explanation:"Hoping begins a participial phrase. There is no subject and no complete main verb to form an independent clause."},
-      {id:19,topic:"Punctuation",skill:"Semicolons",difficulty:"Core",prompt:"Which sentence uses a semicolon correctly?",options:["The library was closing; we checked out quickly.","The library; was closing, so we hurried.","Because the library was closing; we hurried.","The library was; closing quickly."],answer:0,explanation:"A semicolon can join two closely related independent clauses without a coordinating conjunction."},
-      {id:20,topic:"Punctuation",skill:"Nonessential information",difficulty:"Challenging",prompt:"Which sentence correctly punctuates the nonessential phrase?",options:["Ms. Chen our science teacher leads the club.","Ms. Chen, our science teacher, leads the club.","Ms. Chen our science teacher, leads the club.","Ms. Chen, our science teacher leads the club."],answer:1,explanation:"Our science teacher adds nonessential information about Ms. Chen, so commas set it off on both sides."},
-      {id:21,topic:"Agreement",skill:"Compound subjects",difficulty:"Core",prompt:"Choose the verb that agrees with the compound subject.",stimulus:"A notebook and a pencil ___ on every desk.",options:["is","was","sits","are"],answer:3,explanation:"Two subjects joined by and usually form a plural subject, so are is correct."},
-      {id:22,topic:"Agreement",skill:"Collective nouns",difficulty:"Challenging",prompt:"Choose the standard American English verb form.",stimulus:"The orchestra ___ ready to begin its performance.",options:["are","were","is","have been"],answer:2,explanation:"Orchestra is treated as a singular collective noun here because the group acts as one unit."},
-      {id:23,topic:"Subjects & Predicates",skill:"Inverted order",difficulty:"Challenging",prompt:"What is the subject of this sentence?",stimulus:"Across the stage raced the frightened actor.",options:["stage","raced","actor","frightened"],answer:2,explanation:"The sentence uses inverted order. Rearranged, it reads: The frightened actor raced across the stage."},
-      {id:24,topic:"Subjects & Predicates",skill:"Compound predicates",difficulty:"Core",prompt:"Which words form the complete predicate?",stimulus:"The curious students opened the box and examined its contents.",options:["The curious students","opened the box and examined its contents","the box","examined its contents"],answer:1,explanation:"Everything that tells what the subject did belongs to the complete predicate, including both verbs and their objects."},
-      {id:25,topic:"Pronouns",skill:"Pronoun agreement",difficulty:"Core",prompt:"Which sentence has correct pronoun agreement?",options:["Each player must bring their shoes, according to traditional formal agreement.","Each player must bring his or her shoes.","Each players must bring their shoes.","Each player must brings his shoes."],answer:1,explanation:"In traditional formal agreement, singular each matches the singular his or her. (Singular they is also widely accepted in modern usage.)"},
-      {id:26,topic:"Modifiers",skill:"Comparisons",difficulty:"Core",prompt:"Which sentence makes a logical comparison?",options:["Mina's essay is clearer than Jordan.","Mina's essay is clearer than Jordan's essay.","Mina's essay is more clearer than Jordan's.","Mina's essay clearer than Jordan wrote."],answer:1,explanation:"The sentence compares one essay with another essay. Jordan's could also stand in for Jordan's essay."},
-      {id:27,topic:"Sentence Types",skill:"Simple sentences",difficulty:"Challenging",prompt:"Which option is a simple sentence, even though it has two verbs?",options:["Tara packed her bag and caught the bus.","Tara packed her bag, and she caught the bus.","After Tara packed, she caught the bus.","Because Tara packed her bag."],answer:0,explanation:"The sentence has one subject with a compound predicate (packed and caught), so it contains only one independent clause."},
-      {id:28,topic:"Phrases & Clauses",skill:"Noun clauses",difficulty:"Challenging",prompt:"What role does the underlined idea play in the sentence?",stimulus:"We wondered whether the team would arrive on time.",options:["Adjective phrase","Noun clause acting as the verb's object","Independent clause","Prepositional phrase"],answer:1,explanation:"Whether the team would arrive on time is a dependent noun clause that answers what we wondered."}
+      {id:1,topic:"Fragments & Completeness",skill:"Dependent clauses",difficulty:"Medium",prompt:"Is this a complete sentence or a fragment?",stimulus:"Because the violinist missed the entrance during rehearsal.",options:["Complete sentence","Fragment: it is a dependent clause","Fragment: it has no verb","Phrase: it has no subject"],answer:1,explanation:"It has a subject (the violinist) and verb (missed), but because makes the clause dependent. It cannot stand alone."},
+      {id:2,topic:"Phrases & Clauses",skill:"Prepositional phrases",difficulty:"Easy",prompt:"How should the bold idea be classified?",stimulus:"Under the music stand",options:["Phrase","Dependent clause","Independent clause","Compound sentence"],answer:0,explanation:"This is a phrase because it has no subject–verb pair. It begins with the preposition under."},
+      {id:3,topic:"Phrases & Clauses",skill:"Dependent clauses",difficulty:"Easy",prompt:"Classify this group of words.",stimulus:"When the lights went out",options:["Phrase","Dependent clause","Independent clause","Fragment with no verb"],answer:1,explanation:"Lights is the subject and went is the verb, so this is a clause. When makes it dependent."},
+      {id:4,topic:"Phrases & Clauses",skill:"Independent clauses",difficulty:"Easy",prompt:"Classify this group of words.",stimulus:"The drummer counted too quickly.",options:["Phrase","Dependent clause","Independent clause","Participial phrase"],answer:2,explanation:"It has a subject (drummer), a complete verb (counted), and expresses a complete thought."},
+      {id:5,topic:"Subjects & Predicates",skill:"Noun clauses",difficulty:"Hard",prompt:"What is the complete subject of this sentence?",stimulus:"What bothered Maya most was the silence after the announcement.",options:["Maya","What bothered Maya most","The silence","The announcement"],answer:1,explanation:"The noun clause What bothered Maya most acts as the complete subject. The main verb is was."},
+      {id:6,topic:"Fragments & Completeness",skill:"Subordinating conjunctions",difficulty:"Medium",prompt:"Which revision correctly completes the fragment?",stimulus:"After the last bus left the station.",options:["After the last bus.","The last bus left after.","After the last bus left the station, we called a taxi.","Leaving the station after the last bus."],answer:2,explanation:"The original is dependent because it begins with after. Adding we called a taxi supplies an independent clause."},
+      {id:7,topic:"Sentence Types",skill:"Compound sentences",difficulty:"Easy",prompt:"Which option correctly combines the ideas into a compound sentence?",stimulus:"The pitcher lost focus. The runner stole third base.",options:["When the pitcher lost focus, the runner stole third base.","The pitcher lost focus, and the runner stole third base.","The pitcher, losing focus, allowed third base.","Because the pitcher lost focus and the runner stole third."],answer:1,explanation:"A compound sentence joins two independent clauses with a comma and a coordinating conjunction such as and."},
+      {id:8,topic:"Sentence Types",skill:"Compound-complex sentences",difficulty:"Hard",prompt:"Which sentence is compound-complex?",options:["Although Leo practiced, he missed the note, but he kept singing.","Leo practiced and sang every night.","Because Leo practiced every night.","Leo missed the note, but kept singing."],answer:0,explanation:"It contains one dependent clause (Although Leo practiced) and two independent clauses joined by but."},
+      {id:9,topic:"Punctuation",skill:"Comma splices",difficulty:"Medium",prompt:"Which sentence correctly repairs the comma splice?",stimulus:"The storm ended, the players returned to the field.",options:["The storm ended the players returned to the field.","The storm ended, and the players returned to the field.","The storm, ended the players returned to the field.","The storm ended, because the players returned."],answer:1,explanation:"Two independent clauses may be joined with a comma plus a coordinating conjunction: comma + and."},
+      {id:10,topic:"Punctuation",skill:"Introductory clauses",difficulty:"Easy",prompt:"Which sentence uses the comma correctly?",options:["Before the concert began we found our seats.","Before, the concert began we found our seats.","Before the concert began, we found our seats.","Before the concert, began we found our seats."],answer:2,explanation:"A comma follows the introductory dependent clause Before the concert began."},
+      {id:11,topic:"Agreement",skill:"Subject–verb agreement",difficulty:"Easy",prompt:"Choose the verb that agrees with the subject.",stimulus:"The stack of old programs ___ beside the piano.",options:["sit","sits","were sitting","have sat"],answer:1,explanation:"The subject is the singular noun stack, not the plural noun programs, so the singular verb sits is correct."},
+      {id:12,topic:"Agreement",skill:"Indefinite pronouns",difficulty:"Medium",prompt:"Choose the verb that completes the sentence correctly.",stimulus:"Neither of the answers ___ convincing.",options:["are","were","seem","is"],answer:3,explanation:"In formal usage, neither is singular, so it takes the singular verb is."},
+      {id:13,topic:"Pronouns",skill:"Pronoun case",difficulty:"Easy",prompt:"Which sentence uses pronoun case correctly?",options:["The coach spoke to Maya and I.","The coach spoke to Maya and me.","The coach spoke to she and I.","The coach spoke to me and she."],answer:1,explanation:"The pronouns are objects of the preposition to, so the objective form me is required."},
+      {id:14,topic:"Pronouns",skill:"Clear antecedents",difficulty:"Medium",prompt:"Which revision removes the unclear pronoun reference?",stimulus:"When Nina called Ava, she was already late.",options:["When Nina called Ava, she was late already.","Nina called Ava because she was late.","Already late, she called Ava.","Nina was already late when she called Ava."],answer:3,explanation:"The revision names Nina directly, making it clear who was late."},
+      {id:15,topic:"Modifiers",skill:"Dangling modifiers",difficulty:"Hard",prompt:"Which sentence corrects the dangling modifier?",stimulus:"Running to class, the bell rang loudly.",options:["Running to class, the bell was loud.","The bell, running to class, rang loudly.","Running to class, I heard the bell ring loudly.","The loudly ringing bell ran to class."],answer:2,explanation:"The person running must appear immediately after the opening modifier. In the correction, I is the runner."},
+      {id:16,topic:"Modifiers",skill:"Misplaced modifiers",difficulty:"Medium",prompt:"Which sentence most clearly means that the backpack was on the bench?",options:["Jules found the backpack walking past the bench.","Walking past the bench, Jules found the backpack on it.","Jules found the backpack on the bench.","On the bench, Jules was walking past the backpack."],answer:2,explanation:"Placing on the bench directly after backpack clearly shows where the backpack was."},
+      {id:17,topic:"Sentence Types",skill:"Complex sentences",difficulty:"Easy",prompt:"Which sentence is complex?",options:["The rain stopped, and the game resumed.","The game resumed after the rain stopped.","The rain stopped; the game resumed.","The rain stopped, the game resumed."],answer:1,explanation:"It contains an independent clause (The game resumed) and a dependent clause (after the rain stopped)."},
+      {id:18,topic:"Fragments & Completeness",skill:"Participial phrases",difficulty:"Medium",prompt:"Why is this group of words a fragment?",stimulus:"Hoping to finish before midnight.",options:["It has no noun at all.","Hoping is a complete main verb.","It has no subject or complete main verb.","Before always creates a complete sentence."],answer:2,explanation:"Hoping begins a participial phrase. There is no subject and no complete main verb to form an independent clause."},
+      {id:19,topic:"Punctuation",skill:"Semicolons",difficulty:"Easy",prompt:"Which sentence uses a semicolon correctly?",options:["The library was closing; we checked out quickly.","The library; was closing, so we hurried.","Because the library was closing; we hurried.","The library was; closing quickly."],answer:0,explanation:"A semicolon can join two closely related independent clauses without a coordinating conjunction."},
+      {id:20,topic:"Punctuation",skill:"Nonessential information",difficulty:"Medium",prompt:"Which sentence correctly punctuates the nonessential phrase?",options:["Ms. Chen our science teacher leads the club.","Ms. Chen, our science teacher, leads the club.","Ms. Chen our science teacher, leads the club.","Ms. Chen, our science teacher leads the club."],answer:1,explanation:"Our science teacher adds nonessential information about Ms. Chen, so commas set it off on both sides."},
+      {id:21,topic:"Agreement",skill:"Compound subjects",difficulty:"Easy",prompt:"Choose the verb that agrees with the compound subject.",stimulus:"A notebook and a pencil ___ on every desk.",options:["is","was","sits","are"],answer:3,explanation:"Two subjects joined by and usually form a plural subject, so are is correct."},
+      {id:22,topic:"Agreement",skill:"Collective nouns",difficulty:"Medium",prompt:"Choose the standard American English verb form.",stimulus:"The orchestra ___ ready to begin its performance.",options:["are","were","is","have been"],answer:2,explanation:"Orchestra is treated as a singular collective noun here because the group acts as one unit."},
+      {id:23,topic:"Subjects & Predicates",skill:"Inverted order",difficulty:"Hard",prompt:"What is the subject of this sentence?",stimulus:"Across the stage raced the frightened actor.",options:["stage","raced","actor","frightened"],answer:2,explanation:"The sentence uses inverted order. Rearranged, it reads: The frightened actor raced across the stage."},
+      {id:24,topic:"Subjects & Predicates",skill:"Compound predicates",difficulty:"Medium",prompt:"Which words form the complete predicate?",stimulus:"The curious students opened the box and examined its contents.",options:["The curious students","opened the box and examined its contents","the box","examined its contents"],answer:1,explanation:"Everything that tells what the subject did belongs to the complete predicate, including both verbs and their objects."},
+      {id:25,topic:"Pronouns",skill:"Pronoun agreement",difficulty:"Hard",prompt:"Which sentence has correct pronoun agreement?",options:["Each player must bring their shoes, according to traditional formal agreement.","Each player must bring his or her shoes.","Each players must bring their shoes.","Each player must brings his shoes."],answer:1,explanation:"In traditional formal agreement, singular each matches the singular his or her. (Singular they is also widely accepted in modern usage.)"},
+      {id:26,topic:"Modifiers",skill:"Comparisons",difficulty:"Medium",prompt:"Which sentence makes a logical comparison?",options:["Mina's essay is clearer than Jordan.","Mina's essay is clearer than Jordan's essay.","Mina's essay is more clearer than Jordan's.","Mina's essay clearer than Jordan wrote."],answer:1,explanation:"The sentence compares one essay with another essay. Jordan's could also stand in for Jordan's essay."},
+      {id:27,topic:"Sentence Types",skill:"Simple sentences",difficulty:"Hard",prompt:"Which option is a simple sentence, even though it has two verbs?",options:["Tara packed her bag and caught the bus.","Tara packed her bag, and she caught the bus.","After Tara packed, she caught the bus.","Because Tara packed her bag."],answer:0,explanation:"The sentence has one subject with a compound predicate (packed and caught), so it contains only one independent clause."},
+      {id:28,topic:"Phrases & Clauses",skill:"Noun clauses",difficulty:"Hard",prompt:"What role does the underlined idea play in the sentence?",stimulus:"We wondered whether the team would arrive on time.",options:["Adjective phrase","Noun clause acting as the verb's object","Independent clause","Prepositional phrase"],answer:1,explanation:"Whether the team would arrive on time is a dependent noun clause that answers what we wondered."}
     ];
 
     const state = { quiz: [], index: 0, selected: null, checked: false, score: 0, answers: [], requestedLength: 7, topics: [] };
@@ -308,7 +284,6 @@
       const label = document.createElement('label'); label.htmlFor = input.id; label.textContent = topic;
       wrap.append(input, label); topicOptions.append(wrap);
     });
-    document.querySelector('#bank-stat').textContent = `${questionBank.length} tagged questions · ${topicNames.length} topics`;
 
     function shuffle(items) { const copy = [...items]; for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; } return copy; }
     function show(name) { Object.entries(screens).forEach(([key, el]) => el.classList.toggle('hidden', key !== name)); window.scrollTo({top: 0, behavior: 'smooth'}); }
@@ -338,7 +313,7 @@
       const track = document.querySelector('.progress-track'); track.setAttribute('aria-valuenow', Math.round(progress));
       document.querySelector('#progress-fill').style.width = `${progress}%`;
       document.querySelector('#score-chip').textContent = `${state.score} correct`;
-      document.querySelector('#question-meta').innerHTML = `<span class="tag">${q.topic}</span><span class="tag">${q.skill}</span><span class="tag tag-difficulty">${q.difficulty}</span>`;
+      document.querySelector('#question-meta').innerHTML = `<span class="tag">${q.topic}</span><span class="tag tag-difficulty">${q.difficulty}</span>`;
       document.querySelector('#question-title').textContent = q.prompt;
       const stimulus = document.querySelector('#stimulus'); stimulus.textContent = q.stimulus || ''; stimulus.classList.toggle('hidden', !q.stimulus);
       const options = document.querySelector('#options'); options.innerHTML = '';
