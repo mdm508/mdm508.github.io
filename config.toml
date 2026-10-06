@@ -38,11 +38,6 @@ url = "/post/"
 weight = 3
 
 [[menu.main]]
-name = "Grammar Quiz"
-url = "/english-quiz/"
-weight = 4
-
-[[menu.main]]
 name = "Draw"
 url = "/draw/"
-weight = 5
+weight = 4
