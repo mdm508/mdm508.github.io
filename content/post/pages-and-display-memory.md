@@ -22,6 +22,33 @@ Phase 4 will pick up after that. We will look at the frame waiting in the Pico's
 
 You can test the mapping without an OLED. [Download the Phase 3 memory-mapping starter file](/downloads/pico/phase-3-memory-map.py). It creates the 1,024-byte buffer and leaves the coordinate and pixel functions for you to complete as the lesson develops them.
 
+## Start with a Tiny Lite-Brite
+
+Before we calculate anything, make a small picture. This toy has **8 columns and 16 rows**. Click a few pixels, then click one again to turn it off.
+
+The picture is stored in sixteen bytes. Each byte remembers **eight vertically stacked pixels** in one column. A **page** is an eight-row band across the picture, so this little display has two pages. The toy highlights which byte and bit you changed.
+
+{{< pixel-memory-toy >}}
+
+### Explore the page boundary
+
+**Problem:** Click `(3, 0)`, then `(3, 7)`, then `(3, 8)`. Which clicks share a byte? What changes when you cross into row 8?
+
+{{< hints >}}
+- Watch the highlighted byte box as well as the lit pixels.
+- The gap between rows 7 and 8 separates the two pages.
+{{< /hints >}}
+
+{{< answer >}}
+The first two clicks change byte 3: bit 0 at the top and bit 7 at the bottom. Together they make `10000001`, or `0x81`. Pixel `(3, 8)` starts a new vertical group: Page 1, byte 11, bit 0.
+
+Moving down one row can move us into another byte. Moving right one column also selects another byte, but stays in the same page.
+{{< /answer >}}
+
+Keep experimenting: draw a letter or a small pattern and watch its bytes change. The important connection is **one pixel → one bit inside one byte**.
+
+Now scale that idea up. Our real OLED has 128 columns instead of 8, and eight pages instead of two. The vertical groups still contain eight pixels. Let's turn what you saw into a rule that works for any coordinate.
+
 ## Build the Memory Model
 
 ### Start with the screen coordinates
@@ -579,7 +606,7 @@ The page locates a group of eight rows. The index locates the byte for column `x
 
 We can now translate coordinates into bytes and bits, then change that data in a `bytearray`. But the bytes we changed live in the Pico's RAM. Why doesn't a call such as `text()` immediately change the physical screen? What does `show()` do with the frame waiting in memory?
 
-That is Phase 4: **The Frame Buffer**. We will follow a drawing operation from the Pico's RAM to the display and learn why drawing and displaying are separate steps.
+That is [Phase 4: **The Frame Buffer**](/post/the-frame-buffer/). We will follow a drawing operation from the Pico's RAM to the display and learn why drawing and displaying are separate steps.
 
 [Back to Phase 2: Pictures as Data ←](/post/pictures-as-data/)
 

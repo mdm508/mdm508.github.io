@@ -1,0 +1,100 @@
+<style>
+.pixel-toy { margin:1.5rem 0; padding:1rem; background:var(--light-orange); border:1px solid var(--medium-brown); border-radius:8px; }
+.pixel-toy__layout { display:flex; flex-wrap:wrap; gap:1.5rem; align-items:flex-start; }
+.pixel-toy__board { display:grid; grid-template-columns:1.5rem repeat(8, minmax(0,1fr)); gap:3px; width:100%; max-width:320px; background:var(--deep-brown); padding:10px; border-radius:8px; box-sizing:border-box; color:var(--cream); }
+.pixel-toy__board span { text-align:center; font:12px/24px monospace; }
+.pixel-toy button { cursor:pointer; }
+.pixel-toy__pixel { aspect-ratio:1; min-width:0; padding:0; border:2px solid transparent; border-radius:50%; background:#655648; color:#fff8e9; font:12px monospace; }
+.pixel-toy__pixel[aria-pressed="true"] { background:#f7cb6b; color:var(--deep-brown); box-shadow:0 0 6px #f7cb6b; }
+.pixel-toy__pixel[data-group="true"] { border-color:#c29b55; }
+.pixel-toy__pixel[data-selected="true"] { outline:2px solid #fff8e9; outline-offset:1px; }
+.pixel-toy__board .pixel-toy__boundary { margin-top:9px; }
+.pixel-toy button:focus-visible { outline:3px solid var(--accent-orange); outline-offset:3px; }
+.pixel-toy__memory { flex:1; min-width:220px; }
+.pixel-toy__bytes { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+.pixel-toy__byte { padding:5px; border:2px solid transparent; background:var(--cream); font:12px/1.5 monospace; text-align:center; }
+.pixel-toy__byte[data-selected="true"] { border-color:var(--rich-orange); background:#f7cb6b; }
+.pixel-toy__clear { margin-top:1rem; padding:.5rem .8rem; background:var(--rich-brown); color:var(--cream); border:0; border-radius:5px; }
+.pixel-toy__detail { min-height:5em; }
+</style>
+<section class="pixel-toy" data-pixel-toy aria-label="Lite-Brite pixel memory explorer">
+  <p><strong>A tiny Lite-Brite: 8 columns × 16 rows</strong><br>Click a circle to turn it on or off. The outlined vertical group shares one byte. Numbers inside it show bit positions, from 0 at the top to 7 at the bottom.</p>
+  <div class="pixel-toy__layout">
+    <div class="pixel-toy__board" data-board aria-label="Pixel coordinates: x across, y down"></div>
+    <div class="pixel-toy__memory">
+      <p data-detail class="pixel-toy__detail" aria-live="polite">Click any pixel to follow it into memory.</p>
+      <p><strong>Page 0</strong> · rows 0–7 · bytes 0–7</p>
+      <div class="pixel-toy__bytes" data-page="0"></div>
+      <p><strong>Page 1</strong> · rows 8–15 · bytes 8–15</p>
+      <div class="pixel-toy__bytes" data-page="1"></div>
+      <p>Each box shows its byte index and hex value. The selected byte’s binary digits run from bit 7 on the left to bit 0 on the right.</p>
+    </div>
+  </div>
+  <button type="button" class="pixel-toy__clear" data-clear>Clear picture</button>
+  <p>This toy updates immediately to help you explore the layout. On the real OLED, you still need <code>show()</code> to display your changes.</p>
+  <noscript>Enable JavaScript to use the toy. On paper, draw eight columns and sixteen rows; split at row 8. Each eight-pixel vertical group is one byte, with bit 0 at its top.</noscript>
+</section>
+<script>
+(() => {
+  const root = document.currentScript.previousElementSibling;
+  if (!root || !root.matches('[data-pixel-toy]')) return;
+  const memory = new Uint8Array(16);
+  const pixels = [];
+  const bytes = [];
+  let selected = null;
+  const board = root.querySelector('[data-board]');
+  const detail = root.querySelector('[data-detail]');
+  const label = text => { const span = document.createElement('span'); span.textContent = text; board.append(span); return span; };
+  label('y/x');
+  for (let x = 0; x < 8; x++) label(x);
+  for (let y = 0; y < 16; y++) {
+    const row = label(y);
+    if (y === 8) row.classList.add('pixel-toy__boundary');
+    for (let x = 0; x < 8; x++) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'pixel-toy__pixel';
+      if (y === 8) button.classList.add('pixel-toy__boundary');
+      button.addEventListener('click', () => {
+        selected = {x, y};
+        memory[Math.floor(y / 8) * 8 + x] ^= 1 << (y % 8);
+        render();
+      });
+      pixels.push({button, x, y});
+      board.append(button);
+    }
+  }
+  for (let index = 0; index < 16; index++) {
+    const box = document.createElement('div');
+    box.className = 'pixel-toy__byte';
+    root.querySelector(`[data-page="${Math.floor(index / 8)}"]`).append(box);
+    bytes.push(box);
+  }
+  function render() {
+    const page = selected ? Math.floor(selected.y / 8) : -1;
+    const index = selected ? page * 8 + selected.x : -1;
+    for (const pixel of pixels) {
+      const pixelPage = Math.floor(pixel.y / 8);
+      const bit = pixel.y % 8;
+      const on = Boolean(memory[pixelPage * 8 + pixel.x] & (1 << bit));
+      const group = selected !== null && pixel.x === selected.x && pixelPage === page;
+      pixel.button.setAttribute('aria-pressed', String(on));
+      pixel.button.setAttribute('aria-label', `Pixel (${pixel.x}, ${pixel.y}), ${on ? 'on' : 'off'}`);
+      pixel.button.dataset.group = String(group);
+      pixel.button.dataset.selected = String(selected !== null && pixel.x === selected.x && pixel.y === selected.y);
+      pixel.button.textContent = group ? bit : '';
+    }
+    bytes.forEach((box, i) => {
+      box.textContent = `[${i}] 0x${memory[i].toString(16).toUpperCase().padStart(2, '0')}`;
+      box.dataset.selected = String(i === index);
+    });
+    if (selected) {
+      const bit = selected.y % 8;
+      const on = Boolean(memory[index] & (1 << bit));
+      detail.textContent = `Pixel (${selected.x}, ${selected.y}) is now ${on ? 'on' : 'off'}. Page ${page}, byte ${index}, bit ${bit}. This byte now holds ${memory[index].toString(2).padStart(8, '0')} (decimal ${memory[index]}). The other seven pixels in this byte keep their states.`;
+    } else detail.textContent = 'Click any pixel to follow it into memory. All 16 bytes are zero.';
+  }
+  root.querySelector('[data-clear]').addEventListener('click', () => { memory.fill(0); selected = null; render(); });
+  render();
+})();
+</script>

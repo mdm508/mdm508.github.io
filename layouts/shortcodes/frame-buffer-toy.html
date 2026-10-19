@@ -1,0 +1,80 @@
+<style>
+.frame-lab { padding:1rem; margin:1.5rem 0; background:var(--light-orange); border:1px solid var(--medium-brown); border-radius:8px; }
+.frame-lab__screens { display:flex; flex-wrap:wrap; gap:1.5rem; }
+.frame-lab__panel { flex:1; min-width:220px; }
+.frame-lab__grid { display:grid; grid-template-columns:repeat(8,1fr); gap:4px; max-width:280px; padding:10px; background:var(--deep-brown); border-radius:8px; }
+.frame-lab__dot { display:block; aspect-ratio:1; min-width:0; padding:0; border:1px solid #a88b6a; border-radius:50%; background:#54463a; }
+.frame-lab__dot[data-on="true"] { background:#f7cb6b; box-shadow:0 0 5px #f7cb6b; }
+.frame-lab button { cursor:pointer; }
+.frame-lab__actions { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem; }
+.frame-lab__actions button { padding:.6rem .8rem; border:1px solid var(--rich-brown); border-radius:5px; background:var(--rich-brown); color:var(--cream); font:inherit; }
+.frame-lab button:focus-visible { outline:3px solid var(--accent-orange); outline-offset:3px; }
+.frame-lab__bytes { font:12px/1.6 monospace; overflow-wrap:anywhere; }
+</style>
+<section class="frame-lab" data-frame-lab aria-label="Draw first, show second experiment">
+  <p>Click pixels on the left to prepare a picture. Then press <strong>show()</strong> to send it to the display on the right. Each tiny screen is 8 × 8 pixels: eight bytes.</p>
+  <div class="frame-lab__screens">
+    <div class="frame-lab__panel"><p><strong>Pico RAM: editable frame buffer</strong></p><div class="frame-lab__grid" data-drawing></div><p class="frame-lab__bytes" data-ram-bytes></p></div>
+    <div class="frame-lab__panel"><p><strong>OLED: last image sent</strong></p><div class="frame-lab__grid" data-display role="img" aria-label="Blank simulated OLED"></div><p class="frame-lab__bytes" data-display-bytes></p></div>
+  </div>
+  <div class="frame-lab__actions"><button type="button" data-show>show()</button><button type="button" data-fill>fill(0): clear RAM</button><button type="button" data-reset>Reset both screens</button></div>
+  <p data-status role="status">Both images are blank.</p>
+  <p>This model copies the bytes in one step. Real I²C sends them over time; <code>show()</code> does not guarantee an instantaneous, tear-free screen update.</p>
+  <noscript>JavaScript is needed for this toy. On paper, use two 8 × 8 grids: draw on the first, and copy it to the second only when you write show().</noscript>
+</section>
+<script>
+(() => {
+  const root = document.currentScript.previousElementSibling;
+  if (!root || !root.matches('[data-frame-lab]')) return;
+  const ram = new Uint8Array(8);
+  const display = new Uint8Array(8);
+  const drawingDots = [];
+  const displayDots = [];
+  const status = root.querySelector('[data-status]');
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 8; x++) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'frame-lab__dot';
+      button.addEventListener('click', () => {
+        ram[x] ^= 1 << y;
+        render(`Changed pixel (${x}, ${y}) in RAM. The OLED still holds the last image sent.`);
+      });
+      root.querySelector('[data-drawing]').append(button);
+      drawingDots.push({node:button, x, y});
+      const dot = document.createElement('span');
+      dot.className = 'frame-lab__dot';
+      dot.setAttribute('aria-hidden', 'true');
+      root.querySelector('[data-display]').append(dot);
+      displayDots.push({node:dot, x, y});
+    }
+  }
+  const hex = data => Array.from(data, value => value.toString(16).toUpperCase().padStart(2, '0')).join(' ');
+  function render(message) {
+    drawingDots.forEach(({node,x,y}) => {
+      const on = Boolean(ram[x] & (1 << y));
+      node.dataset.on = String(on);
+      node.setAttribute('aria-pressed', String(on));
+      node.setAttribute('aria-label', `Pixel (${x}, ${y}), ${on ? 'on' : 'off'}`);
+    });
+    displayDots.forEach(({node,x,y}) => { node.dataset.on = String(Boolean(display[x] & (1 << y))); });
+    root.querySelector('[data-ram-bytes]').textContent = `RAM: ${hex(ram)}`;
+    root.querySelector('[data-display-bytes]').textContent = `OLED: ${hex(display)}`;
+    root.querySelector('[data-display]').setAttribute('aria-label', `Simulated OLED, column bytes in hexadecimal: ${hex(display)}`);
+    status.textContent = message;
+  }
+  root.querySelector('[data-show]').addEventListener('click', () => {
+    display.set(ram);
+    render('show() sent all eight bytes. The images now match; RAM was not cleared.');
+  });
+  root.querySelector('[data-fill]').addEventListener('click', () => {
+    ram.fill(0);
+    render('fill(0) cleared RAM. The OLED has not changed.');
+  });
+  root.querySelector('[data-reset]').addEventListener('click', () => {
+    ram.fill(0); display.fill(0);
+    render('Both images are blank. Reset is a toy control, not an OLED drawing method.');
+  });
+  render('Both images are blank. Draw a picture in RAM to begin.');
+})();
+</script>
