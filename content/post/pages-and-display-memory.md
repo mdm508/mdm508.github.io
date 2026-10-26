@@ -8,6 +8,8 @@ summary: "Trace a pixel from (x, y) to its page, byte, and bit in SSD1306 displa
 reading_time: 120
 ---
 
+Part of the [Pico OLED project: start here and see all phases](/post/pico-oled-project/).
+
 ## Where This Lesson Fits
 
 In [Phase 1: Meet the OLED](/post/meet-the-oled/), we treated the 128 × 64 display as a coordinate grid. `x` moves across columns; `y` moves down rows. We used drawing commands and `show()` without opening the driver.
@@ -113,6 +115,139 @@ A page is not a separate display or a single row. It is one eight-row-tall strip
 | 7 | 56–63 | 896–1023 |
 
 That also checks our memory count: 8 pages × 128 bytes per page = 1,024 bytes.
+
+## Intermezzo: A 2D Board in a 1D List
+
+Before we calculate a byte index, let's practice storing a familiar grid in one long list. Think of a tic-tac-toe board:
+
+```python
+board = [
+    ["X", "O", " "],  # Row 0
+    [" ", "X", " "],  # Row 1
+    ["O", " ", "X"],  # Row 2
+]
+```
+
+This is a **two-dimensional (2D) arrangement**: choose a row, then a column. In Python, we represent it here with a list of lists. `board[1][2]` means row 1, column 2: the middle-right square. Both numbers start at zero. Here the order is **row, column**; screen coordinates use **`(x, y)`**, or column, row.
+
+We can keep the same nine squares in a **one-dimensional (1D) list** by storing one whole row after another. This order is called **row-major order**:
+
+```python
+flat = ["X", "O", " ", " ", "X", " ", "O", " ", "X"]
+```
+
+```text
+board position:  (0,0) (0,1) (0,2) | (1,0) (1,1) (1,2) | (2,0) (2,1) (2,2)
+flat index:         0     1     2  |    3     4     5  |    6     7     8
+```
+
+The bars just mark where each row ends; they do not take up entries. These are two representations of the same board. They are separate Python lists in this example, so changing one will not automatically change the other.
+
+Try finding addresses before writing a formula. Count the squares in complete earlier rows, then move across the current row.
+
+{{< grid-index-game >}}
+
+### A: Where is the middle-right square?
+
+**Problem:** Find the flat index for row 1, column 2. Explain every square you skip.
+
+{{< hints >}}
+- One complete row comes before row 1.
+- Each row has three squares; column 2 is two positions past its row's start.
+{{< /hints >}}
+
+{{< answer >}}
+Skip row 0's three squares. Row 1 therefore begins at index 3. Move two positions across:
+
+```text
+earlier rows = 1
+squares per row = 3
+row start = 1 × 3 = 3
+index = 3 + 2 = 5
+```
+
+`board[1][2]` and `flat[5]` describe the same square in the two representations.
+{{< /answer >}}
+
+### B: What is the rule for any width?
+
+**Problem:** Write a rule for the flat index using `row`, `column`, and `width` (the number of columns). Test it on row 2, column 1 of the tic-tac-toe board. Then find row 1, column 3 in a grid four columns wide.
+
+{{< hints >}}
+- The row number counts how many complete rows come first.
+- Multiply that count by the width, then add the column.
+{{< /hints >}}
+
+{{< answer >}}
+```python
+index = row * width + column
+```
+
+For the tic-tac-toe board, `2 * 3 + 1 = 7`. Two complete rows use six entries, then we move one position across.
+
+For the four-column grid, `1 * 4 + 3 = 7` too. The same index can mean a different position when the width changes. We need the width to interpret the flat list.
+{{< /answer >}}
+
+### C: Can you go backward from an index?
+
+**Problem:** A square is at index 7 in the three-column board. Find its row and column. Then write the general reverse rules.
+
+{{< hints >}}
+- How many complete groups of three fit before index 7?
+- The remainder tells you how far across the next row to move.
+{{< /hints >}}
+
+{{< answer >}}
+```text
+7 = 2 × 3 + 1
+row = 7 // 3 = 2
+column = 7 % 3 = 1
+```
+
+In general:
+
+```python
+row = index // width
+column = index % width
+```
+
+Integer division finds the complete rows. The remainder finds the position within the row.
+{{< /answer >}}
+
+### D: How does the board connect to OLED pages?
+
+**Problem:** Imagine the tiny Lite-Brite's bytes as a table with two page rows and eight columns. Which flat byte index holds Page 1, column 2? Is that entry a single pixel?
+
+{{< hints >}}
+- Replace the board's row number with the page number.
+- One complete page comes first, containing eight bytes.
+- Each byte still holds eight vertical pixels.
+{{< /hints >}}
+
+{{< answer >}}
+```text
+page start = 1 × 8 = 8
+byte index = 8 + 2 = 10
+```
+
+This is byte 10. It holds the eight pixels in column 2, rows 8–15. It does not identify just one pixel yet; we still need a bit inside the byte.
+
+Pixel `(2, 14)` is in this group: `14 // 8 = 1` gives its page and `14 % 8 = 6` gives its bit. On the eight-column toy, that pixel is **byte 10, bit 6**.
+{{< /answer >}}
+
+## Back to the OLED: Find the Pixel
+
+Think of the real OLED's bytes as a table with **8 page rows and 128 columns**. The actual buffer is flat, just like `flat` above:
+
+| Board idea | OLED byte-layout idea |
+| --- | --- |
+| Row | Page |
+| Column | `x` |
+| Squares per row | Bytes per page, equal to the display width |
+| One square's value | One byte holding eight vertical pixels |
+| `row * width + column` | `page * width + x` |
+
+The page chooses a group of eight screen rows. After finding the byte, we choose a bit to locate one pixel within that group. A page row in this byte table is **not** a single row of screen pixels.
 
 ### From `(x, y)` to page, byte, and bit
 
@@ -410,6 +545,8 @@ Therefore pixel `(37, 29)` is controlled by bit 5 of `buffer[421]`.
 
 ## Change Pixels in Raw Memory
 
+Using VS Code with MicroPico? Read the [Python-session note in Phase 4](/post/the-frame-buffer/#keep-your-python-session) before switching between running a file and entering commands at `>>>`. It explains how to keep names such as `buffer` available during experiments. This phase's raw-memory starter still needs no OLED or driver.
+
 ### Q13: How do you turn this pixel on without changing its neighbors?
 
 **Problem:** The target is bit 5 of `buffer[421]`. Write the operation that sets it while preserving the other seven bits.
@@ -616,6 +753,9 @@ That is [Phase 4: **The Frame Buffer**](/post/the-frame-buffer/). We will follow
 | --- | --- | --- |
 | Coordinate | A screen location written `(x, y)`, with `x` across and `y` down. | `(37, 29)` means column 37, row 29. |
 | Buffer | A region of memory holding the display's pixel data. | `bytearray(1024)` creates 1,024 editable byte slots. |
+| 2D arrangement | Values located by a row and a column. | `board[1][2]` selects row 1, column 2 in a list of lists. |
+| Flat (1D) list | Values located by one index. | `flat[5]` selects the sixth entry. |
+| Row-major order | Store a complete row, then the next row. | `index = row * width + column`. |
 | Byte | Eight bits; in this layout, one byte stores eight vertical pixels in one column. | `0b00100000` turns on the pixel at bit 5 in that group. |
 | Page | A horizontal band eight pixels tall. | Page 3 contains rows 24 through 31. |
 | Page number | The eight-row group containing row `y`. | `29 // 8` gives page 3. |

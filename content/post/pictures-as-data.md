@@ -1,5 +1,5 @@
 ---
-title: "Pictures as Data: Binary, Hex, and Bit Masks"
+title: "Phase 2: Pictures as Data — Binary, Hex, and Bit Masks"
 date: 2026-09-06T12:00:00-07:00
 draft: false
 description: "Represent monochrome OLED pixels as bits, translate bytes between binary and hexadecimal, and manipulate individual bits with Python masks."
@@ -7,6 +7,8 @@ tags: ["python", "micropython", "raspberry-pi-pico", "electronics", "binary", "h
 summary: "Move from OLED pixels to bytes, binary, hexadecimal, shifts, and masks—then practice the connections in an interactive byte-building game."
 reading_time: 120
 ---
+
+Part of the [Pico OLED project: start here and see all phases](/post/pico-oled-project/).
 
 This lesson continues [Meet the OLED: Pixels, Coordinates, and `show()`](/post/meet-the-oled/). We know that drawing commands prepare an image in memory before `show()` sends it to the display. Now we can ask what that image is made of.
 

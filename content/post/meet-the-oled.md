@@ -1,5 +1,5 @@
 ---
-title: "Meet the OLED: Pixels, Coordinates, and show()"
+title: "Phase 1: Meet the OLED — Pixels, Coordinates, and show()"
 date: 2026-08-16T13:00:00-07:00
 draft: false
 description: "Connect a Raspberry Pi Pico to an SSD1306 OLED, locate pixels and text, and learn why drawing and displaying are separate steps."
@@ -7,6 +7,8 @@ tags: ["python", "micropython", "raspberry-pi-pico", "electronics"]
 summary: "Use a Pico and SSD1306 OLED to learn I2C wiring, screen coordinates, drawing commands, and the frame buffer behind show()."
 reading_time: 120
 ---
+
+Part of the [Pico OLED project: start here and see all phases](/post/pico-oled-project/).
 
 A small OLED gives Python a physical result you can see. It also makes several abstract ideas concrete: a program can depend on hardware, a screen is a grid of numbered positions, and drawing a picture is not the same as displaying it.
 

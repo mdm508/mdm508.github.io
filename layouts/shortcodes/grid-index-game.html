@@ -1,0 +1,277 @@
+{{ $id := printf "grid-index-game-%d" .Ordinal }}
+<style>
+  .grid-index-game {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    color: var(--text-primary);
+    background: var(--light-orange);
+    border: 1px solid rgba(104, 68, 33, 0.3);
+    border-radius: 8px;
+  }
+  .grid-index-game__controls, .grid-index-game__actions, .grid-index-game__answer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0.9rem 0;
+  }
+  .grid-index-game__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+    gap: 1.25rem;
+  }
+  .grid-index-game__board {
+    display: grid;
+    grid-template-columns: 2rem repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    max-width: 300px;
+  }
+  .grid-index-game__axis {
+    align-self: center;
+    text-align: center;
+    font: 0.8rem/1.6 ui-monospace, monospace;
+  }
+  .grid-index-game__cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    aspect-ratio: 1;
+    padding: 0.25rem;
+    min-width: 0;
+    color: var(--deep-brown);
+    background: var(--cream);
+    border: 2px solid var(--medium-brown);
+    border-radius: 5px;
+    font: 700 1.4rem/1.2 ui-monospace, monospace;
+  }
+  .grid-index-game__cell small { font-size: 0.65rem; font-weight: 400; }
+  .grid-index-game__strip-wrap { overflow-x: auto; padding: 3px; }
+  .grid-index-game__strip { display: grid; grid-template-columns: repeat(9, 1fr); min-width: 324px; }
+  .grid-index-game__slot {
+    padding: 0.4rem 0.1rem;
+    text-align: center;
+    background: var(--cream);
+    border: 1px solid var(--medium-brown);
+    font: 700 1rem/1.5 ui-monospace, monospace;
+  }
+  .grid-index-game__slot small { display: block; font-size: 0.7rem; font-weight: 400; }
+  .grid-index-game [data-highlight="true"] {
+    background: #f7cb6b;
+    border-color: var(--deep-brown);
+    box-shadow: inset 0 0 0 1px var(--deep-brown);
+  }
+  .grid-index-game button, .grid-index-game select { cursor: pointer; }
+  .grid-index-game button:disabled { cursor: default; }
+  .grid-index-game__actions button, .grid-index-game__answer button, .grid-index-game select {
+    padding: 0.55rem 0.75rem;
+    color: var(--deep-brown);
+    background: var(--cream);
+    border: 1px solid var(--medium-brown);
+    border-radius: 5px;
+    font: inherit;
+  }
+  .grid-index-game__answer button, .grid-index-game__actions [data-next] {
+    color: #fffaf0;
+    background: var(--rich-brown);
+  }
+  .grid-index-game__actions button:disabled, .grid-index-game__answer button:disabled { opacity: 0.55; }
+  .grid-index-game input {
+    width: 4rem;
+    max-width: 100%;
+    padding: 0.55rem;
+    color: var(--text-primary);
+    background: var(--cream);
+    border: 1px solid var(--medium-brown);
+    border-radius: 5px;
+    font: inherit;
+  }
+  .grid-index-game :is(button, input, select):focus-visible {
+    outline: 3px solid var(--accent-orange);
+    outline-offset: 3px;
+  }
+  .grid-index-game__feedback { min-height: 3em; font-weight: 600; }
+  .grid-index-game__hint { color: var(--text-secondary); }
+  .grid-index-game [hidden] { display: none; }
+  @media (max-width: 640px) {
+    .grid-index-game__layout { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+<section class="grid-index-game" data-grid-index-game aria-labelledby="{{ $id }}-title">
+  <h3 id="{{ $id }}-title">Tic-tac-toe: find the address</h3>
+  <p>The board and the flat list hold the same nine squares. All row, column, and index numbers start at zero. This is an address puzzle; you do not need to play a match.</p>
+  <div data-interactive hidden>
+    <div class="grid-index-game__controls">
+      <label for="{{ $id }}-mode">Practice:</label>
+      <select id="{{ $id }}-mode" data-mode>
+        <option value="forward">Position → flat index</option>
+        <option value="reverse">Flat index → position</option>
+      </select>
+      <span data-score>Solved without revealing: 0</span>
+    </div>
+    <p data-prompt></p>
+    <div class="grid-index-game__layout">
+      <div>
+        <p><strong>Board</strong> · row down, column across</p>
+        <div class="grid-index-game__board" data-board aria-label="Tic-tac-toe board with row and column labels"></div>
+      </div>
+      <div>
+        <p><strong>Flat list</strong> · index 0 through 8</p>
+        <div class="grid-index-game__strip-wrap"><div class="grid-index-game__strip" data-strip aria-label="Nine squares stored row by row"></div></div>
+        <p>Read the board left to right across a row, then continue with the next row. The Xs and Os are values; the numbers below the list are their addresses.</p>
+      </div>
+    </div>
+    <form class="grid-index-game__answer" data-answer-form novalidate>
+      <label for="{{ $id }}-index">Flat index:</label>
+      <input id="{{ $id }}-index" data-index type="text" inputmode="numeric" autocomplete="off" maxlength="2" aria-describedby="{{ $id }}-range">
+      <span id="{{ $id }}-range">0–8</span>
+      <button type="submit" data-check>Check index</button>
+    </form>
+    <div class="grid-index-game__actions">
+      <button type="button" data-hint>Hint</button>
+      <button type="button" data-reveal>Show answer</button>
+      <button type="button" data-next>New square</button>
+    </div>
+    <p class="grid-index-game__hint" data-hint-text aria-live="polite"></p>
+    <p class="grid-index-game__feedback" data-feedback role="status"></p>
+  </div>
+  <noscript>Try these on paper: which flat index is row 1, column 2? Which row and column contain index 7? Use the hints and answers below to check.</noscript>
+</section>
+<script>
+(() => {
+  const root = document.currentScript.previousElementSibling;
+  if (!root || !root.matches('[data-grid-index-game]')) return;
+  const find = selector => root.querySelector(selector);
+  const marks = ['X', 'O', '·', '·', 'X', '·', 'O', '·', 'X'];
+  const cells = [];
+  const slots = [];
+  const mode = find('[data-mode]');
+  const input = find('[data-index]');
+  const feedback = find('[data-feedback]');
+  let target = 5;
+  let finished = false;
+  let hintCount = 0;
+  let score = 0;
+
+  function label(text) {
+    const node = document.createElement('span');
+    node.className = 'grid-index-game__axis';
+    node.textContent = text;
+    find('[data-board]').append(node);
+  }
+  label('r/c');
+  for (let column = 0; column < 3; column++) label(column);
+  for (let row = 0; row < 3; row++) {
+    label(row);
+    for (let column = 0; column < 3; column++) {
+      const index = row * 3 + column;
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'grid-index-game__cell';
+      cell.setAttribute('aria-label', `Row ${row}, column ${column}: ${marks[index] === '·' ? 'empty' : marks[index]}`);
+      cell.addEventListener('click', () => {
+        if (mode.value === 'reverse') check(index);
+      });
+      find('[data-board]').append(cell);
+      cells.push(cell);
+      const slot = document.createElement('div');
+      slot.className = 'grid-index-game__slot';
+      const mark = document.createElement('span');
+      mark.textContent = marks[index];
+      const address = document.createElement('small');
+      address.textContent = `[${index}]`;
+      slot.append(mark, address);
+      find('[data-strip]').append(slot);
+      slots.push(slot);
+    }
+  }
+
+  function render() {
+    const reverse = mode.value === 'reverse';
+    const row = Math.floor(target / 3);
+    const column = target % 3;
+    find('[data-prompt]').textContent = reverse
+      ? `The flat index is ${target}. Click its square on the board.`
+      : `The highlighted square is at row ${row}, column ${column}. What is its flat index?`;
+    find('[data-answer-form]').hidden = reverse;
+    cells.forEach((cell, index) => {
+      cell.disabled = !reverse || finished;
+      cell.dataset.highlight = String(index === target && (!reverse || finished));
+      cell.textContent = marks[index];
+      if (finished && index === target) {
+        const address = document.createElement('small');
+        address.textContent = `index ${index}`;
+        cell.append(address);
+      }
+    });
+    slots.forEach((slot, index) => { slot.dataset.highlight = String(index === target && (reverse || finished)); });
+    input.disabled = finished;
+    find('[data-check]').disabled = finished;
+    find('[data-hint]').disabled = finished || hintCount === 3;
+    find('[data-reveal]').disabled = finished;
+    find('[data-score]').textContent = `Solved without revealing: ${score}`;
+  }
+
+  function solution() {
+    const row = Math.floor(target / 3);
+    const column = target % 3;
+    return mode.value === 'reverse'
+      ? `${target} // 3 = ${row} complete rows; ${target} % 3 = ${column} squares into the next row. Row ${row}, column ${column}.`
+      : `Skip ${row} × 3 squares in earlier rows, then move ${column} across this row: ${row} × 3 + ${column} = index ${target}.`;
+  }
+
+  function check(answer) {
+    if (finished) return;
+    if (answer !== target) {
+      feedback.textContent = mode.value === 'reverse'
+        ? `That square has flat index ${answer}. Count groups of three from index 0 and try again.`
+        : 'Not yet. Count every square in the earlier rows, then move across this row.';
+      return;
+    }
+    finished = true;
+    score++;
+    feedback.textContent = `Correct. ${solution()}`;
+    render();
+  }
+
+  function startRound() {
+    finished = false;
+    hintCount = 0;
+    input.value = '';
+    feedback.textContent = '';
+    find('[data-hint-text]').textContent = '';
+    render();
+  }
+  find('[data-answer-form]').addEventListener('submit', event => {
+    event.preventDefault();
+    const value = input.value.trim();
+    if (!/^[0-8]$/.test(value)) {
+      feedback.textContent = 'Enter a whole-number index from 0 to 8.';
+      return;
+    }
+    check(Number(value));
+  });
+  find('[data-hint]').addEventListener('click', () => {
+    if (finished || hintCount === 3) return;
+    const hints = mode.value === 'reverse'
+      ? ['Each board row holds three entries from the flat list.', 'Count how many complete groups of three come before the target. That is its row number.', 'The entries left over tell you the column: divide by 3 for the row, and use the remainder for the column.']
+      : ['One complete row contains three squares.', 'The row number tells you how many complete rows come before this square.', 'Multiply the row number by 3, then add the column number.'];
+    find('[data-hint-text]').textContent = `Hint ${hintCount + 1} of 3: ${hints[hintCount]}`;
+    hintCount++;
+    render();
+  });
+  find('[data-reveal]').addEventListener('click', () => {
+    if (finished) return;
+    finished = true;
+    feedback.textContent = solution();
+    render();
+  });
+  find('[data-next]').addEventListener('click', () => {
+    target = (target + 4) % 9;
+    startRound();
+  });
+  mode.addEventListener('change', startRound);
+  startRound();
+  find('[data-interactive]').hidden = false;
+})();
+</script>

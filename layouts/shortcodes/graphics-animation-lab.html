@@ -1,0 +1,212 @@
+{{ $id := printf "graphics-animation-lab-%d" .Ordinal }}
+<style>
+  .graphics-lab {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: var(--light-orange);
+    border: 1px solid var(--medium-brown);
+    border-radius: 8px;
+  }
+  .graphics-lab__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+  .graphics-lab canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--deep-brown);
+    border: 1px solid var(--medium-brown);
+    border-radius: 5px;
+    image-rendering: pixelated;
+  }
+  .graphics-lab__controls, .graphics-lab__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin: 0.8rem 0;
+  }
+  .graphics-lab :is(button, select) {
+    padding: 0.55rem 0.75rem;
+    color: var(--deep-brown);
+    background: var(--cream);
+    border: 1px solid var(--medium-brown);
+    border-radius: 5px;
+    cursor: pointer;
+    font: inherit;
+  }
+  .graphics-lab [data-play] { background: var(--rich-brown); color: #fffaf0; }
+  .graphics-lab button:disabled { opacity: 0.55; cursor: default; }
+  .graphics-lab input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--rich-brown); }
+  .graphics-lab :is(button, select, input):focus-visible {
+    outline: 3px solid var(--accent-orange);
+    outline-offset: 3px;
+  }
+  .graphics-lab pre { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 0; }
+  .graphics-lab__readout { font: 0.85rem/1.6 ui-monospace, monospace; }
+  .graphics-lab [hidden] { display: none; }
+  @media (max-width: 640px) {
+    .graphics-lab__layout { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+<section class="graphics-lab" data-graphics-lab aria-labelledby="{{ $id }}-title">
+  <h3 id="{{ $id }}-title">Frame by frame</h3>
+  <p>This model has the same 128 × 64 coordinates as our OLED. Each step prepares and sends a frame, moving the object four pixels right. At the edge it stops; Reset starts a fresh picture at x = 0.</p>
+  <div data-interactive hidden>
+    <div class="graphics-lab__controls">
+      <label for="{{ $id }}-shape">Object:</label>
+      <select id="{{ $id }}-shape" data-shape>
+        <option value="filled">Filled 8 × 8 square</option>
+        <option value="outline">Outline 8 × 8 square</option>
+        <option value="pixel">One pixel</option>
+      </select>
+      <label for="{{ $id }}-delay">Pause between frames:</label>
+      <select id="{{ $id }}-delay" data-delay>
+        <option value="500">500 ms</option>
+        <option value="250" selected>250 ms</option>
+        <option value="100">100 ms</option>
+      </select>
+    </div>
+    <div class="graphics-lab__controls">
+      <input id="{{ $id }}-clear" data-clear type="checkbox" checked>
+      <label for="{{ $id }}-clear">Clear the frame buffer before drawing each frame</label>
+    </div>
+    <div class="graphics-lab__layout">
+      <div>
+        <p><strong>Simulated OLED</strong></p>
+        <canvas data-screen width="512" height="256" role="img" aria-label="Simulated OLED"></canvas>
+        <p class="graphics-lab__readout" data-readout></p>
+      </div>
+      <div>
+        <p><strong>Commands for the displayed frame</strong></p>
+        <pre><code data-code></code></pre>
+        <p>The object stays at y = 28. The code changes its x-coordinate; <code>show()</code> sends the new picture. Changing the object starts a fresh run.</p>
+      </div>
+    </div>
+    <div class="graphics-lab__actions">
+      <button type="button" data-step>Step one frame</button>
+      <button type="button" data-play>Play</button>
+      <button type="button" data-reset>Reset</button>
+    </div>
+    <p data-status role="status">Ready to step through frames.</p>
+    <p>The animation uses a simple software timer. Real Pico frame timing also includes drawing and I²C transfer time.</p>
+  </div>
+  <noscript>JavaScript is needed for this toy. On paper, sketch an 8 × 8 square at x = 0, then at x = 4, then at x = 8. Compare clearing the old picture each time with keeping all three squares.</noscript>
+</section>
+<script>
+(() => {
+  const root = document.currentScript.previousElementSibling;
+  if (!root || !root.matches('[data-graphics-lab]')) return;
+  const find = selector => root.querySelector(selector);
+  const width = 128;
+  const height = 64;
+  const y = 28;
+  const buffer = new Uint8Array(width * height / 8);
+  const screen = find('[data-screen]');
+  const context = screen.getContext('2d');
+  if (!context) return;
+  let x = 0;
+  let frame = 0;
+  let timer = null;
+  const size = () => find('[data-shape]').value === 'pixel' ? 1 : 8;
+  const lastX = () => width - size();
+  const pixel = (px, py) => { buffer[Math.floor(py / 8) * width + px] |= 1 << (py % 8); };
+
+  function updateButtons() {
+    find('[data-play]').textContent = timer === null ? 'Play' : 'Pause';
+    find('[data-play]').disabled = x === lastX();
+    find('[data-step]').disabled = timer !== null || x === lastX();
+  }
+  function stop() {
+    if (timer !== null) clearInterval(timer);
+    timer = null;
+    updateButtons();
+  }
+  function drawFrame() {
+    const clear = find('[data-clear]').checked;
+    if (clear) buffer.fill(0);
+    const shape = find('[data-shape]').value;
+    const side = size();
+    for (let dy = 0; dy < side; dy++) {
+      for (let dx = 0; dx < side; dx++) {
+        if (shape !== 'outline' || dx === 0 || dy === 0 || dx === side - 1 || dy === side - 1) pixel(x + dx, y + dy);
+      }
+    }
+    frame++;
+    context.fillStyle = '#2d2118';
+    context.fillRect(0, 0, screen.width, screen.height);
+    context.fillStyle = '#f7cb6b';
+    let lit = 0;
+    for (let py = 0; py < height; py++) {
+      for (let px = 0; px < width; px++) {
+        if (buffer[Math.floor(py / 8) * width + px] & (1 << (py % 8))) {
+          context.fillRect(px * 4, py * 4, 4, 4);
+          lit++;
+        }
+      }
+    }
+    find('[data-readout]').textContent = `Frame ${frame} · x = ${x}, y = ${y} · ${lit} lit pixels`;
+    screen.setAttribute('aria-label', `Frame ${frame}: ${shape} object at (${x}, ${y}), ${lit} lit pixels including any trail.`);
+    const command = shape === 'pixel' ? `oled.pixel(${x}, ${y}, 1)`
+      : `oled.${shape === 'outline' ? 'rect' : 'fill_rect'}(${x}, ${y}, 8, 8, 1)`;
+    find('[data-code]').textContent = `${clear ? 'oled.fill(0)' : '# Keep the previous pixels'}\n${command}\noled.show()`;
+    updateButtons();
+  }
+  function advance(manual = false) {
+    if (x === lastX()) return;
+    x = Math.min(x + 4, lastX());
+    drawFrame();
+    if (x === lastX()) {
+      stop();
+      find('[data-status]').textContent = `Reached x = ${x}. The whole object still fits. Reset to start again.`;
+    } else if (manual) {
+      find('[data-status]').textContent = `Displayed frame ${frame} at x = ${x}. Compare it with the previous frame.`;
+    }
+  }
+  function reset() {
+    stop();
+    buffer.fill(0);
+    x = 0;
+    frame = 0;
+    drawFrame();
+    find('[data-status]').textContent = 'A fresh first frame is displayed at x = 0. Step forward or press Play.';
+  }
+  function play() {
+    timer = setInterval(() => advance(), Number(find('[data-delay]').value));
+    updateButtons();
+  }
+  find('[data-step]').addEventListener('click', () => advance(true));
+  find('[data-play]').addEventListener('click', () => {
+    if (timer !== null) {
+      stop();
+      find('[data-status]').textContent = `Paused at frame ${frame}. You can step forward one frame at a time.`;
+    } else {
+      play();
+      find('[data-status]').textContent = 'Playing. Press Pause to inspect a frame.';
+    }
+  });
+  find('[data-reset]').addEventListener('click', reset);
+  find('[data-shape]').addEventListener('change', reset);
+  find('[data-clear]').addEventListener('change', () => {
+    find('[data-status]').textContent = find('[data-clear]').checked
+      ? 'The next frame will clear the old pixels before drawing.'
+      : 'The next frame will keep the old pixels. Step forward to look for a trail.';
+  });
+  find('[data-delay]').addEventListener('change', () => {
+    if (timer !== null) { stop(); play(); }
+    find('[data-status]').textContent = `The pause is now ${find('[data-delay]').value} milliseconds.`;
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && timer !== null) {
+      stop();
+      find('[data-status]').textContent = 'Paused while the lesson is in the background.';
+    }
+  });
+  window.addEventListener('pagehide', stop);
+  reset();
+  find('[data-interactive]').hidden = false;
+})();
+</script>

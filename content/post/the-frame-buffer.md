@@ -8,6 +8,8 @@ summary: "Draw in an interactive frame buffer, then trace text(), fill(), and sh
 reading_time: 90
 ---
 
+Part of the [Pico OLED project: start here and see all phases](/post/pico-oled-project/).
+
 ## Where This Lesson Fits
 
 In [Phase 1](/post/meet-the-oled/), we drew pixels and text, then called `show()`. [Phase 2](/post/pictures-as-data/) gave us bits and masks. In [Phase 3](/post/pages-and-display-memory/), we found the exact byte and bit for a screen coordinate.
@@ -79,31 +81,55 @@ The transfer takes time. Preparing a complete frame before sending it avoids del
 
 ## Try It on the Pico
 
-[Download the Phase 4 frame lab](/downloads/pico/phase-4-frame-lab.py). Save it alongside `ssd1306.py` on the Pico using the wiring from Phase 1. Run it in Thonny, then use the Shell to press Enter at each checkpoint. No rewiring is needed.
+[Download the Phase 4 frame lab](/downloads/pico/phase-4-frame-lab.py). It contains **only the setup as executable code**, followed by instructions for experiments you write yourself. The lesson link is at the top of the file.
 
-The first two experiments are ready to run. Later TODOs are commented out until you reach their problems. If you do not have the hardware, use the toy and trace the code on paper.
+Keep **`ssd1306.py` in the same folder on the Pico** as the lab file; having it only on your computer is not enough. The driver is in the [Phase 1 kit](/downloads/pico/phase-1-kit.zip). Use the same wiring as Phase 1.
 
-For the snippets below, run the starter's setup first so `oled` exists. Each experiment explicitly establishes its starting picture. `input()` pauses the program until you press Enter, giving you time to compare RAM with the screen.
+Run the starter using **MicroPico's Run command** in VS Code, or run it in Thonny. After setup finishes without an error, enter your experiment commands one at a time at MicroPico's `>>>` prompt or in Thonny's Shell. Use the Pico terminal, not your computer's Python terminal. If you do not have the hardware, use the toy and trace the code on paper.
 
-### Q3: Where is WAITING while the program waits?
+{{< python-session-note >}}
+### Keep Your Python Session
 
-**Problem:** Predict the display before and after pressing Enter:
+A **Python session** is the running interpreter and the variables and objects it currently remembers. When setup creates `oled`, later commands in that same session can use it. A soft reset restarts MicroPython and clears those variables; files saved on the Pico remain.
+
+For this lesson, enable **No Soft Reset On Run** in MicroPico so running a file does not automatically reset the session. This lets you run the setup, then keep using `oled` at `>>>` as you explore.
+
+1. Open VS Code Settings: **Ctrl+,** on Windows or **Cmd+,** on Mac.
+2. Search for `micropico.noSoftResetOnRun`.
+3. Enable **No Soft Reset On Run** for this workspace.
+
+If you edit `.vscode/settings.json` instead, add this property inside its existing settings object:
+
+```json
+"micropico.noSoftResetOnRun": true
+```
+
+Older MicroPico versions reset both before and after a file run; version 4.4.0 changed the default to reset only before. Different versions and settings can therefore behave differently. See the [MicroPico changelog](https://github.com/paulober/MicroPico/blob/main/CHANGELOG.md#440---2026-09-14).
+
+With this setting enabled, old variables also remain until you replace them or reset deliberately. After a reset or power disconnect, run setup again. If typing `oled` gives `NameError`, setup may not have completed in the current session. An `EIO` error during setup is a separate I²C communication problem.
+{{< /python-session-note >}}
+
+**You control the pauses.** In the examples below, a `# STOP` comment means: inspect the screen before entering the next command. Do not run the entire block at once. We use no `input()` pauses, so the experiment does not depend on how the editor handles interactive script input.
+
+### Q3: Where is WAITING before you send it?
+
+**Problem:** Enter the following commands one at a time. At the STOP point, what is in RAM and what is visible? Predict what the last command will change.
 
 ```python
 oled.fill(0)
 oled.show()
 oled.text("WAITING", 0, 0)
-input("Inspect the screen, then press Enter: ")
+# STOP: inspect the screen before entering the next command.
 oled.show()
 ```
 
 {{< hints >}}
 - The first `show()` sends a blank frame.
-- `text()` changes RAM during the pause.
+- `text()` changes RAM before you enter the final command.
 {{< /hints >}}
 
 {{< answer >}}
-During the pause, the OLED is blank. The pixels spelling WAITING already exist in `oled.buffer`, but have not been sent. After Enter, `show()` sends them and the word appears.
+At STOP, the OLED is blank. The pixels spelling WAITING already exist in `oled.buffer`, but have not been sent. When you enter the final `show()`, it sends them and the word appears.
 
 The text was drawn before it became visible.
 {{< /answer >}}
@@ -123,12 +149,12 @@ The length is `8 * 128 = 1024`. That is the number of stored bytes. A blank pict
 
 ### Q5: Can a drawing method change the byte you calculated?
 
-**Problem:** Complete Experiment 3 in the starter. Begin with a cleared buffer and blank display. Draw pixel `(37, 29)`, inspect byte 421, pause, and finally display the pixel.
+**Problem:** Write your commands for Experiment 3 in the starter. Begin with a cleared buffer and blank display. Draw pixel `(37, 29)`, inspect byte 421, stop to inspect the OLED, and finally display the pixel.
 
 {{< hints >}}
 - Phase 3 placed this pixel at byte 421, bit 5.
 - `1 << 5` is 32.
-- Print and pause before calling `show()`.
+- Print and inspect before entering the final `show()`.
 {{< /hints >}}
 
 {{< answer >}}
@@ -137,7 +163,7 @@ oled.fill(0)
 oled.show()
 oled.pixel(37, 29, 1)
 print("Byte 421:", oled.buffer[421])
-input("The screen is blank. Press Enter to show the pixel: ")
+# STOP: inspect the blank screen before entering the next command.
 oled.show()
 ```
 
@@ -165,17 +191,17 @@ The timing is the same: RAM changes immediately, but the display waits for `show
 
 ### Q7: What survives a clear?
 
-**Problem:** Trace the buffer and screen at each pause:
+**Problem:** Enter these commands one at a time. Trace the buffer and screen at each STOP point:
 
 ```python
 oled.fill(0)
 oled.text("OLD", 0, 0)
 oled.show()
-input("Pause A: ")
+# STOP A: inspect RAM and the screen.
 oled.fill(0)
-input("Pause B: ")
+# STOP B: inspect RAM and the screen.
 oled.text("NEW", 0, 0)
-input("Pause C: ")
+# STOP C: inspect RAM and the screen.
 oled.show()
 ```
 
@@ -187,9 +213,9 @@ oled.show()
 {{< answer >}}
 | Checkpoint | Pico frame buffer | OLED display |
 | --- | --- | --- |
-| Pause A | OLD | OLD |
-| Pause B | Blank | OLD |
-| Pause C | NEW | OLD |
+| STOP A | OLD | OLD |
+| STOP B | Blank | OLD |
+| STOP C | NEW | OLD |
 | After final `show()` | NEW | NEW |
 
 The OLED keeps OLD while we prepare NEW. We do not need to display the blank intermediate frame.
@@ -227,7 +253,7 @@ Drawing several things into RAM lets us decide when to send the result. For a st
 
 ### Q10: Can two lines arrive as one prepared frame?
 
-**Problem:** Complete Experiment 4 in the starter: prepare READY at `(0, 0)` and PICO at `(0, 16)`, then send the finished frame once. Avoid displaying a blank frame between the previous picture and this one.
+**Problem:** Write your commands for Experiment 4 in the starter: prepare READY at `(0, 0)` and PICO at `(0, 16)`, then send the finished frame once. Avoid displaying a blank frame between the previous picture and this one.
 
 {{< hints >}}
 - Clear RAM first.
@@ -277,7 +303,9 @@ Drawing prepares the image. Sending updates the display's image data. The contro
 
 ## Next: Drawing Graphics
 
-We can now explain where a picture waits and when it reaches the OLED. In Phase 5, we will use pixels, lines, rectangles, and text to build complete scenes, then change those scenes over time.
+We can now explain where a picture waits and when it reaches the OLED. In [Phase 5: Drawing Graphics](/post/drawing-graphics/), we will use pixels, lines, rectangles, and text to build complete scenes, then change those scenes over time.
+
+[Continue to Phase 5: Drawing Graphics →](/post/drawing-graphics/)
 
 [Back to Phase 3: Memory Organization ←](/post/pages-and-display-memory/) · [Revisit Phase 1's drawing experiments](/post/meet-the-oled/)
 
@@ -288,6 +316,8 @@ We can now explain where a picture waits and when it reaches the OLED. In Phase 
 | Frame | One complete image. | A screen containing READY and PICO. |
 | Frame buffer | Memory holding the pixels of a prepared image. | `oled.buffer` contains 1,024 bytes for our display. |
 | RAM | Working memory used while a program runs. | The Pico stores the prepared frame in RAM. |
+| Python session | A running interpreter and the variables and objects it currently remembers. | Create `oled` during setup, then use it at `>>>`. |
+| Soft reset | Restart MicroPython, clearing variables while keeping saved files. | Run setup again after a reset. |
 | Display memory | Memory inside the OLED controller holding received image data. | It keeps OLD while the Pico prepares NEW. |
 | Drawing operation | An operation that changes the prepared image. | `text()`, `pixel()`, and `fill()`. |
 | Transfer | Sending data from one place to another. | `show()` sends image bytes over I²C. |

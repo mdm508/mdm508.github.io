@@ -1,5 +1,7 @@
 """Phase 3 starter: map screen coordinates into a raw SSD1306 buffer.
 
+Lesson: https://mdm508.github.io/post/pages-and-display-memory/
+
 No OLED driver is required. Complete the TODOs as you work through the lesson,
 then uncomment the test lines at the bottom.
 """
