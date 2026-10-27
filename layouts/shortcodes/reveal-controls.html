@@ -1,0 +1,28 @@
+{{ $scope := .Get "scope" | default "lesson" }}
+{{ if not (in (slice "lesson" "glossary") $scope) }}{{ errorf "Unknown reveal scope %q" $scope }}{{ end }}
+<div class="lesson-reveal-controls" data-reveal-controls data-scope="{{ $scope }}" role="group" aria-label="{{ if eq $scope "glossary" }}Glossary definition controls{{ else }}Whole lesson review controls{{ end }}" hidden>
+<span class="lesson-reveal-controls__label">{{ if eq $scope "glossary" }}Definitions{{ else }}Whole lesson{{ end }}</span>
+<button type="button" data-reveal>{{ if eq $scope "glossary" }}Show all definitions{{ else }}Reveal all{{ end }}</button>
+<button type="button" data-conceal>{{ if eq $scope "glossary" }}Hide all definitions{{ else }}Hide all{{ end }}</button>
+<span class="lesson-review-status" data-reveal-status role="status"></span>
+</div>
+<script>
+(() => {
+ const controls = document.currentScript.previousElementSibling;
+ if (!controls || !controls.matches('[data-reveal-controls]')) return;
+ const article = controls.closest('.article-content');
+ if (!article) return;
+ const selector = controls.dataset.scope === 'glossary'
+  ? 'details.glossary-definition'
+  : 'details.qa-hints, details.qa-answer, details.glossary-definition';
+ function setAll(open) {
+  const targets = [...article.querySelectorAll(selector)];
+  targets.forEach(details => { details.open = open; });
+  const subject = controls.dataset.scope === 'glossary' ? 'definitions' : 'hints, solutions, and definitions';
+  controls.querySelector('[data-reveal-status]').textContent = `All ${targets.length} ${subject} ${open ? 'revealed' : 'hidden'}.`;
+ }
+ controls.querySelector('[data-reveal]').addEventListener('click', () => setAll(true));
+ controls.querySelector('[data-conceal]').addEventListener('click', () => setAll(false));
+ controls.hidden = false;
+})();
+</script>

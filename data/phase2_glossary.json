@@ -1,0 +1,98 @@
+[
+  {
+    "id": "bit",
+    "term": "Bit",
+    "definition": "A binary digit: either `0` or `1`.",
+    "example": "`1 << 3` makes the value `00001000`."
+  },
+  {
+    "id": "byte",
+    "term": "Byte",
+    "definition": "A group of eight bits.",
+    "example": "The pattern `00101101` represents byte value 45."
+  },
+  {
+    "id": "monochrome",
+    "term": "Monochrome",
+    "definition": "Having two pixel states: on and off.",
+    "example": "One bit can represent one monochrome pixel."
+  },
+  {
+    "id": "binary",
+    "term": "Binary",
+    "definition": "A base-2 way to write values using only `0` and `1`.",
+    "example": "`0b00111100` is 60."
+  },
+  {
+    "id": "bit-position",
+    "term": "Bit position",
+    "definition": "A bit's numbered place in a byte, counting from 0 on the right.",
+    "example": "In `00001000`, bit 3 is on."
+  },
+  {
+    "id": "bitwise-inversion",
+    "term": "Bitwise inversion (`~`)",
+    "definition": "Reverse each bit of an integer. Python integers are not restricted to eight positions.",
+    "example": "`~(1 << 5) & 0xFF` gives the eight-bit mask `11011111`."
+  },
+  {
+    "id": "bit-mask",
+    "term": "Bit mask",
+    "definition": "A bit pattern used to select or change chosen bit positions.",
+    "example": "`1 << 5` creates a mask for bit 5."
+  },
+  {
+    "id": "bitwise-and",
+    "term": "Bitwise AND (`&`)",
+    "definition": "Combines bits so a result bit is `1` only when both inputs have `1`.",
+    "example": "`value & (1 << 2)` tests bit 2."
+  },
+  {
+    "id": "bitwise-or",
+    "term": "Bitwise OR (`|`)",
+    "definition": "Combines bits so a `1` in either input produces a `1`; useful for setting a bit.",
+    "example": "`value |= 1 << 5` turns bit 5 on."
+  },
+  {
+    "id": "bit-shift",
+    "term": "Bit shift (`<<`, `>>`)",
+    "definition": "Moves a bit pattern left or right. For nonnegative integers, left shifts add zeroes on the right; right shifts discard the lowest positions.",
+    "example": "`0x2D << 1` is `0x5A`; `0x2D >> 2` is `0x0B`."
+  },
+  {
+    "id": "nibble",
+    "term": "Nibble",
+    "definition": "A group of four bits, or half a byte.",
+    "example": "`1101` is the low nibble of `0x2D`."
+  },
+  {
+    "id": "hexadecimal",
+    "term": "Hexadecimal",
+    "definition": "A base-16 notation that writes each group of four bits as one digit.",
+    "example": "`0x2D` represents `0010 1101`."
+  },
+  {
+    "id": "representation",
+    "term": "Representation",
+    "definition": "A way of writing or arranging a value.",
+    "example": "`60`, `0x3C`, and `0b00111100` write the same value in different bases."
+  },
+  {
+    "id": "rgb",
+    "term": "RGB",
+    "definition": "A way to represent color with red, green, and blue components. In this lesson, each component gets one byte.",
+    "example": "`#4080C0` combines red 64, green 128, and blue 192."
+  },
+  {
+    "id": "color-channel",
+    "term": "Color channel",
+    "definition": "One component of a color, such as red. Its byte value selects how much of that component to contribute.",
+    "example": "In `#0000FF`, the blue channel is 255 and the other two are zero."
+  },
+  {
+    "id": "packing",
+    "term": "Packing",
+    "definition": "Putting several values into separate bit positions of one larger integer.",
+    "example": "In our packed RGB value, red occupies bits 16 through 23."
+  }
+]

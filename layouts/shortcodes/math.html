@@ -1,0 +1,11 @@
+{{- /* Render TeX to native MathML at build time; no browser script or external stylesheet. */ -}}
+{{- $options := dict "displayMode" true "output" "mathml" -}}
+<style>
+.lesson-equation math { font-size:1.1em; }
+/* MathML Core browsers use CSS rather than the older columnalign attribute. */
+.lesson-equation mtable[columnalign="right left"] > mtr > mtd:nth-child(odd) { text-align:right; }
+.lesson-equation mtable[columnalign="right left"] > mtr > mtd:nth-child(even) { text-align:left; }
+</style>
+<div class="lesson-equation" style="overflow-x:auto; padding:0.4rem 0; margin:0.8rem 0;">
+  {{ transform.ToMath (strings.TrimSpace .Inner) $options }}
+</div>

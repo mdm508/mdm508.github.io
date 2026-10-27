@@ -1,0 +1,10 @@
+{{ $number := .Get "number" }}
+{{ $id := .Get "id" }}
+{{ $level := .Get "level" | default "3" }}
+{{ if not (in (slice "3" "4") $level) }}{{ errorf "Exercise heading level must be 3 or 4" }}{{ end }}
+<section class="lesson-exercise" aria-labelledby="{{ $id }}">
+{{ printf "<h%s class=\"lesson-exercise__title\" id=\"%s\">" $level $id | safeHTML }}<span class="lesson-exercise__number">Q{{ $number }}</span> <span>{{ .Get "title" }}{{ with .Get "difficulty" }} <span class="lesson-exercise__difficulty" aria-label="{{ if eq . "2" }}Very challenging{{ else }}Challenging{{ end }}">{{ if eq . "2" }}★★{{ else }}★{{ end }}</span>{{ end }}</span>{{ printf "</h%s>" $level | safeHTML }}
+<div class="lesson-exercise__body">
+{{ .Inner | markdownify }}
+</div>
+</section>

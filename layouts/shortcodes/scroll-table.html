@@ -1,0 +1,7 @@
+<style>
+.lesson-table-scroll { max-width:100%; overflow-x:auto; margin:1rem 0; }
+.lesson-table-scroll:focus-visible { outline:2px solid var(--accent-orange); outline-offset:3px; }
+</style>
+<div class="lesson-table-scroll" tabindex="0" role="region" aria-label="{{ .Get 0 }}; scroll horizontally if needed">
+{{ .Inner | markdownify }}
+</div>

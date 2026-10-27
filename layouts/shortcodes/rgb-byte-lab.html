@@ -1,0 +1,172 @@
+{{- $id := printf "rgb-byte-lab-%d" .Ordinal -}}
+<style>
+.rgb-byte-lab { min-width:0; margin:1.3rem 0; padding:1rem; background:var(--light-orange); border:1px solid rgba(104,68,33,.25); border-radius:7px; }
+.rgb-byte-lab > p:first-child { margin-top:0; }
+.rgb-byte-lab label { display:block; font-size:.9rem; }
+.rgb-byte-lab input, .rgb-byte-lab select { box-sizing:border-box; max-width:100%; padding:.45rem; color:var(--deep-brown); background:var(--cream); border:1px solid var(--medium-brown); border-radius:4px; font:inherit; }
+.rgb-byte-lab select { display:block; width:100%; margin:.35rem 0 .8rem; }
+.rgb-byte-lab input { width:100%; margin-top:.3rem; font-family:ui-monospace,monospace; }
+.rgb-byte-lab__swatches { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; margin:.8rem 0; }
+.rgb-byte-lab__swatches figure { min-width:0; margin:0; }
+.rgb-byte-lab__swatches figcaption { font-size:.85rem; margin-bottom:.35rem; color:var(--rich-brown); }
+.rgb-byte-lab__swatch { min-height:75px; border:1px solid var(--medium-brown); border-radius:5px; background:#e4dbcd; }
+.rgb-byte-lab__channels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.6rem; }
+.rgb-byte-lab__channels label { min-width:0; }
+.rgb-byte-lab__actions { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.8rem; }
+.rgb-byte-lab button { padding:.5rem .75rem; border:1px solid var(--rich-brown); border-radius:4px; background:var(--rich-brown); color:var(--cream); font:inherit; cursor:pointer; }
+.rgb-byte-lab button[data-next] { background:transparent; color:var(--rich-brown); }
+.rgb-byte-lab button:disabled { opacity:.55; cursor:default; }
+.rgb-byte-lab input:focus-visible, .rgb-byte-lab select:focus-visible, .rgb-byte-lab button:focus-visible { outline:3px solid var(--accent-orange); outline-offset:3px; }
+.rgb-byte-lab__feedback { min-height:1.5em; font-weight:600; }
+.rgb-byte-lab__values { display:grid; gap:.5rem; }
+.rgb-byte-lab__value { padding:.5rem .65rem; background:var(--cream); border-left:2px solid var(--medium-brown); }
+.rgb-byte-lab__fields { display:flex; flex-wrap:wrap; gap:.3rem 1rem; font-size:.85rem; }
+.rgb-byte-lab [hidden] { display:none; }
+@media (max-width:520px) { .rgb-byte-lab { padding:.75rem; } .rgb-byte-lab__channels { gap:.35rem; } }
+</style>
+<section class="rgb-byte-lab" data-rgb-byte-lab aria-labelledby="{{ $id }}-title">
+  <p id="{{ $id }}-title"><strong>Hex color challenge</strong></p>
+  <label for="{{ $id }}-mode">Practice direction</label>
+  <select id="{{ $id }}-mode" data-mode>
+    <option value="hex-to-rgb">Hex → decimal RGB</option>
+    <option value="rgb-to-hex">Decimal RGB → hex</option>
+  </select>
+  <p data-prompt aria-live="polite">Convert #4080C0 to three decimal channel values.</p>
+  <div class="rgb-byte-lab__swatches">
+    <figure><figcaption>Target color</figcaption><div class="rgb-byte-lab__swatch" data-target-swatch role="img" aria-label="Target color"></div></figure>
+    <figure><figcaption>Your mix</figcaption><div class="rgb-byte-lab__swatch" data-mix-swatch role="img" aria-label="Your mix will appear after you enter a complete answer."></div></figure>
+  </div>
+  <form data-form novalidate aria-label="Convert the target color">
+    <div class="rgb-byte-lab__channels" data-rgb-inputs>
+{{- range slice "Red" "Green" "Blue" }}
+<label for="{{ $id }}-{{ lower . }}">{{ . }}<input id="{{ $id }}-{{ lower . }}" data-channel="{{ lower . }}" type="number" min="0" max="255" step="1" inputmode="numeric" autocomplete="off"></label>
+{{- end }}
+    </div>
+    <div data-hex-input hidden>
+      <label for="{{ $id }}-hex">Hex color code<input id="{{ $id }}-hex" data-hex type="text" placeholder="#RRGGBB" autocomplete="off" spellcheck="false"></label>
+    </div>
+    <p data-input-help style="font-size:.85rem;">Enter whole decimal values from 0 through 255. Your mix changes as you edit.</p>
+    <div class="rgb-byte-lab__actions">
+      <button type="submit" data-check disabled>Check conversion</button>
+      <button type="button" data-next disabled>New color</button>
+    </div>
+  </form>
+  <p class="rgb-byte-lab__feedback" data-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+  <div class="rgb-byte-lab__values" data-values role="list" aria-label="Your channel values in hex, decimal, and binary" hidden></div>
+  <noscript>On paper, convert #4080C0 into decimal red, green, and blue values. Then write its three bytes in binary. The hints and answer below work without this interactive tool.</noscript>
+</section>
+<script>
+(() => {
+  const root = document.currentScript.previousElementSibling;
+  if (!root || !root.matches('[data-rgb-byte-lab]')) return;
+  const colors = [0x4080C0, 0x12ABF0, 0xFF8000, 0x0A40C9, 0x808080, 0x05A03F];
+  const names = ['Red', 'Green', 'Blue'];
+  const mode = root.querySelector('[data-mode]');
+  const channels = names.map(name => root.querySelector(`[data-channel="${name.toLowerCase()}"]`));
+  const hexInput = root.querySelector('[data-hex]');
+  const feedback = root.querySelector('[data-feedback]');
+  const values = root.querySelector('[data-values]');
+  const mix = root.querySelector('[data-mix-swatch]');
+  let next = 0;
+  let target = colors[0];
+  const hex = (value, width) => value.toString(16).toUpperCase().padStart(width, '0');
+  const parts = value => [(value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF];
+  function guess() {
+    if (mode.value === 'hex-to-rgb') {
+      const text = channels.map(input => input.value.trim());
+      if (text.some(value => !/^\d{1,3}$/.test(value))) return null;
+      const rgb = text.map(Number);
+      if (rgb.some(value => value > 255)) return null;
+      return (rgb[0] << 16) | (rgb[1] << 8) | rgb[2];
+    }
+    const text = hexInput.value.trim();
+    return /^#?[0-9a-f]{6}$/i.test(text) ? parseInt(text.replace(/^#/, ''), 16) : null;
+  }
+  function updateMix() {
+    const value = guess();
+    mix.style.backgroundColor = value === null ? '#e4dbcd' : `#${hex(value, 6)}`;
+    mix.setAttribute('aria-label', value === null ? 'Enter a complete answer to see your mix.' : `Your mix: #${hex(value, 6)}`);
+  }
+  function clearFeedback() {
+    feedback.textContent = '';
+    feedback.removeAttribute('data-result');
+    values.hidden = true;
+    values.replaceChildren();
+  }
+  function startRound() {
+    target = colors[next % colors.length];
+    next++;
+    channels.forEach(input => { input.value = ''; });
+    hexInput.value = '';
+    const fromHex = mode.value === 'hex-to-rgb';
+    root.querySelector('[data-rgb-inputs]').hidden = !fromHex;
+    root.querySelector('[data-hex-input]').hidden = fromHex;
+    const rgb = parts(target);
+    root.querySelector('[data-prompt]').textContent = fromHex
+      ? `Convert #${hex(target, 6)} to three decimal channel values.`
+      : `Red = ${rgb[0]}, green = ${rgb[1]}, blue = ${rgb[2]}. Write the six-digit hex color code.`;
+    root.querySelector('[data-input-help]').textContent = fromHex
+      ? 'Enter whole decimal values from 0 through 255. Your mix changes as you edit.'
+      : 'Use two hex digits per channel, with or without the initial #. Keep leading zeroes.';
+    const swatch = root.querySelector('[data-target-swatch]');
+    swatch.style.backgroundColor = `#${hex(target, 6)}`;
+    swatch.setAttribute('aria-label', fromHex ? `Target color #${hex(target, 6)}` : `Target color: red ${rgb[0]}, green ${rgb[1]}, blue ${rgb[2]}`);
+    clearFeedback();
+    updateMix();
+  }
+  function showValues(value) {
+    values.replaceChildren();
+    parts(value).forEach((byte, i) => {
+      const card = document.createElement('div');
+      card.className = 'rgb-byte-lab__value';
+      card.setAttribute('role', 'listitem');
+      const name = document.createElement('strong');
+      name.textContent = names[i];
+      const fields = document.createElement('div');
+      fields.className = 'rgb-byte-lab__fields';
+      for (const [label, text] of [['Hex', `0x${hex(byte, 2)}`], ['Decimal', String(byte)], ['Bits', byte.toString(2).padStart(8, '0')]]) {
+        const span = document.createElement('span');
+        const code = document.createElement('code');
+        code.textContent = text;
+        span.append(`${label} `, code);
+        fields.append(span);
+      }
+      card.append(name, fields);
+      values.append(card);
+    });
+    values.hidden = false;
+  }
+  root.querySelector('[data-form]').addEventListener('submit', event => {
+    event.preventDefault();
+    const value = guess();
+    if (value === null) {
+      feedback.dataset.result = 'invalid';
+      feedback.textContent = mode.value === 'hex-to-rgb'
+        ? 'Enter three whole decimal numbers from 0 through 255.'
+        : 'Use exactly six hex digits (0–9 or A–F), for example #4080C0.';
+      values.hidden = true;
+      return;
+    }
+    showValues(value);
+    const rgb = parts(value);
+    if (value === target) {
+      feedback.dataset.result = 'correct';
+      feedback.textContent = `Correct: #${hex(value, 6)} = RGB(${rgb.join(', ')}). Each pair of hex digits represents one byte.`;
+    } else {
+      const expected = parts(target);
+      const different = names.filter((_, i) => rgb[i] !== expected[i]).map(name => name.toLowerCase());
+      feedback.dataset.result = 'retry';
+      feedback.textContent = `Your mix is #${hex(value, 6)}. Recheck the ${different.join(', ')} channel${different.length === 1 ? '' : 's'}. Your current byte values are shown below.`;
+    }
+  });
+  for (const input of [...channels, hexInput]) {
+    input.addEventListener('input', () => { clearFeedback(); updateMix(); });
+  }
+  mode.addEventListener('change', startRound);
+  root.querySelector('[data-next]').addEventListener('click', startRound);
+  startRound();
+  root.querySelector('[data-check]').disabled = false;
+  root.querySelector('[data-next]').disabled = false;
+  root.dataset.ready = 'true';
+})();
+</script>

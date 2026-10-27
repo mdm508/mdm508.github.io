@@ -54,7 +54,7 @@
 </style>
 <section class="graphics-lab" data-graphics-lab aria-labelledby="{{ $id }}-title">
   <h3 id="{{ $id }}-title">Frame by frame</h3>
-  <p>This model has the same 128 × 64 coordinates as our OLED. Each step prepares and sends a frame, moving the object four pixels right. At the edge it stops; Reset starts a fresh picture at x = 0.</p>
+  <p>This model has the same 128 × 64 coordinates as our OLED. Each step prepares and sends a frame, moving the object up to four pixels right without passing its last fitting position. At the edge it stops; Reset starts a fresh picture at x = 0.</p>
   <div data-interactive hidden>
     <div class="graphics-lab__controls">
       <label for="{{ $id }}-shape">Object:</label>

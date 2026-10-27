@@ -1,0 +1,29 @@
+{{- $bits := slice 0 0 1 0 1 1 0 1 -}}
+<style>
+.byte-lights { margin:1.3rem 0; padding:1rem; background:var(--light-orange); border:1px solid rgba(139,104,62,.3); border-radius:6px; }
+.byte-lights__bits { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:clamp(.2rem,1vw,.7rem); max-width:520px; margin:auto; }
+.byte-lights__bit { min-width:0; text-align:center; }
+.byte-lights__bulb { display:block; width:100%; max-width:32px; height:auto; margin:0 auto .3rem; color:var(--rich-brown); }
+.byte-lights__glass { fill:#e4dbcd; }
+.byte-lights__bit[data-state="1"] .byte-lights__glass { fill:#f7cb6b; }
+.byte-lights__state { display:block; font-size:.65rem; line-height:1.5; color:var(--rich-brown); }
+.byte-lights__digit { display:block; font:700 1.2rem/1.7 ui-monospace,monospace; color:var(--deep-brown); }
+.byte-lights__bracket { max-width:520px; margin:.25rem auto .6rem; height:6px; border:1px solid var(--medium-brown); border-top:0; }
+.byte-lights figcaption { text-align:center; font-size:.9rem; color:var(--rich-brown); }
+</style>
+<figure class="byte-lights" aria-label="Eight light states stored in one byte">
+  <div class="byte-lights__bits" role="img" aria-label="The byte 00101101 represents eight light states, from left to right: off, off, on, off, on, on, off, on.">
+    {{ range $bits }}
+    <div class="byte-lights__bit" data-state="{{ . }}" aria-hidden="true">
+      <svg class="byte-lights__bulb" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path class="byte-lights__glass" d="M10 28c0-3-6-6-6-13a12 12 0 0 1 24 0c0 7-6 10-6 13z"/>
+        <path d="M12 17l4 5 4-5M16 22v6M10 32h12M11 36h10M14 40h4"/>
+      </svg>
+      <span class="byte-lights__state">{{ if eq . 1 }}on{{ else }}off{{ end }}</span>
+      <span class="byte-lights__digit">{{ . }}</span>
+    </div>
+    {{ end }}
+  </div>
+  <div class="byte-lights__bracket" aria-hidden="true"></div>
+  <figcaption><strong>1 byte = 8 bits.</strong> Each digit describes the light above it.</figcaption>
+</figure>

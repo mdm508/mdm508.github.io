@@ -8,43 +8,166 @@ summary: "Give the pet model one source of truth, split the interface into focus
 reading_time: 120
 ---
 
-This lesson continues [From Swift Objects to SwiftUI](/post/from-swift-objects-to-swiftui/). Part 1 gave `PetView` its own energy and taught it to keep that value between `0` and `10`.
+This lesson continues [From Swift Objects to SwiftUI](/post/from-swift-objects-to-swiftui/). In Part 1, we built `PetView`: one view displayed the pet's name and energy, stored the energy with `@State`, and provided Feed and Play buttons.
 
-That works until the interface grows. A status panel may need to display the pet. A control panel may need to feed it. A parent screen may need to save it or replace it. If each view keeps its own energy, the interface can disagree with itself.
+We will now **refactor that same feature**. A refactor reorganizes working code while preserving its behavior. Our pet will still start with `5` energy, gain one when fed, lose one when played with, and stay between `0` and `10`. What changes is where those responsibilities live.
 
-> How can several views work with one pet without creating several conflicting sources of truth?
+By the end, we will have a `Pet` model for the pet's data and rules, a `PetScreen` that owns the changing pet, and two smaller views for the display and controls. We will build those pieces one at a time. The questions are checkpoints after each explanation; you should be able to read the lesson without opening the answers and still follow the design.
 
-The answer has three parts: the model protects its own rules, one view owns the changing value, and child views receive only the access they need.
+## First, What Are Parent and Child Views?
 
-## Put the Rule in the Model
-
-### Q1: What is wrong with protecting energy only in a button?
-
-Part 1 used this button action:
+**View composition** means building a larger interface by combining smaller views. You have already done this:
 
 ```swift
-Button("Feed") {
-    energy = min(energy + 1, 10)
+VStack {
+    Text("Cookie")
+    Text("Energy: 5")
 }
 ```
 
-The boundary works. Why is the design fragile once another screen, button, or test can also change energy?
+Here, the `VStack` contains two `Text` views. In this relationship, the container is the **parent** and the views it contains are its **children**. These words describe how views fit together on screen. They do not mean that one Swift type inherits from another.
 
-{{< answer >}}
-The rule belongs to one button instead of the pet. Every new control must remember the same boundary:
+We can also compose views that we define ourselves. For example, we can move the labels into a named view:
 
-```text
-Feed button   must remember 0...10
-Sleep button  must remember 0...10
-Debug screen  must remember 0...10
+```swift
+struct PetSummary: View {
+    var body: some View {
+        VStack {
+            Text("Cookie")
+            Text("Energy: 5")
+        }
+    }
+}
 ```
 
-One forgotten check can create an invalid pet. The interface should decide what action the user requested. The model should decide what counts as valid pet data.
+Another view can now include `PetSummary()` in its own `body`, just as it would include `Text(...)`. This gives a familiar group of interface elements a name and a focused job. The values are fixed for this first example; later, the parent will supply the current pet.
+
+In our refactored feature, the custom views will fit together like this:
+
+```text
+PetScreen                 arranges the feature
+    └── VStack            stacks its two sections vertically
+        ├── PetSummary    displays the name and energy
+        └── PetControls   contains Feed and Play buttons
+```
+
+We will call `PetScreen` the parent of these two custom views because it creates and coordinates them in its `body`. There is a `VStack` between them in the layout. `PetSummary` and `PetControls` are siblings: they appear alongside each other under the same parent screen. A view can be a child in one relationship and a parent in another; `PetSummary` will contain its own labels.
+
+## Before and After: The Refactor We Are Building
+
+The left column is the complete `PetView` from Part 1. The right column previews the new parent screen. The new screen uses three types we will define below: `Pet`, `PetSummary`, and `PetControls`. **The right column is a destination to read, not a complete program to paste yet.**
+
+{{< code-comparison >}}
+### Before: One View Does Every Job
+
+```swift
+struct PetView: View {
+    let name: String
+    @State private var energy = 5
+
+    init(name: String = "Cookie") {
+        self.name = name
+    }
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Text(name)
+                .font(.title)
+
+            Text("Energy: \(energy)")
+
+            HStack {
+                Button("Feed") {
+                    energy = min(energy + 1, 10)
+                }
+                .disabled(energy >= 10)
+
+                Button("Play") {
+                    energy = max(energy - 1, 0)
+                }
+                .disabled(energy <= 0)
+            }
+        }
+        .padding()
+    }
+}
+```
+
+The name, state, labels, buttons, and energy rules all live in `PetView`.
+<!-- next -->
+### After: A Parent Composes Smaller Views
+
+```swift
+struct PetScreen: View {
+    @State private var pet = Pet(name: "Cookie")
+
+    var body: some View {
+        VStack(spacing: 12) {
+            PetSummary(pet: pet)
+            PetControls(pet: $pet)
+        }
+        .padding()
+    }
+}
+```
+
+`PetScreen` owns one pet and arranges the two child views. The labels move into `PetSummary`. The buttons move into `PetControls`. The energy rules move into `Pet`.
+
+Read the two child initializers as:
+
+```swift
+// Give the summary a value to display.
+PetSummary(pet: pet)
+
+// Give the controls access to edit
+// the parent's state.
+PetControls(pet: $pet)
+```
+
+The `$pet` syntax supplies read-and-write access called a **binding**. We will explain and use it after the model and display are in place.
+{{< /code-comparison >}}
+
+The new parent is shorter because other types now do some of its work. The total program may be longer, but each part has a clearer purpose:
+
+| Responsibility | Before | After |
+| --- | --- | --- |
+| Store changing data | `PetView.energy` | `PetScreen.pet` |
+| Keep energy in `0...10` | Each button action | Methods on `Pet` |
+| Display the pet | Labels inside `PetView` | `PetSummary` |
+| Respond to Feed and Play | Buttons inside `PetView` | `PetControls` |
+| Arrange the feature | `PetView.body` | `PetScreen.body` |
+
+This lets us change the summary's layout without searching through button code, reuse the summary in another screen, and reuse safe pet operations wherever they are needed. Splitting a view does not automatically improve a program; the useful split gives each piece a job we can describe.
+
+We will make this refactor in three steps: move the pet's rules into a model, put one pet in the parent, and connect the children to it.
+
+## Step 1: Put the Rule in the Model
+
+A **model** represents the information and behavior of the thing our program works with. `Pet` is our model; labels and buttons are its interface. The rule that energy stays between `0` and `10` describes a valid pet, so it belongs in `Pet`.
+
+In Part 1, each button enforced part of that rule:
+
+```swift
+// Feed button
+energy = min(energy + 1, 10)
+
+// Play button
+energy = max(energy - 1, 0)
+```
+
+That works for those buttons. But if a second screen changes energy, it must remember the same checks. Moving the rule into model methods gives every interface a safe operation to call.
+
+### Q1: What problem would another Feed button create?
+
+Suppose a new screen feeds the pet with `energy += 1`. The pet already has `10` energy. What would happen, and which rule did the new button forget?
+
+{{< answer >}}
+Energy would become `11`. The button forgot the upper boundary. When validation lives in individual buttons, every new button must remember it. A shared model method can enforce the boundary for every caller.
 {{< /answer >}}
 
-### Q2: How can `Pet` enforce the rule once?
+### Build a Pet That Starts and Stays Valid
 
-Read this model before opening the answer:
+Here is the model we will use in the refactored feature:
 
 ```swift
 struct Pet {
@@ -66,96 +189,90 @@ struct Pet {
 }
 ```
 
-What happens when a caller creates `Pet(name: "Cookie")`? What happens with starting energy values of `-4` and `30`?
+The initializer's default, `energy: Int = 5`, lets us write `Pet(name: "Cookie")`. The expression `min(max(energy, 0), 10)` **clamps** the starting value: `max` raises anything below `0` to `0`, and `min` lowers anything above `10` to `10`. For example, starting energy `30` becomes `10`.
 
-{{< answer >}}
-The initializer supplies `5` when the caller omits energy:
+The methods are marked `mutating` because they change a stored property of a struct. Calling `feed()` or `play()` keeps the same valid range after initialization.
+
+`private(set)` means that code outside `Pet` can read energy but cannot assign to it directly:
+
+```swift
+var pet = Pet(name: "Cookie")
+print(pet.energy)  // Allowed: read the energy.
+pet.feed()         // Allowed: use a safe model operation.
+// pet.energy = 100  // Not allowed: the setter is private.
+```
+
+A rule that must always hold is sometimes called an **invariant**. Here, the invariant is `0 <= energy && energy <= 10`. Restricting direct assignment helps `Pet` protect it.
+
+### Q2: What energy will each new pet have?
+
+Predict the energy of these three pets, using the initializer above:
 
 ```swift
 Pet(name: "Cookie")
+Pet(name: "Mochi", energy: -4)
+Pet(name: "Pepper", energy: 30)
 ```
 
-The nested `max` and `min` clamp every supplied value to the valid range:
-
-```text
--4  → 0
- 5  → 5
-30  → 10
-```
-
-The methods preserve the same rule after initialization. A valid pet starts valid and remains valid.
+{{< answer >}}
+Cookie starts at the default `5`, Mochi at `0`, and Pepper at `10`. The initializer clamps supplied values into the valid range.
 {{< /answer >}}
 
-### Q3: What does `private(set)` allow?
+### Q3: Which changes are allowed outside `Pet`?
 
-Compare these two lines outside `Pet`:
+Given `var pet = Pet(name: "Cookie")`, decide which of these lines compile:
 
 ```swift
 print(pet.energy)
 pet.energy = 100
+pet.feed()
 ```
-
-Which line is allowed, and why is that useful?
 
 {{< answer >}}
-Other code may read `energy`, so the first line works. Its setter is private, so the second line does not compile.
-
-```swift
-private(set) var energy: Int
-```
-
-This gives the interface enough access to display the value without giving it permission to bypass `feed()` and `play()`. The model exposes information while keeping control of its invariant.
+Reading `pet.energy` and calling `pet.feed()` compile. Direct assignment to `energy` does not, because its setter is private. Callers can change the pet through its methods while the model keeps control of the rule.
 {{< /answer >}}
 
-## Give the State One Owner
+## Step 2: Give the Parent One Pet to Own
 
-### Q4: Which view should own the pet?
-
-Suppose a screen contains both a pet summary and a row of controls. Which value should be state?
+Now we need somewhere to keep the pet while the interface is in use. In Part 1, `@State` preserved an integer for `PetView`. It can also preserve a whole `Pet` value for `PetScreen`:
 
 ```swift
 struct PetScreen: View {
     @State private var pet = Pet(name: "Cookie")
 
     var body: some View {
-        // summary and controls will go here
+        Text("Energy: \(pet.energy)")
     }
 }
 ```
 
-Why does the parent own the whole `Pet` instead of keeping a separate energy value in each child?
+At this intermediate step, the parent still displays energy directly. Next, it will pass the pet to the two children from our diagram.
+
+Here, **owns the state** means that this view declares the `@State` property whose storage SwiftUI manages. A **single source of truth** is the one stored value all parts of the feature use. Both children need the same pet, so we keep it in their shared parent, `PetScreen`.
+
+Creating a separate `@State private var pet` in each child would create two independent pets. Matching names and starting energies would not connect them. Feeding one would leave the other unchanged.
+
+### Q4: Where should the shared pet live?
+
+`PetSummary` needs to display energy, and `PetControls` needs to change it. In the view diagram above, which custom view contains both of them and should declare `@State private var pet`?
 
 {{< answer >}}
-`PetScreen` is the nearest view that needs to coordinate both children. Its `pet` is the single source of truth.
-
-```text
-PetScreen owns Pet
-    ├── summary reads Pet
-    └── controls request changes to Pet
-```
-
-When `pet` changes, SwiftUI reevaluates the screen and supplies the current value to its children. The children do not need competing copies of the same state.
+`PetScreen` contains and coordinates both children, so it owns the shared state. The summary will receive the current value; the controls will receive access to change the same state.
 {{< /answer >}}
 
-### Q5: Why not give both children their own `@State`?
+### Q5: What would two independent state properties display?
 
-Imagine that `PetSummary` and `PetControls` each begin with this declaration:
-
-```swift
-@State private var pet = Pet(name: "Cookie")
-```
-
-What goes wrong after the controls feed their pet?
+Imagine both children declare their own `@State private var pet = Pet(name: "Cookie")`. Both pets start at `5`. The controls feed their pet once. What energy would each copy now have?
 
 {{< answer >}}
-The two properties create two pets. Feeding the controls' copy does not change the summary's copy.
-
-The problem is not that `@State` is weak. The problem is that it creates ownership. Use it when a view truly owns a changing value, not whenever a view needs to see one.
+The controls' pet would have `6` energy, and the summary's pet would still have `5`. Each `@State` declaration created independent storage. A child that needs the parent's data should receive it instead of starting a second source of truth.
 {{< /answer >}}
 
-## Pass Read-Only Data Down
+## Step 3: Connect the Children to the Parent's Pet
 
-### Q6: How can a child display the pet without owning it?
+### A Display Child Receives a Value
+
+First, replace our fixed-label `PetSummary` with a version that accepts a `Pet`:
 
 ```swift
 struct PetSummary: View {
@@ -172,23 +289,27 @@ struct PetSummary: View {
 }
 ```
 
-Why is `let pet: Pet` enough? Will the summary become stale when the parent changes its state?
-
-{{< answer >}}
-The summary only displays information, so a read-only property is the honest interface.
-
-The child does not keep a second source of truth. When the parent's state changes, SwiftUI creates a new description of the screen and passes the current pet into `PetSummary` again.
+The declaration `let pet: Pet` makes this a read-only input. Swift automatically supplies an initializer whose parameters come from the stored properties, called a **memberwise initializer**. That lets the parent create this child and supply its `pet` property with:
 
 ```swift
 PetSummary(pet: pet)
 ```
 
-Think of this as data flowing down from the owner, not as the parent handing away ownership.
+Replace the parent's `Text(...)` with that line. The parent still owns the state; the child receives the current `Pet` value to display. When the state changes, SwiftUI updates the dependent interface and supplies the child with the current value. A `let` input does not freeze the display at its first energy reading.
+
+This is **data flowing down**: the parent supplies information to the views it composes. Because `Pet` is a struct, passing its value does not give the child shared writable storage. Calling a `mutating` method such as `feed()` on this `let` property would fail to compile.
+
+### Q6: What will the summary show after a change?
+
+The parent passes `PetSummary(pet: pet)` when energy is `5`. Later, the parent's pet is fed and energy becomes `6`. Which value should the summary display after SwiftUI updates the interface?
+
+{{< answer >}}
+It displays `6`. SwiftUI supplies the current pet as input when updating the child. `let` prevents the child from mutating its input; it does not prevent the parent from supplying updated input.
 {{< /answer >}}
 
-### Q7: Why can't the summary call `pet.feed()`?
+### Q7: Can the display child feed its input?
 
-`feed()` is a mutating method. What would this button do inside `PetSummary`?
+Would this button compile inside the `PetSummary` above? Explain using the child's property declaration.
 
 ```swift
 Button("Feed") {
@@ -197,16 +318,14 @@ Button("Feed") {
 ```
 
 {{< answer >}}
-It does not compile because `pet` is a `let` property. That is useful feedback: a display-only child is trying to perform a job outside its contract.
-
-We could make every child more powerful, but that would hide the design. A clearer program distinguishes views that read from views that may request changes.
+No. `pet` is a `let` property, and `feed()` is a mutating method. This child has read-only input. The control child needs a different kind of access.
 {{< /answer >}}
 
-## Let a Child Request Changes with a Binding
+### An Editing Child Receives a Binding
 
-### Q8: What does `@Binding` mean?
+`PetControls` needs to change the pet that `PetScreen` owns. A **binding** provides read-and-write access to a value stored elsewhere. It connects an editing view to existing state instead of creating a separate state value.
 
-The control view needs to work with the parent's pet:
+The child declares this access with `@Binding`:
 
 ```swift
 struct PetControls: View {
@@ -217,77 +336,100 @@ struct PetControls: View {
             Button("Feed") {
                 pet.feed()
             }
+            .disabled(pet.energy >= 10)
 
             Button("Play") {
                 pet.play()
             }
+            .disabled(pet.energy <= 0)
         }
     }
 }
 ```
 
-Does `PetControls` now own another pet?
+Here is the difference among the declarations we have used:
 
-{{< answer >}}
-No. A binding is read-and-write access to state owned somewhere else.
+| Declaration | Role in this feature |
+| --- | --- |
+| `@State private var pet` | The parent declares the changing state. |
+| `let pet: Pet` | The summary receives a value to read. |
+| `@Binding var pet: Pet` | The controls receive access to read and edit existing state. |
 
-```text
-@State    owns changing storage
-@Binding  refers to changing storage owned by another view
+To supply a binding from its `@State` property, the parent writes `$pet`:
+
+```swift
+PetControls(pet: $pet)
 ```
 
-Calling `pet.feed()` through the binding changes the `PetScreen` state. The control view can edit the value, but it does not decide how long that value lives.
-{{< /answer >}}
+`pet` gives us the current `Pet` value. `$pet` gives us a `Binding<Pet>` connected to the parent's state. The `$` form is called a **projected value**; for `@State`, that projected value is a binding. A **property wrapper** such as `@State` or `@Binding` adds behavior to a property. For `@State`, this includes SwiftUI-managed storage and access to a binding. The `$` form depends on what the wrapper provides; it is not syntax we can add to any ordinary variable.
 
-### Q9: Why does the parent pass `$pet` instead of `pet`?
-
-The parent constructs its children like this:
+The parent can now compose both children inside its `VStack`:
 
 ```swift
 PetSummary(pet: pet)
 PetControls(pet: $pet)
 ```
 
-What different meanings do `pet` and `$pet` have?
+The two lines look similar, but they grant different access. The summary reads a value; the controls can change the parent's state through a binding. The model still prevents direct assignment to `energy`, so the controls use `feed()` and `play()`.
+
+### Q8: Does `@Binding` create another pet to own?
+
+The controls call `pet.feed()` through their binding. Which view's state changes, and does the summary receive the result?
 
 {{< answer >}}
-`pet` is the current `Pet` value. That is what the read-only summary needs.
-
-`$pet` is the binding projected by `@State`. It carries a path back to the parent's storage. That is what a child with `@Binding` expects.
-
-The dollar sign does not mean “the more powerful version of every variable.” Property wrappers may expose a projected value with `$`. For `@State`, that projected value is a binding.
+The binding writes the changed pet back to `PetScreen`'s state. It does not create an independent source of truth in `PetControls`. SwiftUI updates the summary with the new value.
 {{< /answer >}}
 
-### Q10: Where is the energy rule enforced now?
+### Q9: Which argument belongs in each call?
 
-The button closure contains only this line:
+Fill the blanks with `pet` or `$pet`, using the property declarations in the children above:
 
 ```swift
-pet.feed()
+PetSummary(pet: _____)
+PetControls(pet: _____)
 ```
-
-Trace one press from the button to the updated label. Which layer handles the request, which layer validates it, and which layer redraws the interface?
 
 {{< answer >}}
-The action follows one clear route:
-
-```text
-button press
-    → PetControls calls pet.feed()
-    → Pet.feed() protects the 0...10 rule
-    → PetScreen's state changes through the binding
-    → SwiftUI reevaluates the screen
-    → PetSummary receives and displays the new pet
+```swift
+PetSummary(pet: pet)
+PetControls(pet: $pet)
 ```
 
-The control expresses intent. The model enforces validity. The parent owns the result. SwiftUI keeps the display synchronized.
+The summary expects a `Pet` value. The controls expect a `Binding<Pet>`.
+{{< /answer >}}
+
+### Follow One Feed Press
+
+We have now moved the original code into the parts shown in the early comparison. Follow a press with energy starting at `5`:
+
+```text
+1. The user presses Feed in PetControls.
+2. The button calls pet.feed() through the binding.
+3. Pet.feed() calculates min(5 + 1, 10), producing 6.
+4. The binding writes the updated Pet to PetScreen's state.
+5. SwiftUI updates the dependent interface.
+6. PetSummary receives the current pet and displays Energy: 6.
+```
+
+The button chooses an operation, the model enforces its rule, and the binding connects the edit to the parent's state. The parent then supplies updated data to its children. This route is what we mean by **data flow** in this feature.
+
+Disabling a button communicates a limit to the user. The model's boundary checks still matter: code outside this button may call the same methods.
+
+### Q10: Does the model still protect the boundary?
+
+Suppose code calls `feed()` on a pet with energy `10`, even though the Feed button would be disabled. What energy results, and where is the boundary enforced?
+
+{{< answer >}}
+Energy remains `10` because `Pet.feed()` evaluates `min(10 + 1, 10)`. The model enforces the boundary. It does not depend on every interface disabling its controls correctly.
 {{< /answer >}}
 
 ## Read the Whole Feature
 
-### Q11: How do the pieces fit together?
+We have completed the refactor previewed at the start. This version keeps the same plain energy label and Feed/Play behavior as Part 1. The new types separate the work; a progress bar or other display improvements can come later.
 
-Read the complete example from the model upward:
+This is the complete example. In the SwiftUI project from Part 1, replace the old `PetView` with these four declarations. Where your app's root view previously used `PetView()`, use `PetScreen()` instead. Keep the project's existing app entry point.
+
+Read from the model to the parent, then through its two children:
 
 ```swift
 import SwiftUI
@@ -314,7 +456,7 @@ struct PetScreen: View {
     @State private var pet = Pet(name: "Cookie")
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 12) {
             PetSummary(pet: pet)
             PetControls(pet: $pet)
         }
@@ -330,13 +472,7 @@ struct PetSummary: View {
             Text(pet.name)
                 .font(.title)
 
-            ProgressView(
-                "Energy",
-                value: Double(pet.energy),
-                total: 10
-            )
-
-            Text("\(pet.energy) / 10")
+            Text("Energy: \(pet.energy)")
         }
     }
 }
@@ -360,10 +496,14 @@ struct PetControls: View {
 }
 ```
 
-Before running it, identify the owner, the two borrowers, and the only code allowed to assign a new energy value.
+### Q11: How do the pieces fit together?
+
+Before running the complete example, identify which view owns the state, which child receives a value, which child receives a binding, and which type can assign directly to `energy`.
+
+Then run it. Confirm that energy starts at `5`, Feed stops at `10`, Play stops at `0`, and the summary changes after each press. Compare the result with Part 1: the behavior should be familiar even though the code is organized differently.
 
 {{< answer >}}
-`PetScreen` owns the pet through `@State`. `PetSummary` borrows read-only information through a plain property. `PetControls` borrows read-and-write access through `@Binding`.
+`PetScreen` owns the pet through `@State`. `PetSummary` receives a read-only value through a plain property. `PetControls` receives read-and-write access through `@Binding`.
 
 Only code inside `Pet` can assign to `energy` because its setter is private. The controls can call the model's methods, but they cannot invent a new energy rule.
 
@@ -371,6 +511,8 @@ The feature has one changing value, one place that validates it, and explicit pa
 {{< /answer >}}
 
 ## Practice: Extend the Data Flow
+
+Use the completed example for these exercises. Each extension builds on the same route: the parent stores the pet, the summary displays it, and the controls change it through model operations.
 
 ### Q12: Can you add rest without duplicating the boundary?
 
@@ -398,6 +540,19 @@ Button("Rest") {
 
 If another interface adds a Rest control later, it can reuse the same safe operation.
 {{< /answer >}}
+
+### Derive Information Instead of Storing It Twice
+
+A **derived value** is calculated from existing data. For example, a pet's mood can depend entirely on its energy. A **computed property** returns such a calculation when it is read instead of storing another independent value.
+
+```swift
+// Inside Pet:
+var isTired: Bool {
+    energy <= 2
+}
+```
+
+The summary could read `pet.isTired`. When energy changes, the next read uses the new energy. We do not need another `@State` property to remember the same information in a different form.
 
 ### Q13: Where should a derived mood live?
 
@@ -437,6 +592,10 @@ Text(pet.mood)
 There is still one source of truth. Mood cannot disagree with energy because it is recalculated from energy.
 {{< /answer >}}
 
+### Another Control Can Request the Same Operations
+
+A `Stepper` is a SwiftUI control with increment and decrement actions, often shown as plus and minus buttons. One form edits a numeric binding directly. Another accepts action closures: code to run when the user increments or decrements. We will use the action form so `Pet` can keep protecting its energy.
+
 ### Q14: Can you learn `Stepper` without weakening the model?
 
 Read Apple's [`Stepper` documentation](https://developer.apple.com/documentation/swiftui/stepper). Find an initializer that accepts separate increment and decrement actions.
@@ -463,7 +622,11 @@ Test the stepper at `0` and `10`. A control is not finished merely because it ch
 
 ## How Much Power Should a Child Receive?
 
-A binding is appropriate when a child genuinely edits a value owned by its parent. It is not the only option. A small control can receive closures instead:
+The complete feature above uses `@Binding`. An alternative is useful when a child should be allowed to request only a few specific operations.
+
+A **closure** is a function value that can be passed to other code. You used closures for button actions in Part 1. Here, the parent can supply the button actions instead of giving the child a binding to the whole pet.
+
+In the alternative below, `onFeed` and `onPlay` have type `() -> Void`: functions that take no arguments and return no result. The controls receive the current energy for display decisions and these two actions to run. This is an optional replacement for `PetControls`, not another declaration to add alongside the binding version:
 
 ```swift
 struct PetControls: View {
@@ -483,7 +646,7 @@ struct PetControls: View {
 }
 ```
 
-The parent supplies the actions:
+If you choose this alternative, also replace `PetControls(pet: $pet)` in the parent with:
 
 ```swift
 PetControls(
@@ -494,6 +657,8 @@ PetControls(
 ```
 
 This child can request exactly two changes and nothing else. Prefer the clearest contract for the job: a value for reading, a binding for general editing, or closures for a small set of named actions.
+
+For Apple's explanation of state storage and sharing it between views, see [Managing user interface state](https://developer.apple.com/documentation/swiftui/managing-user-interface-state).
 
 ## What Comes Next
 

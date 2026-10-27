@@ -1,0 +1,206 @@
+<style>
+.lite-brite-photo { max-width:480px; margin:1.4rem auto; }
+.lite-brite-photo img { display:block; width:100%; height:auto; border-radius:6px; }
+.lite-brite-photo figcaption { margin-top:.5rem; font-size:.8rem; line-height:1.5; color:var(--medium-brown); }
+.brite-guide { margin:1.5rem 0; padding:1rem; background:var(--light-orange); border:1px solid var(--medium-brown); border-radius:8px; }
+.brite-guide__intro { margin-top:0; }
+.brite-guide__layout { display:grid; grid-template-columns:226px minmax(0,1fr); gap:1.2rem; align-items:start; }
+.brite-guide__board { display:grid; grid-template-columns:1.2rem repeat(8,minmax(0,1fr)); gap:3px; width:226px; max-width:100%; padding:8px; box-sizing:border-box; border-radius:8px; background:var(--deep-brown); color:var(--cream); }
+.brite-guide__axis { text-align:center; font:11px/20px monospace; }
+.brite-guide__axis[data-current="true"] { background:#f7cb6b; color:var(--deep-brown); border-radius:3px; font-weight:bold; }
+.brite-guide__dot { aspect-ratio:1; border:1px solid transparent; border-radius:50%; background:#655648; color:#fff8e9; text-align:center; font:11px/1.7 monospace; }
+.brite-guide__dot[data-target="true"] { border:1px dashed #f7cb6b; }
+.brite-guide__dot[data-group="true"] { outline:1px solid #fff8e9; outline-offset:1px; }
+.brite-guide__dot[data-on="true"] { background:#f7cb6b; color:var(--deep-brown); box-shadow:0 0 4px #f7cb6b; }
+.brite-guide__boundary { margin-top:9px; }
+/* All twelve cards size the same grid cell, including the unseen cards.
+   Reserving the largest state keeps the controls still without fixed heights. */
+.brite-guide__panel { display:grid; min-width:0; }
+.brite-guide__card { grid-area:1 / 1; min-width:0; align-self:start; visibility:hidden; pointer-events:none; }
+.brite-guide__card[data-current="true"] { visibility:visible; pointer-events:auto; }
+.brite-guide__card p { margin:.65rem 0; }
+.brite-guide__card p:first-child { margin-top:0; }
+.brite-guide__progress { font-size:.8rem; color:var(--medium-brown); }
+.brite-guide__destination { font-weight:bold; }
+.brite-guide__cue { display:block; margin-bottom:.25rem; font-weight:bold; color:var(--rich-brown); }
+.brite-guide__byte { padding:.65rem; background:var(--cream); border-left:3px solid var(--rich-orange); margin:.65rem 0; }
+.brite-guide__byte code { white-space:normal; overflow-wrap:anywhere; }
+.brite-guide__bits { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:3px; margin:.5rem 0 .2rem; }
+.brite-guide__bit { display:grid; gap:3px; text-align:center; font:12px/1.5 monospace; }
+.brite-guide__bit small { font-size:10px; color:var(--medium-brown); }
+.brite-guide__bit b { border-radius:3px; background:#655648; color:#fff8e9; }
+.brite-guide__bit[data-on="true"] b { background:#f7cb6b; color:var(--deep-brown); }
+.brite-guide__controls { display:flex; flex-wrap:wrap; gap:.6rem; padding-top:1rem; margin-top:1rem; border-top:1px solid var(--medium-brown); }
+.brite-guide button { min-height:2.8rem; padding:.5rem .8rem; border:1px solid var(--rich-brown); border-radius:5px; background:var(--rich-brown); color:var(--cream); cursor:pointer; font:inherit; }
+.brite-guide button[data-advance] { width:15rem; max-width:100%; }
+.brite-guide button[data-restart] { background:transparent; color:var(--rich-brown); }
+.brite-guide button:disabled { opacity:.5; cursor:default; }
+.brite-guide button:focus-visible { outline:3px solid var(--accent-orange); outline-offset:3px; }
+.brite-guide__live { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+@media (max-width:600px) {
+  .brite-guide__layout { grid-template-columns:minmax(0,1fr); }
+  .brite-guide__board { justify-self:center; }
+  .brite-guide__controls button { width:100%; }
+}
+</style>
+<section class="brite-guide" id="guided-triangle" data-brite-guide aria-label="Guided triangle: send one vertical byte at a time">
+  <p class="brite-guide__intro"><strong>Build a triangle, one byte at a time</strong><br>Dashed circles are the target; gold lights are the picture so far. The outlined column is the next eight-light group. Its numbers show bit positions, from 0 at the top to 7 at the bottom.</p>
+  <div class="brite-guide__layout">
+    <div class="brite-guide__board" id="triangle-board" data-board role="img" aria-label="Eight columns and sixteen rows; the triangle target is in Page 1."></div>
+    <div class="brite-guide__panel" id="triangle-explanation" data-panel></div>
+  </div>
+  <div class="brite-guide__controls" aria-label="Triangle walkthrough controls">
+    <button type="button" data-advance aria-controls="triangle-board triangle-explanation" disabled>Reveal and send byte</button>
+    <button type="button" data-restart disabled>Start again</button>
+  </div>
+  <p class="brite-guide__live" data-live role="status" aria-live="polite" aria-atomic="true"></p>
+  <noscript>The triangle uses Page 1, columns 1–6, with byte values C0, F0, FC, FC, F0, C0 in hexadecimal. Sketch each byte vertically, putting bit 0 at row 8 and bit 7 at row 15.</noscript>
+</section>
+<script>
+(() => {
+  const root = document.currentScript.previousElementSibling;
+  if (!root || !root.matches('[data-brite-guide]')) return;
+  const target = [0, 0xC0, 0xF0, 0xFC, 0xFC, 0xF0, 0xC0, 0];
+  const steps = [
+    {x:3, title:'Begin at the tip', rows:'10–15',
+      question:'Page 1 begins at row 8 with bit 0. Count down to row 10. Which bits light rows 10–15? Write all eight bits before sending.',
+      reason:'Row 8 is bit 0, row 9 is bit 1, and row 10 is bit 2. Rows 10–15 therefore use bits 2–7. The two rightmost zeroes leave rows 8 and 9 dark.',
+      insight:'A bit number counts from the top of its page, not from the top of the screen.'},
+    {x:4, title:'Repeat the tip beside it', rows:'10–15',
+      question:'This column needs the same rows as the previous one. What should stay the same: the byte, the destination, or both? Write your prediction.',
+      reason:'Only the destination changes: Page 1, column 4. Sending the same byte lights the same six rows beside column 3.',
+      insight:'The byte chooses a pattern; the page and column choose where it goes.'},
+    {x:2, title:'Widen the left side', rows:'12–15',
+      question:'The triangle is wider near its base. In column 2 we only need rows 12–15. Count from row 8 to find their bits, then write the byte.',
+      reason:'Rows 12–15 use bits 4–7. Their weights add to 16 + 32 + 64 + 128 = 240. Four ones light the bottom four points in this column.',
+      insight:'A wider part of the picture can need a shorter vertical group in each added column.'},
+    {x:5, title:'Mirror the right side', rows:'12–15',
+      question:'Match column 2 at column 5. Predict the byte, then decide: will sending it change anything in column 2?',
+      reason:'The same byte lights rows 12–15 in column 5. Columns 2, 3, and 4 keep the bytes already sent to them.',
+      insight:'Sending one byte replaces one eight-light group; it leaves other groups alone.'},
+    {x:1, title:'Add the left edge', rows:'14–15',
+      question:'Only the bottom two lights are needed here. Which bit numbers belong to rows 14 and 15? Write the byte with bit 7 on the left.',
+      reason:'Rows 14 and 15 are bits 6 and 7: 64 + 128 = 192. Those are the two leftmost ones in the written byte, but the two lowest lights on the board.',
+      insight:'Written binary runs bit 7 to bit 0; the vertical lights run bit 0 to bit 7.'},
+    {x:6, title:'Finish the right edge', rows:'14–15',
+      question:'Match the left edge at column 6. Predict its byte. Once it is sent, will Page 0 contain any lights? Explain your answer before checking.',
+      reason:'The last byte lights rows 14 and 15 in column 6. The triangle is complete. Page 0 stays dark: every destination was in Page 1.',
+      insight:'To place a pattern, we need both its byte value and its destination.'}
+  ];
+  const memory = new Uint8Array(8);
+  const dots = [];
+  const headers = [];
+  const cards = [];
+  const board = root.querySelector('[data-board]');
+  const panel = root.querySelector('[data-panel]');
+  const advance = root.querySelector('[data-advance]');
+  const restart = root.querySelector('[data-restart]');
+  const live = root.querySelector('[data-live]');
+  let step = 0;
+  let revealed = false;
+  const element = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const label = (text, boundary=false) => {
+    const span = element('span', 'brite-guide__axis', text);
+    if (boundary) span.classList.add('brite-guide__boundary');
+    board.append(span);
+    return span;
+  };
+  label('y/x');
+  for (let x = 0; x < 8; x++) headers.push(label(x));
+  for (let y = 0; y < 16; y++) {
+    label(y, y === 8);
+    for (let x = 0; x < 8; x++) {
+      const dot = element('span', 'brite-guide__dot');
+      dot.setAttribute('aria-hidden', 'true');
+      if (y === 8) dot.classList.add('brite-guide__boundary');
+      board.append(dot);
+      dots.push({dot, x, y});
+    }
+  }
+  steps.forEach((current, index) => {
+    const pair = [];
+    for (const sent of [false, true]) {
+      const card = element('div', 'brite-guide__card');
+      card.id = `triangle-step-${index + 1}-${sent ? 'sent' : 'predict'}`;
+      card.append(element('p', 'brite-guide__progress', `Step ${index + 1} of ${steps.length} · ${current.title}`));
+      card.append(element('p', 'brite-guide__destination', `Destination: Page 1, column ${current.x}`));
+      card.append(element('p', '', `Goal: light rows ${current.rows}. Keep the other lights in this group dark.`));
+      const cue = element('p');
+      cue.append(element('span', 'brite-guide__cue', sent ? 'Compare your prediction' : 'Think first'));
+      cue.append(document.createTextNode(sent ? current.reason : current.question));
+      if (sent) {
+        const byte = element('div', 'brite-guide__byte');
+        const binary = target[current.x].toString(2).padStart(8, '0');
+        byte.append(element('span', 'brite-guide__cue', 'Byte sent'));
+        byte.append(element('code', '', `0b${binary} · 0x${target[current.x].toString(16).toUpperCase()} · ${target[current.x]}`));
+        const bits = element('div', 'brite-guide__bits');
+        bits.setAttribute('role', 'img');
+        bits.setAttribute('aria-label', `Written byte: bits 7 through 0 are ${binary.split('').join(', ')}.`);
+        for (let bit = 7; bit >= 0; bit--) {
+          const item = element('span', 'brite-guide__bit');
+          const on = Boolean(target[current.x] & (1 << bit));
+          item.dataset.on = String(on);
+          item.setAttribute('aria-hidden', 'true');
+          item.append(element('small', '', bit), element('b', '', on ? '1' : '0'));
+          bits.append(item);
+        }
+        byte.append(bits);
+        card.append(byte, cue);
+        const takeaway = element('p');
+        takeaway.append(element('strong', '', current.insight));
+        card.append(takeaway);
+      } else {
+        card.append(cue);
+      }
+      card.inert = true;
+      card.setAttribute('aria-hidden', 'true');
+      panel.append(card);
+      pair.push(card);
+    }
+    cards.push(pair);
+  });
+  function render(announce = true) {
+    const current = steps[step];
+    const complete = revealed && step === steps.length - 1;
+    for (const {dot, x, y} of dots) {
+      const inPage = y >= 8;
+      const mask = 1 << (y % 8);
+      const group = inPage && x === current.x;
+      dot.dataset.target = String(inPage && Boolean(target[x] & mask));
+      dot.dataset.on = String(inPage && Boolean(memory[x] & mask));
+      dot.dataset.group = String(group);
+      dot.textContent = group ? y % 8 : '';
+    }
+    headers.forEach((header, x) => { header.dataset.current = String(x === current.x); });
+    const filled = steps.slice(0, step + (revealed ? 1 : 0)).map(s => s.x).join(', ');
+    board.setAttribute('aria-label', `8 by 16 board. Triangle target in Page 1: columns 1 and 6, rows 14–15; columns 2 and 5, rows 12–15; columns 3 and 4, rows 10–15. Completed columns: ${filled || 'none'}. Current group: Page 1, column ${current.x}.`);
+    cards.forEach((pair, index) => pair.forEach((card, state) => {
+      const active = index === step && state === Number(revealed);
+      card.dataset.current = String(active);
+      card.inert = !active;
+      card.setAttribute('aria-hidden', String(!active));
+    }));
+    const active = cards[step][Number(revealed)];
+    advance.setAttribute('aria-describedby', active.id);
+    advance.textContent = complete ? 'Draw it again' : revealed ? 'Next column →' : 'Reveal and send byte';
+    restart.disabled = step === 0 && !revealed;
+    if (announce) live.textContent = `Step ${step + 1} of ${steps.length}. Page 1, column ${current.x}. ${revealed ? `Byte sent: ${target[current.x]}. ${current.reason} ${current.insight}` : `Goal: light rows ${current.rows}. ${current.question}`}`;
+  }
+  function reset() { memory.fill(0); step = 0; revealed = false; render(); }
+  advance.addEventListener('click', () => {
+    if (!revealed) { memory[steps[step].x] = target[steps[step].x]; revealed = true; }
+    else if (step < steps.length - 1) { step++; revealed = false; }
+    else { reset(); return; }
+    render();
+  });
+  restart.addEventListener('click', reset);
+  render(false);
+  advance.disabled = false;
+  root.dataset.ready = 'true';
+})();
+</script>

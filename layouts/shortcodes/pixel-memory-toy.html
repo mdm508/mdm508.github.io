@@ -1,37 +1,67 @@
 <style>
 .pixel-toy { margin:1.5rem 0; padding:1rem; background:var(--light-orange); border:1px solid var(--medium-brown); border-radius:8px; }
-.pixel-toy__layout { display:flex; flex-wrap:wrap; gap:1.5rem; align-items:flex-start; }
-.pixel-toy__board { display:grid; grid-template-columns:1.5rem repeat(8, minmax(0,1fr)); gap:3px; width:100%; max-width:320px; background:var(--deep-brown); padding:10px; border-radius:8px; box-sizing:border-box; color:var(--cream); }
-.pixel-toy__board span { text-align:center; font:12px/24px monospace; }
+.pixel-toy__layout { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); gap:1.5rem; align-items:start; }
+.pixel-toy__board { display:grid; grid-template-columns:1.5rem repeat(8, minmax(0,1fr)); gap:3px; width:100%; max-width:280px; background:var(--deep-brown); padding:10px; border-radius:8px; box-sizing:border-box; color:var(--cream); }
+.pixel-toy__board span { align-self:center; text-align:center; font:12px/1.5 monospace; }
 .pixel-toy button { cursor:pointer; }
-.pixel-toy__pixel { aspect-ratio:1; min-width:0; padding:0; border:2px solid transparent; border-radius:50%; background:#655648; color:#fff8e9; font:12px monospace; }
+.pixel-toy__pixel { display:grid; place-items:center; aspect-ratio:1; min-width:0; padding:0; border:2px solid transparent; border-radius:50%; background:#655648; color:#fff8e9; font:12px/1 monospace; }
 .pixel-toy__pixel[aria-pressed="true"] { background:#f7cb6b; color:var(--deep-brown); box-shadow:0 0 6px #f7cb6b; }
 .pixel-toy__pixel[data-group="true"] { border-color:#c29b55; }
 .pixel-toy__pixel[data-selected="true"] { outline:2px solid #fff8e9; outline-offset:1px; }
 .pixel-toy__board .pixel-toy__boundary { margin-top:9px; }
 .pixel-toy button:focus-visible { outline:3px solid var(--accent-orange); outline-offset:3px; }
-.pixel-toy__memory { flex:1; min-width:220px; }
-.pixel-toy__bytes { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
-.pixel-toy__byte { padding:5px; border:2px solid transparent; background:var(--cream); font:12px/1.5 monospace; text-align:center; }
-.pixel-toy__byte[data-selected="true"] { border-color:var(--rich-orange); background:#f7cb6b; }
+.pixel-toy__memory { min-width:0; }
+.pixel-toy__table-wrap { margin-top:1rem; overflow-x:auto; }
+.pixel-toy .pixel-toy__table { width:100%; min-width:480px; margin:0; border-collapse:collapse; white-space:nowrap; }
+.pixel-toy .pixel-toy__table :is(th,td) { padding:.45rem .25rem; text-align:center; vertical-align:middle; }
+.pixel-toy .pixel-toy__table tbody th { background:var(--cream); color:var(--deep-brown); font-size:.8rem; }
+.pixel-toy .pixel-toy__byte { background:var(--cream); color:var(--deep-brown); font:12px/1.5 monospace; }
+.pixel-toy .pixel-toy__byte[data-selected="true"] { outline:2px solid var(--rich-orange); outline-offset:-2px; background:#f7cb6b; }
+.pixel-toy__caption { margin:.6rem 0 0; font-size:.85rem; }
 .pixel-toy__clear { margin-top:1rem; padding:.5rem .8rem; background:var(--rich-brown); color:var(--cream); border:0; border-radius:5px; }
-.pixel-toy__detail { min-height:5em; }
+.pixel-toy .pixel-toy__detail { margin:0 0 1rem; }
+.pixel-toy__send { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:.65rem .8rem; padding:.8rem; margin:0; background:var(--cream); border-radius:5px; }
+.pixel-toy__send > :is(strong,small,button,p), .pixel-toy__send label:last-of-type { grid-column:1 / -1; }
+.pixel-toy__send label { display:grid; gap:.25rem; min-width:0; margin:0; }
+.pixel-toy__send input, .pixel-toy__send select { max-width:100%; box-sizing:border-box; padding:.3rem; font:inherit; color:var(--deep-brown); background:var(--cream); border:1px solid var(--medium-brown); border-radius:3px; }
+.pixel-toy__send input, .pixel-toy__send select { width:100%; min-height:2.5rem; }
+.pixel-toy__send input { font-family:monospace; }
+.pixel-toy__send button { justify-self:start; min-height:2.5rem; padding:.4rem .7rem; margin:0; background:var(--rich-brown); color:var(--cream); border:0; border-radius:5px; font:inherit; }
+.pixel-toy__send .pixel-toy__error { margin:0; color:var(--deep-brown); font-weight:600; }
+.pixel-toy__error:empty { display:none; }
+@media (max-width:760px) {
+  .pixel-toy__layout { grid-template-columns:minmax(0,1fr); }
+  .pixel-toy__board { justify-self:center; }
+}
+@media (max-width:400px) {
+  .pixel-toy__send { grid-template-columns:minmax(0,1fr); }
+}
 </style>
-<section class="pixel-toy" data-pixel-toy aria-label="Lite-Brite pixel memory explorer">
-  <p><strong>A tiny Lite-Brite: 8 columns × 16 rows</strong><br>Click a circle to turn it on or off. The outlined vertical group shares one byte. Numbers inside it show bit positions, from 0 at the top to 7 at the bottom.</p>
+<section class="pixel-toy" id="pixel-memory-explorer" data-pixel-toy aria-label="Lite-Brite pixel memory explorer">
+  <p><strong>Your board: 8 columns × 16 rows</strong><br>Click a circle to turn it on or off. Its outlined group shares one byte; the numbers inside show bit positions. Or choose a page and column and send all eight states at once.</p>
   <div class="pixel-toy__layout">
     <div class="pixel-toy__board" data-board aria-label="Pixel coordinates: x across, y down"></div>
     <div class="pixel-toy__memory">
       <p data-detail class="pixel-toy__detail" aria-live="polite">Click any pixel to follow it into memory.</p>
-      <p><strong>Page 0</strong> · rows 0–7 · bytes 0–7</p>
-      <div class="pixel-toy__bytes" data-page="0"></div>
-      <p><strong>Page 1</strong> · rows 8–15 · bytes 8–15</p>
-      <div class="pixel-toy__bytes" data-page="1"></div>
-      <p>Each box shows its byte index and hex value. The selected byte’s binary digits run from bit 7 on the left to bit 0 on the right.</p>
+      <form class="pixel-toy__send" data-send novalidate aria-label="Send a byte to a vertical group">
+        <strong>Choose a group, then send a byte</strong>
+        <label>Page <select data-destination-page aria-label="Destination page"><option value="0">0 · rows 0–7</option><option value="1" selected>1 · rows 8–15</option></select></label>
+        <label>Column <select data-destination-column aria-label="Destination column"><option>0</option><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
+        <label>Byte <input data-value aria-label="Byte value" type="text" value="0b00000000" autocomplete="off" spellcheck="false"></label>
+        <small>Use binary with <code>0b</code>, hex with <code>0x</code>, or decimal 0–255.</small>
+        <button type="submit">Send byte</button>
+        <p class="pixel-toy__error" data-error role="status"></p>
+      </form>
     </div>
   </div>
+  <div class="pixel-toy__table-wrap" role="region" tabindex="0" aria-label="Byte values by page and column; scroll horizontally if needed">
+    <table class="pixel-toy__table" aria-label="Two pages of eight column bytes">
+      <thead><tr><th scope="col">Page</th>{{ range seq 0 7 }}<th scope="col">x{{ . }}</th>{{ end }}</tr></thead>
+      <tbody><tr data-page="0"><th scope="row">0 · y0–7</th></tr><tr data-page="1"><th scope="row">1 · y8–15</th></tr></tbody>
+    </table>
+  </div>
+  <p class="pixel-toy__caption">Each table row is a page; each cell holds one column's byte in hex. You can see which byte changes when you click. Next we'll find that byte's index in Python's flat buffer.</p>
   <button type="button" class="pixel-toy__clear" data-clear>Clear picture</button>
-  <p>This toy updates immediately to help you explore the layout. On the real OLED, you still need <code>show()</code> to display your changes.</p>
   <noscript>Enable JavaScript to use the toy. On paper, draw eight columns and sixteen rows; split at row 8. Each eight-pixel vertical group is one byte, with bit 0 at its top.</noscript>
 </section>
 <script>
@@ -42,8 +72,13 @@
   const pixels = [];
   const bytes = [];
   let selected = null;
+  let action = 'choose';
   const board = root.querySelector('[data-board]');
   const detail = root.querySelector('[data-detail]');
+  const destinationPage = root.querySelector('[data-destination-page]');
+  const destinationColumn = root.querySelector('[data-destination-column]');
+  const valueInput = root.querySelector('[data-value]');
+  const error = root.querySelector('[data-error]');
   const label = text => { const span = document.createElement('span'); span.textContent = text; board.append(span); return span; };
   label('y/x');
   for (let x = 0; x < 8; x++) label(x);
@@ -56,8 +91,10 @@
       button.className = 'pixel-toy__pixel';
       if (y === 8) button.classList.add('pixel-toy__boundary');
       button.addEventListener('click', () => {
-        selected = {x, y};
+        selected = {x, page:Math.floor(y / 8), bit:y % 8};
         memory[Math.floor(y / 8) * 8 + x] ^= 1 << (y % 8);
+        action = 'pixel';
+        error.textContent = '';
         render();
       });
       pixels.push({button, x, y});
@@ -65,13 +102,13 @@
     }
   }
   for (let index = 0; index < 16; index++) {
-    const box = document.createElement('div');
+    const box = document.createElement('td');
     box.className = 'pixel-toy__byte';
     root.querySelector(`[data-page="${Math.floor(index / 8)}"]`).append(box);
     bytes.push(box);
   }
-  function render() {
-    const page = selected ? Math.floor(selected.y / 8) : -1;
+  function render(syncValue = true) {
+    const page = selected ? selected.page : -1;
     const index = selected ? page * 8 + selected.x : -1;
     for (const pixel of pixels) {
       const pixelPage = Math.floor(pixel.y / 8);
@@ -81,20 +118,53 @@
       pixel.button.setAttribute('aria-pressed', String(on));
       pixel.button.setAttribute('aria-label', `Pixel (${pixel.x}, ${pixel.y}), ${on ? 'on' : 'off'}`);
       pixel.button.dataset.group = String(group);
-      pixel.button.dataset.selected = String(selected !== null && pixel.x === selected.x && pixel.y === selected.y);
+      pixel.button.dataset.selected = String(group && bit === selected.bit);
       pixel.button.textContent = group ? bit : '';
     }
     bytes.forEach((box, i) => {
-      box.textContent = `[${i}] 0x${memory[i].toString(16).toUpperCase().padStart(2, '0')}`;
+      box.textContent = `0x${memory[i].toString(16).toUpperCase().padStart(2, '0')}`;
+      box.setAttribute('aria-label', `Page ${Math.floor(i / 8)}, column ${i % 8}: byte value ${memory[i]}`);
       box.dataset.selected = String(i === index);
     });
     if (selected) {
-      const bit = selected.y % 8;
-      const on = Boolean(memory[index] & (1 << bit));
-      detail.textContent = `Pixel (${selected.x}, ${selected.y}) is now ${on ? 'on' : 'off'}. Page ${page}, byte ${index}, bit ${bit}. This byte now holds ${memory[index].toString(2).padStart(8, '0')} (decimal ${memory[index]}). The other seven pixels in this byte keep their states.`;
-    } else detail.textContent = 'Click any pixel to follow it into memory. All 16 bytes are zero.';
+      const bit = selected.bit;
+      const binary = memory[index].toString(2).padStart(8, '0');
+      const hex = memory[index].toString(16).toUpperCase().padStart(2, '0');
+      destinationPage.value = String(page);
+      destinationColumn.value = String(selected.x);
+      if (syncValue) valueInput.value = `0b${binary}`;
+      if (action === 'pixel') {
+        const y = page * 8 + bit;
+        const mask = 1 << bit;
+        const on = Boolean(memory[index] & mask);
+        detail.textContent = `Pixel (${selected.x}, ${y}) is now ${on ? 'on' : 'off'}. Page ${page}, column ${selected.x}, bit ${bit}. To light just this point in an empty group, send ${mask.toString(2).padStart(8, '0')} (0x${mask.toString(16).toUpperCase().padStart(2, '0')}). This group's current byte is ${binary} (0x${hex}).`;
+      } else {
+        detail.textContent = `${action === 'send' ? 'Sent to' : 'Current byte in'} Page ${page}, column ${selected.x}: ${binary} (0x${hex}). Bit 0 is row ${page * 8}; bit 7 is row ${page * 8 + 7}. Sending replaces all eight states in this group and leaves other groups alone.`;
+      }
+    } else detail.textContent = 'Start with (2, 14). Predict its page, column, bit, and single-pixel byte, then click it to check. All groups start at zero.';
   }
-  root.querySelector('[data-clear]').addEventListener('click', () => { memory.fill(0); selected = null; render(); });
+  for (const select of [destinationPage, destinationColumn]) {
+    select.addEventListener('change', () => {
+      selected = {page:Number(destinationPage.value), x:Number(destinationColumn.value), bit:null};
+      // Keep the input pattern so it can be sent to another destination.
+      action = 'choose'; error.textContent = ''; render(false);
+    });
+  }
+  root.querySelector('[data-send]').addEventListener('submit', event => {
+    event.preventDefault();
+    const text = valueInput.value.trim();
+    const value = Number(text);
+    if (!/^(?:0b[01]{1,8}|0x[0-9a-f]{1,2}|[0-9]{1,3})$/i.test(text) || !Number.isInteger(value) || value > 255) {
+      error.textContent = 'Enter one byte: for example 0b01000000, 0x40, or 64 (0–255).';
+      return;
+    }
+    selected = {page:Number(destinationPage.value), x:Number(destinationColumn.value), bit:null};
+    memory[selected.page * 8 + selected.x] = value;
+    action = 'send'; error.textContent = ''; render();
+  });
+  root.querySelector('[data-clear]').addEventListener('click', () => {
+    memory.fill(0); selected = null; valueInput.value = '0b00000000'; error.textContent = ''; render();
+  });
   render();
 })();
 </script>

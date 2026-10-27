@@ -1,0 +1,14 @@
+{{ $key := .Get "data" | default "phase1_glossary" }}
+{{ $terms := index hugo.Data $key }}
+{{ if not $terms }}{{ errorf "No review terms found for %q" $key }}{{ end }}
+<div class="recall-glossary" data-lesson-glossary>
+{{ range $terms }}
+<details class="glossary-definition" id="term-{{ .id }}">
+<summary>{{ .term | markdownify }}</summary>
+<div class="glossary-definition__content">
+{{ .definition | markdownify }}
+<p class="glossary-definition__example"><strong>Example:</strong> {{ .example | markdownify }}</p>
+</div>
+</details>
+{{ end }}
+</div>

@@ -2,263 +2,206 @@
 title: "Phase 3: Memory Organization — Pages, Bytes, and Coordinates"
 date: 2026-10-04T08:00:00-07:00
 draft: false
-description: "Map SSD1306 screen coordinates to pages, bytes, and bits, then change individual pixels in a raw MicroPython bytearray."
+description: "Connect a 2D grid to a flat list, then map OLED coordinates to pages, byte indices, and bit positions."
 tags: ["python", "micropython", "raspberry-pi-pico", "electronics", "binary", "hexadecimal"]
-summary: "Trace a pixel from (x, y) to its page, byte, and bit in SSD1306 display memory."
+summary: "Explore a tiny Lite-Brite, practice grid-to-list addresses, and trace a pixel into the SSD1306's page-organized bytes."
 reading_time: 120
+toc_depth: 3
 ---
 
-Part of the [Pico OLED project: start here and see all phases](/post/pico-oled-project/).
+<aside class="lesson-context" aria-label="Related guides">Part of the <a href="/post/pico-oled-project/">Pico OLED project: guide and lesson roadmap</a>. Previously: <a href="/post/pictures-as-data/">Phase 2: Pictures as Data</a>.</aside>
 
-## Where This Lesson Fits
+You can now change one bit without disturbing its neighbors. But a screen has rows and columns, while our picture is stored in **one long sequence of bytes**. How do we connect the two?
 
-In [Phase 1: Meet the OLED](/post/meet-the-oled/), we treated the 128 × 64 display as a coordinate grid. `x` moves across columns; `y` moves down rows. We used drawing commands and `show()` without opening the driver.
+## What You Will Be Able to Do
 
-In [Phase 2: Pictures as Data](/post/pictures-as-data/), we learned that a monochrome pixel needs one bit, a byte contains eight bits, and a full screen requires 1,024 bytes. We also practiced masks for changing individual bits.
+- Translate between a position in a grid and an index in a flat list.
+- Explain a page and the eight vertical pixels stored in one byte.
+- Calculate a pixel's page, byte index, bit position, and mask—and work backward.
+- Write a pixel operation that preserves neighbors and checks screen boundaries.
 
-So we know how much memory the picture needs and how to change a bit. We have not yet connected a screen coordinate to a particular byte.
+## Get Ready
 
-**Today's goal:** build that map, then answer one question: to turn on pixel `(37, 29)`, which byte do we change, and which bit inside it?
+{{< download "/downloads/pico/phase-3-memory-map.py" "Download the Phase 3 memory lab" >}}. Only dimensions and an empty `bytearray` run; you write the mapping code. Ordinary Python or MicroPython works. **No OLED or driver is needed.** These are memory experiments; nothing in this file sends data to a physical screen.
 
-Phase 4 will pick up after that. We will look at the frame waiting in the Pico's RAM and ask why drawing text does not immediately change the physical screen.
-
-You can test the mapping without an OLED. [Download the Phase 3 memory-mapping starter file](/downloads/pico/phase-3-memory-map.py). It creates the 1,024-byte buffer and leaves the coordinate and pixel functions for you to complete as the lesson develops them.
+Keep the dimensions and buffer allocation at the top, replace earlier experiment code as you move on, and run the whole file. The toy uses width 8; the starter begins with the real display's width of 128. Always check which width a problem specifies.
 
 ## Start with a Tiny Lite-Brite
 
-Before we calculate anything, make a small picture. This toy has **8 columns and 16 rows**. Click a few pixels, then click one again to turn it off.
+Have you ever made a picture with a Lite-Brite? You push colored pegs through black paper into a board and light them from behind. A picture emerges from lots of small points of light.
 
-The picture is stored in sixteen bytes. Each byte remembers **eight vertically stacked pixels** in one column. A **page** is an eight-row band across the picture, so this little display has two pages. The toy highlights which byte and bit you changed.
+<figure class="lite-brite-photo">
+<img src="/images/pico/lite-brite-hello.jpg" width="960" height="789" loading="lazy" alt="A Lite-Brite toy with colored pegs spelling hello across its illuminated board.">
+<figcaption>A Lite-Brite spelling “hello,” with its black paper removed so you can see the holes. Photo: <a href="https://commons.wikimedia.org/wiki/File:Hello_on_a_Lite-Brite.jpg">thomas ambridge / Dhscommtech</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>. Reduced size.</figcaption>
+</figure>
+
+Our OLED does something similar: **a lit pixel is like a lit peg; a dark pixel is like an unfilled hole.** We only need on and off, so ignore peg colors. The browser model below shrinks the OLED to **8 columns and 16 rows**, making each point easy to follow.
+
+Now add the OLED's storage rule: **one byte controls eight vertically stacked lights in one column.** This is how our display driver arranges pixels, not how the real Lite-Brite stores a picture.
+
+Here are the rules for our little board:
+
+- Coordinates count from zero: `x` goes across; `y` goes down.
+- A **page** is an eight-row band. Page 0 covers rows 0–7; Page 1 covers rows 8–15.
+- Choose a **page and column**, then send one byte to that vertical group. Each `1` lights a point; each `0` leaves it dark. Sending a byte replaces all eight states in that group.
+- Within either page, bit 0 controls the top light and bit 7 the bottom. Written binary still puts bit 7 on the left.
+
+Let's draw a triangle silhouette in Page 1. The dashed circles show the goal. **Write your predicted byte before sending it.** Then compare the lit points with your prediction and explain why those bit positions worked. Use the controls below the board to move to the next column. For now, a page and column are enough to choose where a byte goes.
+
+{{< lite-brite-walkthrough >}}
+
+The model shows each byte immediately. On the physical OLED, editing the buffer still needs `show()` to reach the screen.
+
+## One Byte, Eight Vertical Pixels
+
+Our driver uses a layout called **`MONO_VLSB`**: monochrome pixels packed vertically, with the least-significant bit at the top of each group. Here is one byte in Page 0:
+
+| Screen row | Bit position | Mask |
+| ---: | ---: | --- |
+| 0 | 0 | `00000001` |
+| 1 | 1 | `00000010` |
+| 2 | 2 | `00000100` |
+| 3 | 3 | `00001000` |
+| 4 | 4 | `00010000` |
+| 5 | 5 | `00100000` |
+| 6 | 6 | `01000000` |
+| 7 | 7 | `10000000` |
+
+**Printed binary runs bit 7 to bit 0; these physical pixels run bit 0 to bit 7 from top to bottom.** For example, `0x2D`, or `00101101`, lights positions 0, 2, 3, and 5 within its vertical group—the order you practiced inspecting in Phase 2.
+
+Each page needs one byte per column. The toy needs eight bytes for each of its two pages: sixteen bytes altogether. The real 128 × 64 display has **eight pages of 128 bytes**, or 1,024 bytes. A page is eight pixel rows tall, not a single row of pixels.
+
+## Your Turn: Choose a Pixel
+
+Now try the open board. Start with **`(2, 14)`**. Before clicking it, decide: which page contains row 14, which column do you need, and which bit within that eight-light group must turn on? What byte would light just that point in an empty group?
+
+Click the point to check. Then clear the picture, choose Page 1 and column 2 in the controls, and send your predicted byte. Do these two routes make the same picture? Try one more coordinate of your own and explain each choice before checking it.
 
 {{< pixel-memory-toy >}}
 
-### Explore the page boundary
+{{< lesson-exercise number="1" title="What changes at the page boundary?" id="q1-what-changes-at-the-page-boundary" >}}
 
-**Problem:** Click `(3, 0)`, then `(3, 7)`, then `(3, 8)`. Which clicks share a byte? What changes when you cross into row 8?
+Clear the toy. Predict what will happen, then click `(2, 0)`, `(2, 7)`, and `(2, 8)`. Which clicks share a byte? Explain why moving down from row 7 to row 8 changes the vertical group and restarts its bit number.
 
 {{< hints >}}
-- Watch the highlighted byte box as well as the lit pixels.
-- The gap between rows 7 and 8 separates the two pages.
+- The highlighted eight-light group shares one byte.
+- Page 0 ends at row 7. Page 1 starts at row 8.
 {{< /hints >}}
-
 {{< answer >}}
-The first two clicks change byte 3: bit 0 at the top and bit 7 at the bottom. Together they make `10000001`, or `0x81`. Pixel `(3, 8)` starts a new vertical group: Page 1, byte 11, bit 0.
+`(2, 0)` and `(2, 7)` belong to Page 0, column 2, bits 0 and 7. Together they make `10000001`, or `0x81`. `(2, 8)` belongs to Page 1, column 2, bit 0: the first light in a different eight-light group.
 
-Moving down one row can move us into another byte. Moving right one column also selects another byte, but stays in the same page.
+**Moving down the screen advances through bits, then into the next page.** It does not simply advance to a new byte on every row.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-Keep experimenting: draw a letter or a small pattern and watch its bytes change. The important connection is **one pixel → one bit inside one byte**.
+<span id="intermezzo-a-2d-board-in-a-1d-list"></span>
 
-Now scale that idea up. Our real OLED has 128 columns instead of 8, and eight pages instead of two. The vertical groups still contain eight pixels. Let's turn what you saw into a rule that works for any coordinate.
+## Which Index Belongs to This Byte?
 
-## Build the Memory Model
+The toy let us choose a byte with **two numbers: page and column**. For pixel `(2, 14)`, we found Page 1, column 2, bit 6. We even know the one-bit pattern: `01000000`. But to change the picture in Python, we need to know **which `buffer[index]` holds that byte**.
 
-### Start with the screen coordinates
+A **buffer** is memory holding data. For our little display, `bytearray(16)` creates sixteen editable byte slots, numbered 0–15. An **index** is a slot's number. `buffer[2]` selects the third byte, which controls eight pixels; it doesn't select the third pixel.
 
-The OLED is a grid 128 pixels wide and 64 pixels high. We name a pixel with `(x, y)`:
+**So which slot holds Page 1, column 2?** The table above has two rows of eight bytes, but the buffer is one long sequence. We need a rule that turns a position in that table into one index.
 
-- `x` is its column: 0 at the left edge, 127 at the right.
-- `y` is its row: 0 at the top, 63 at the bottom.
+### The Same Question on a Tic-Tac-Toe Board
 
-For example, `(37, 29)` means column 37, row 29. These coordinates describe where the pixel is on the screen. They do not yet tell us where its information is stored.
+A tic-tac-toe board gives us a familiar version of exactly this problem: **how can a row and column locate one entry in a flat list?** Each square holds a mark instead of a byte, but the counting works the same way. We'll work out that count here, then use it for our OLED byte.
 
-### What is the buffer?
-
-A **buffer** is a stretch of memory used to hold data. Here, the data describes the pixels that make up the image. In Python, `bytearray(1024)` creates 1,024 numbered, changeable byte slots, each starting at zero:
-
-```text
-buffer[0], buffer[1], buffer[2], ... buffer[1023]
-```
-
-Each slot stores one byte, a value from 0 through 255. The index tells us which byte slot we mean. It does not mean that one slot stores one screen pixel; the display packs several pixels into a byte.
-
-### One byte holds eight vertical pixels
-
-For the standard MicroPython SSD1306 layout used here, the eight bits of a byte control eight vertically stacked pixels in one screen column. The driver calls this arrangement `MONO_VLSB`: monochrome, vertical, least-significant bit first.
-
-```text
-one screen column         one byte
-row 0  pixel                 bit 0 (D0)
-row 1  pixel                 bit 1 (D1)
-row 2  pixel                 bit 2 (D2)
-row 3  pixel                 bit 3 (D3)
-row 4  pixel                 bit 4 (D4)
-row 5  pixel                 bit 5 (D5)
-row 6  pixel                 bit 6 (D6)
-row 7  pixel                 bit 7 (D7)
-```
-
-Within each group, bit 0 represents the top pixel and bit 7 the bottom. For example, `00000001` turns on the top pixel; `10000000` turns on the bottom one. The binary digits are usually written left-to-right as bit 7 down to bit 0, so the printed order runs opposite to the physical top-to-bottom order.
-
-### What is a page?
-
-A **page** is a horizontal band of eight screen rows. It stretches across the full 128-pixel width. Since one byte represents eight vertical pixels in one column, each column in that band uses one byte:
-
-```text
-Page 0: rows  0–7   → 128 bytes, one byte for each x-column
-Page 1: rows  8–15  → 128 bytes
-Page 2: rows 16–23  → 128 bytes
-Page 3: rows 24–31  → 128 bytes
-  ...
-Page 7: rows 56–63  → 128 bytes
-```
-
-A page is not a separate display or a single row. It is one eight-row-tall strip. The pages are stored consecutively in the buffer:
-
-| Page | Screen rows | Byte indices in the buffer |
-| ---: | --- | --- |
-| 0 | 0–7 | 0–127 |
-| 1 | 8–15 | 128–255 |
-| 2 | 16–23 | 256–383 |
-| 3 | 24–31 | 384–511 |
-| … | … | … |
-| 7 | 56–63 | 896–1023 |
-
-That also checks our memory count: 8 pages × 128 bytes per page = 1,024 bytes.
-
-## Intermezzo: A 2D Board in a 1D List
-
-Before we calculate a byte index, let's practice storing a familiar grid in one long list. Think of a tic-tac-toe board:
+A tic-tac-toe board has three rows and three columns. Here is a Python list of lists:
 
 ```python
 board = [
-    ["X", "O", " "],  # Row 0
-    [" ", "X", " "],  # Row 1
-    ["O", " ", "X"],  # Row 2
+    ["X", "O", " "],
+    [" ", "X", " "],
+    ["O", " ", "X"],
 ]
 ```
 
-This is a **two-dimensional (2D) arrangement**: choose a row, then a column. In Python, we represent it here with a list of lists. `board[1][2]` means row 1, column 2: the middle-right square. Both numbers start at zero. Here the order is **row, column**; screen coordinates use **`(x, y)`**, or column, row.
+`board[1][2]` chooses row 1, column 2: the middle-right square. These indices count from zero. **A list of rows uses row, then column; a screen coordinate `(x, y)` uses column, then row.**
 
-We can keep the same nine squares in a **one-dimensional (1D) list** by storing one whole row after another. This order is called **row-major order**:
+We can store the same nine values in a flat, one-dimensional list by placing complete rows one after another. This is **row-major order**:
 
 ```python
 flat = ["X", "O", " ", " ", "X", " ", "O", " ", "X"]
 ```
 
 ```text
-board position:  (0,0) (0,1) (0,2) | (1,0) (1,1) (1,2) | (2,0) (2,1) (2,2)
-flat index:         0     1     2  |    3     4     5  |    6     7     8
+row:         0       |       1       |       2
+flat index:  0  1  2  |    3  4  5    |    6  7  8
 ```
 
-The bars just mark where each row ends; they do not take up entries. These are two representations of the same board. They are separate Python lists in this example, so changing one will not automatically change the other.
+The bars mark row boundaries; they do not occupy entries. These two Python lists are separate objects, so changing one will not automatically change the other. They show two ways to arrange the same information.
 
-Try finding addresses before writing a formula. Count the squares in complete earlier rows, then move across the current row.
+Try the address game in both directions. Count complete earlier rows, then move across the current one. If you can explain that count, you're ready to write the formula.
 
 {{< grid-index-game >}}
 
-### A: Where is the middle-right square?
+For row 1, column 2, skip one complete row of three entries, then move two positions across: `1 * 3 + 2 = 5`. In general:
 
-**Problem:** Find the flat index for row 1, column 2. Explain every square you skip.
-
-{{< hints >}}
-- One complete row comes before row 1.
-- Each row has three squares; column 2 is two positions past its row's start.
-{{< /hints >}}
-
-{{< answer >}}
-Skip row 0's three squares. Row 1 therefore begins at index 3. Move two positions across:
-
-```text
-earlier rows = 1
-squares per row = 3
-row start = 1 × 3 = 3
-index = 3 + 2 = 5
-```
-
-`board[1][2]` and `flat[5]` describe the same square in the two representations.
-{{< /answer >}}
-
-### B: What is the rule for any width?
-
-**Problem:** Write a rule for the flat index using `row`, `column`, and `width` (the number of columns). Test it on row 2, column 1 of the tic-tac-toe board. Then find row 1, column 3 in a grid four columns wide.
-
-{{< hints >}}
-- The row number counts how many complete rows come first.
-- Multiply that count by the width, then add the column.
-{{< /hints >}}
-
-{{< answer >}}
 ```python
 index = row * width + column
 ```
 
-For the tic-tac-toe board, `2 * 3 + 1 = 7`. Two complete rows use six entries, then we move one position across.
+### Apply That Count to the OLED
 
-For the four-column grid, `1 * 4 + 3 = 7` too. The same index can mean a different position when the width changes. We need the width to interpret the flat list.
-{{< /answer >}}
+Return to our question: **which byte holds Page 1, column 2?** Each page is one row of eight bytes in the toy's table. Count complete earlier pages, then move across to the column:
 
-### C: Can you go backward from an index?
-
-**Problem:** A square is at index 7 in the three-column board. Find its row and column. Then write the general reverse rules.
-
-{{< hints >}}
-- How many complete groups of three fit before index 7?
-- The remainder tells you how far across the next row to move.
-{{< /hints >}}
-
-{{< answer >}}
 ```text
-7 = 2 × 3 + 1
-row = 7 // 3 = 2
-column = 7 % 3 = 1
+1 earlier page × 8 bytes per page = 8 bytes to skip
+8 + column 2 = index 10
 ```
 
-In general:
+So `buffer[10]` is the byte we need. We used the same count as for the board; only the row name and width changed:
 
-```python
-row = index // width
-column = index % width
-```
-
-Integer division finds the complete rows. The remainder finds the position within the row.
-{{< /answer >}}
-
-### D: How does the board connect to OLED pages?
-
-**Problem:** Imagine the tiny Lite-Brite's bytes as a table with two page rows and eight columns. Which flat byte index holds Page 1, column 2? Is that entry a single pixel?
-
-{{< hints >}}
-- Replace the board's row number with the page number.
-- One complete page comes first, containing eight bytes.
-- Each byte still holds eight vertical pixels.
-{{< /hints >}}
-
-{{< answer >}}
-```text
-page start = 1 × 8 = 8
-byte index = 8 + 2 = 10
-```
-
-This is byte 10. It holds the eight pixels in column 2, rows 8–15. It does not identify just one pixel yet; we still need a bit inside the byte.
-
-Pixel `(2, 14)` is in this group: `14 // 8 = 1` gives its page and `14 % 8 = 6` gives its bit. On the eight-column toy, that pixel is **byte 10, bit 6**.
-{{< /answer >}}
-
-## Back to the OLED: Find the Pixel
-
-Think of the real OLED's bytes as a table with **8 page rows and 128 columns**. The actual buffer is flat, just like `flat` above:
-
-| Board idea | OLED byte-layout idea |
+| Tic-tac-toe list | OLED byte buffer |
 | --- | --- |
 | Row | Page |
-| Column | `x` |
-| Squares per row | Bytes per page, equal to the display width |
-| One square's value | One byte holding eight vertical pixels |
+| Three entries per row | One byte per column: eight per page in the toy |
+| A square's mark | A byte holding eight vertical pixels |
 | `row * width + column` | `page * width + x` |
 
-The page chooses a group of eight screen rows. After finding the byte, we choose a bit to locate one pixel within that group. A page row in this byte table is **not** a single row of screen pixels.
+**One table row is a whole page of bytes, not one row of pixels.** That's the important difference between our two grids. The real display uses the same rule with 128 bytes per page.
 
-### From `(x, y)` to page, byte, and bit
+### Work Backward from an Index
 
-Now each part of the mapping has a meaning:
+We can reverse the same count too. This will help us identify the pixels belonging to a byte later in the lesson.
 
-1. Divide `y` by 8 to find which page contains that row.
-2. The remainder after dividing `y` by 8 is the bit position inside the byte.
-3. Each page uses `width` bytes, so skip `page * width` bytes, then move `x` bytes across that page.
-4. Shift a `1` left by the bit number to make a mask for that pixel.
+To go backward, divide the index into complete groups of `width`. For nonnegative indices, **integer division `//`** gives the number of complete groups; **modulo `%`** gives the remainder:
 
-That gives us four expressions:
+```text
+7 = 2 × 3 + 1
+7 // 3 = 2 complete rows
+7 % 3 = 1 position across
+```
+
+So `row = index // width` and `column = index % width`.
+
+{{< lesson-exercise number="2" title="Can the same index describe a different square?" id="q2-can-the-same-index-describe-a-different-square" >}}
+
+In the three-column board, which row and column contain index 7? Now imagine a grid four columns wide. Where is index 7 in that grid? Check both answers with the forward formula and explain why the width matters.
+
+{{< hints >}}
+- Separate the index into complete rows and a remainder.
+- For width 4, write `7 = row * 4 + column`.
+{{< /hints >}}
+{{< answer >}}
+| Width | Row | Column | Forward check |
+| ---: | ---: | ---: | --- |
+| 3 | `7 // 3 = 2` | `7 % 3 = 1` | `2 * 3 + 1 = 7` |
+| 4 | `7 // 4 = 1` | `7 % 4 = 3` | `1 * 4 + 3 = 7` |
+
+**An index only tells us a grid position when we also know the layout and width.** The flat list itself has no drawn row boundaries.
+{{< /answer >}}
+{{< /lesson-exercise >}}
+
+<span id="back-to-the-oled-find-the-pixel"></span>
+
+## From a Pixel to Its Byte and Bit
+
+We can now turn a page and column into an index. A pixel coordinate gives us `x` and `y` instead, so there is one more question: **which page contains row `y`, and which bit controls that row within the page?**
+
+Divide `y` into eight-row groups. The quotient is the page; the remainder is the bit position. Combine that with the index rule we just learned:
 
 ```python
 page = y // 8
@@ -267,502 +210,209 @@ index = page * width + x
 mask = 1 << bit
 ```
 
-The standard display in this lesson is 128 pixels wide, so `width` is 128. Using the name `width` makes clear what that number means and lets the same formula work for another display width.
+Put all the steps together for **`(2, 14)` on the eight-column toy**. We should recover the byte index 10 we found above:
 
-### Walk through `(37, 29)` once
+1. Row 14 lies in Page 1, which covers rows 8–15: `14 // 8 = 1`.
+2. Its offset inside that page is `14 - 8 = 6`, also `14 % 8 = 6`.
+3. Skip Page 0's eight bytes: `1 * 8 = 8`.
+4. Move to column 2: `8 + 2 = 10`.
+5. Select bit 6: `1 << 6 = 0b01000000 = 0x40 = 64`.
 
-The row is `y = 29`. Page 3 covers rows 24 through 31, so row 29 is in Page 3. It is the sixth row of that page when counting from zero:
+The pixel is **byte 10, bit 6**. That byte holds all eight pixels in column 2, rows 8–15; the mask selects just one of them. Find it in the toy to check every part of the calculation.
 
-```text
-page = 29 // 8 = 3
-bit  = 29 % 8  = 5
-```
+{{< lesson-exercise number="3" title="Scale the address up to the real screen" id="q3-scale-the-address-up-to-the-real-screen" >}}
 
-Page 3 starts after three complete pages. Each page has 128 bytes, and column 37 is 37 bytes from the start of the page:
-
-```text
-index = 3 * 128 + 37 = 421
-mask  = 1 << 5 = 00100000 = 0x20
-```
-
-So the answer to our driving question is: change bit 5 of `buffer[421]`. We have not changed the display yet; we have only located the pixel's stored bit. The questions below give you practice deriving and using each part of this model.
-
-## Check the Model
-
-### Q1: Does the buffer size tell us a pixel's address?
-
-**Problem:** We know the display image needs 1,024 bytes. Does that number alone tell us which byte holds pixel `(37, 29)`? What other parts of the memory model do we need?
+{{< exercise-step "predict" >}}
+For width 128 and height 64, locate pixel `(37, 29)`. Find its page, bit, byte index, and mask. Explain which complete pages you skip.
+{{< /exercise-step >}}
+{{< exercise-step "try" >}}
+Write the four calculations in the starter and print the results. Do not use the toy's width of eight for this problem.
+{{< /exercise-step >}}
+{{< exercise-step "explain" >}}
+Would changing only the display width change the page and bit, or the byte index? Why?
+{{< /exercise-step >}}
 
 {{< hints >}}
-- The size tells us how many byte slots are available.
-- We also need to know what a byte represents and how the screen is divided into pages.
+- `29 = 3 * 8 + 5` tells you the page and position inside it.
+- Three complete pages come before Page 3. Each contains 128 bytes.
+- Make the mask from the bit position, not from `y` itself.
 {{< /hints >}}
-
 {{< answer >}}
-No. The size tells us the buffer's capacity, not the meaning of each index. To locate a pixel, we need the page layout, the column's byte position within that page, and the bit's position inside that byte. The model above supplies those missing connections.
-{{< /answer >}}
-
-## One Byte, Eight Vertical Pixels
-
-### Q2: What part of the screen does one byte represent?
-
-**Problem:** A byte has eight bits. Sketch the group of screen pixels represented by one byte in this display layout.
-
-{{< hints >}}
-- The SSD1306 groups pixels vertically, not horizontally.
-- Picture one column, eight pixels tall.
-{{< /hints >}}
-
-{{< answer >}}
-One byte controls eight vertically stacked pixels in a single screen column. For the orientation used here, D0 is the top pixel and D7 is the bottom:
-
-```text
-screen column       byte bits
-    pixel             D0
-    pixel             D1
-    pixel             D2
-    pixel             D3
-    pixel             D4
-    pixel             D5
-    pixel             D6
-    pixel             D7
-```
-
-So one byte represents one column across an eight-pixel-high strip.
-{{< /answer >}}
-
-### Q3: What do `00000001` and `10000000` look like?
-
-**Problem:** For each byte, identify which of its eight vertical pixels is on.
-
-{{< hints >}}
-- The rightmost digit is bit 0; the leftmost is bit 7.
-- Bit 0 is at the top of this group, and bit 7 is at the bottom.
-{{< /hints >}}
-
-{{< answer >}}
-`00000001` sets only bit 0, so the top pixel is on. `10000000` sets only bit 7, so the bottom pixel is on:
-
-```text
-00000001       10000000
-D0  ●          D0  ○
-D1  ○          D1  ○
-D2  ○          D2  ○
-D3  ○          D3  ○
-D4  ○          D4  ○
-D5  ○          D5  ○
-D6  ○          D6  ○
-D7  ○          D7  ●
-```
-
-Binary is written from bit 7 on the left to bit 0 on the right, while physical pixels run from D0 at the top to D7 at the bottom. Keep the direction straight.
-{{< /answer >}}
-
-### Q4: Decode `0x2D` as a vertical pattern.
-
-**Problem:** Convert `0x2D` to binary, then list which of the eight pixels are on from top to bottom.
-
-{{< hints >}}
-- Convert each hex digit separately: `2` is `0010` and `D` is `1101`.
-- The rightmost bit, D0, is the top pixel.
-{{< /hints >}}
-
-{{< answer >}}
-`0x2D` is `0010 1101`. Read the bits from D0 upward to get the physical pattern:
-
-```text
-D0  1  ●
-D1  0  ○
-D2  1  ●
-D3  1  ●
-D4  0  ○
-D5  1  ●
-D6  0  ○
-D7  0  ○
-```
-
-From top to bottom: on, off, on, on, off, on, off, off.
-{{< /answer >}}
-
-## Divide the Screen into Pages
-
-### Q5: How many pages fit on a 64-pixel-high display?
-
-**Problem:** Each byte represents eight vertical pixels. How many eight-pixel groups fit in a display that is 64 pixels tall?
-
-{{< hints >}}
-- Divide the display height by the height represented by one byte.
-- Each group is called a page.
-{{< /hints >}}
-
-{{< answer >}}
-`64 ÷ 8 = 8`, so the screen has eight pages. A page is a memory-layout group, not a separate screen:
-
-| Page | Rows |
-| --- | --- |
-| 0 | 0–7 |
-| 1 | 8–15 |
-| 2 | 16–23 |
-| 3 | 24–31 |
-| 4 | 32–39 |
-| 5 | 40–47 |
-| 6 | 48–55 |
-| 7 | 56–63 |
-{{< /answer >}}
-
-### Q6: How many bytes are in one page?
-
-**Problem:** A page is 128 pixels wide and eight pixels tall. If one byte controls eight vertical pixels in one column, how many bytes does a page need? Check that all pages account for the whole buffer.
-
-{{< hints >}}
-- Count the columns across one page.
-- There is one byte for each column.
-{{< /hints >}}
-
-{{< answer >}}
-There are 128 columns, so a page needs 128 bytes. Across eight pages:
-
-```text
-8 pages × 128 bytes = 1,024 bytes
-```
-
-That matches our original framebuffer size. The two ways of counting the memory agree.
-{{< /answer >}}
-
-## Find a Page and Bit from `y`
-
-### Q7: Which page contains row `y`?
-
-**Problem:** Page 0 contains rows 0–7, Page 1 contains rows 8–15, and so on. Find a rule that maps `y` to a page, then test `y = 3, 8, 19, 29, 63`.
-
-{{< hints >}}
-- Each page contains eight rows.
-- Integer division discards the remainder.
-{{< /hints >}}
-
-{{< answer >}}
-Use integer division:
-
-```python
-page = y // 8
-```
-
-The examples are `3 // 8 = 0`, `8 // 8 = 1`, `19 // 8 = 2`, `29 // 8 = 3`, and `63 // 8 = 7`. The result tells us which eight-row group contains the pixel.
-{{< /answer >}}
-
-### Q8: Which bit within that page represents row `y`?
-
-**Problem:** Row 29 is in Page 3. Find an operation that gives its position, from 0 through 7, inside that page.
-
-{{< hints >}}
-- Subtracting the page's first row would work.
-- The remainder after division by 8 gives the same result.
-{{< /hints >}}
-
-{{< answer >}}
-Use modulo:
-
-```python
-bit = y % 8
-```
-
-For `y = 29`, `29 % 8 = 5`. So row 29 uses bit 5 in a byte on Page 3. Integer division finds the group; modulo finds the position inside it.
-{{< /answer >}}
-
-### Q9: Calculate the page and bit for several rows.
-
-**Problem:** Without code, find `page = y // 8` and `bit = y % 8` for `y = 0, 7, 8, 15, 16, 37, 63`.
-
-{{< hints >}}
-- Divide each row by 8; the quotient is the page.
-- The remainder is the bit position.
-{{< /hints >}}
-
-{{< answer >}}
-| `y` | Page | Bit |
-| ---: | ---: | ---: |
-| 0 | 0 | 0 |
-| 7 | 0 | 7 |
-| 8 | 1 | 0 |
-| 15 | 1 | 7 |
-| 16 | 2 | 0 |
-| 37 | 4 | 5 |
-| 63 | 7 | 7 |
-
-Notice the boundary: row 7 is the last bit of Page 0; row 8 starts Page 1 at bit 0.
-{{< /answer >}}
-
-## Find the Byte from Page and `x`
-
-### Q10: Where does Page 3 begin in the buffer?
-
-**Problem:** Each page contains 128 bytes. What is the index of the first byte in Page 3?
-
-{{< hints >}}
-- Pages 0, 1, and 2 come before Page 3.
-- Multiply the number of earlier pages by 128.
-{{< /hints >}}
-
-{{< answer >}}
-Three complete pages come first: `3 × 128 = 384`. Page 3 begins at `buffer[384]`. In general, `page_start = page * 128`.
-{{< /answer >}}
-
-### Q11: Which byte in Page 3 represents column 37?
-
-**Problem:** Page 3 begins at byte 384. Each column uses one byte. Find the buffer index for column `x = 37` on that page.
-
-{{< hints >}}
-- Column 0 is the first byte in the page.
-- Add the column number to the page's starting index.
-{{< /hints >}}
-
-{{< answer >}}
-`384 + 37 = 421`, so `buffer[421]` stores the eight-pixel group in column 37 on Page 3.
-{{< /answer >}}
-
-### Q12: Solve the original coordinate problem.
-
-**Problem:** Find the page, bit, buffer index, and bit mask for pixel `(37, 29)`.
-
-{{< hints >}}
-- Use `page = y // 8` and `bit = y % 8`.
-- A page has 128 bytes; add `x` to its starting index.
-- The mask is a 1 shifted left by the bit number.
-{{< /hints >}}
-
-{{< answer >}}
-For `x = 37` and `y = 29`:
-
 ```text
 page  = 29 // 8 = 3
-bit   = 29 % 8  = 5
-index = 3 × 128 + 37 = 421
-mask  = 1 << 5 = 00100000 = 0x20
+bit   = 29 % 8 = 5
+index = 3 * 128 + 37 = 384 + 37 = 421
+mask  = 1 << 5 = 0b00100000 = 0x20 = 32
 ```
 
-Therefore pixel `(37, 29)` is controlled by bit 5 of `buffer[421]`.
+Page 3 covers rows 24–31. Row 29 is five steps below its first row, so it uses bit 5. The byte index depends on width because width determines how many bytes each earlier page occupies. Page and bit depend only on `y`.
+
+**First choose the vertical group, then its column byte, then the bit within it.** Capacity alone—“1,024 bytes”—would not tell us this mapping.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-## Change Pixels in Raw Memory
+## Change a Pixel Without Erasing Its Neighbors
 
-Using VS Code with MicroPico? Read the [Python-session note in Phase 4](/post/the-frame-buffer/#keep-your-python-session) before switching between running a file and entering commands at `>>>`. It explains how to keep names such as `buffer` available during experiments. This phase's raw-memory starter still needs no OLED or driver.
-
-### Q13: How do you turn this pixel on without changing its neighbors?
-
-**Problem:** The target is bit 5 of `buffer[421]`. Write the operation that sets it while preserving the other seven bits.
-
-{{< hints >}}
-- Build a mask with one 1 at bit 5.
-- OR preserves a bit when the mask has 0 and sets it when the mask has 1.
-{{< /hints >}}
-
-{{< answer >}}
-Use the mask with OR:
+The starter's `buffer` is a `bytearray`. Read a byte with `buffer[index]`, and assign a new byte value to change it. Use the Phase 2 masks when you want to preserve neighboring pixels:
 
 ```python
+buffer[index] |= mask   # Set the selected bit.
+buffer[index] &= ~mask  # Clear the selected bit.
+```
+
+For valid byte values and bit positions 0–7, these expressions stay in the range 0–255. If you intend to keep only the lowest eight bits of a larger integer, calculate `value & 0xFF` explicitly, as in Phase 2. That makes the operation clear and keeps our code independent of how a particular Python runtime handles out-of-range assignments.
+
+{{< lesson-exercise number="4" title="Why did the neighboring pixel disappear?" id="q4-why-did-the-neighboring-pixel-disappear" >}}
+
+On the 128-wide display, pixel `(37, 30)` is already on. Start with `buffer[421] = 0b01000000`. You also want `(37, 29)` on. A friend writes `buffer[421] = 1 << 5`.
+
+Predict both pixels' states after that assignment. Repair it so both pixels remain on, then print the resulting byte in hex. Which Phase 2 rule explains the repair?
+
+{{< hints >}}
+- Rows 29 and 30 are in the same page and column, at bits 5 and 6.
+- Plain assignment replaces the whole byte. OR can preserve its other bits.
+{{< /hints >}}
+{{< answer >}}
+The assignment replaces `01000000` with `00100000`, turning off bit 6. Instead:
+
+```python
+buffer[421] = 0b01000000
 buffer[421] |= 1 << 5
+print(hex(buffer[421]))  # 0x60: 01100000
 ```
 
-The mask is `00100000`. OR sets bit 5 and leaves every other bit unchanged.
+**A byte is shared by eight pixels.** Knowing the right address is only half the job; the update must preserve the seven bits you did not select.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q14: Can you derive the general set-pixel operation?
+## Work Backward and Check Boundaries
 
-**Problem:** Replace 37 and 29 with arbitrary coordinates `x` and `y`. Write the expressions for page, bit, index, and mask, then turn the pixel on.
+The reverse map first recovers a page and column from the byte index, just as we recovered a row and column from a flat-list index:
+
+```python
+page = index // width
+x = index % width
+y = page * 8 + bit
+```
+
+For example, byte 135, bit 2 on a 128-wide screen gives `page = 1`, `x = 7`, and `y = 1 * 8 + 2 = 10`.
+
+Valid screen coordinates are `0 <= x < width` and `0 <= y < height`. Check those **before** calculating and writing an address. Python allows negative list and bytearray indices to count from the end, and an out-of-screen `x` can even produce an in-range index in the wrong page. An address being in the buffer does not prove the original coordinate was on screen.
+
+<hr class="lesson-review-divider">
+
+## Homework
+
+### Explain yourself
+
+Explain each term before checking it. Sketch a board, its flat list, and one OLED page. Which parts of the grid-to-list idea carry over? Which extra step does a byte of vertical pixels require?
+
+<span id="glossary"></span>
+
+{{< reveal-controls scope="glossary" >}}
+{{< recall-glossary data="phase3_glossary" >}}
+
+### Exercises
+
+Try these from the memory model before returning to the formulas. ★ Challenging · ★★ Very challenging.
+
+{{< lesson-exercise number="5" level="4" title="Check all four corners" id="q5-check-all-four-corners" >}}
+
+For width 128 and height 64, find the byte and bit for all four screen corners. Starting with the empty starter buffer, turn on those four pixels using raw byte edits. Print the four byte values and explain why the last corner fits inside a 1,024-byte buffer.
 
 {{< hints >}}
-- The row `y` determines both the page and the bit.
-- The column `x` selects a byte within that page.
-- Combine the index and mask with OR.
+- Use the first and last valid coordinates from Phase 1.
+- The top corners use bit 0; the bottom corners use bit 7.
+- The last valid byte index is one less than the length.
 {{< /hints >}}
-
 {{< answer >}}
-The coordinate mapping is:
+| Coordinate | Page | Byte index | Bit |
+| --- | ---: | ---: | ---: |
+| `(0, 0)` | 0 | 0 | 0 |
+| `(127, 0)` | 0 | 127 | 0 |
+| `(0, 63)` | 7 | 896 | 7 |
+| `(127, 63)` | 7 | 1023 | 7 |
 
 ```python
-page = y // 8
-bit = y % 8
-index = page * 128 + x
-mask = 1 << bit
-
-buffer[index] |= mask
+buffer[0] |= 1 << 0
+buffer[127] |= 1 << 0
+buffer[896] |= 1 << 7
+buffer[1023] |= 1 << 7
+print(buffer[0], buffer[127], buffer[896], buffer[1023])  # 1 1 128 128
 ```
 
-That is the core logic behind drawing a pixel. A full function should also check that the coordinates are inside the display.
+Byte 1023 is the final slot, not one past it.
+
+**Boundary cases check whether the coordinate model and storage model agree.** These commands prepare data; they do not display it.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q15: How can the code support a different display width?
+{{< lesson-exercise number="6" level="4" title="Decode a byte back into pixels" difficulty="1" id="q6-decode-a-byte-back-into-pixels" >}}
 
-**Problem:** The expression `index = page * 128 + x` assumes the display is always 128 pixels wide. Rewrite it so the mapping can use a width supplied by the program.
+An **eight-column, sixteen-row** picture has only byte 10 set to `0x41`; all other bytes are zero. Without using the toy first, find every lit pixel's `(x, y)`. Then draw your prediction in the toy and check its byte values. What would byte 10 mean on a 128-wide screen instead?
 
 {{< hints >}}
-- Every page contains one byte per horizontal column.
-- The number of columns is the page's byte length.
+- Split byte index 10 into complete pages of eight bytes and a column remainder.
+- `0x41` is `01000001`: two bits are on.
+- Rebuild `y` from the page's first row and the bit position.
 {{< /hints >}}
-
 {{< answer >}}
-Use `width` instead of the literal `128`:
+For width 8, `page = 10 // 8 = 1` and `x = 10 % 8 = 2`. Bits 0 and 6 are on, so the pixels are `(2, 8)` and `(2, 14)`.
 
-```python
-index = page * width + x
+For width 128, byte 10 is on Page 0 at column 10, so the same byte value would light `(10, 0)` and `(10, 6)`.
 
-def set_pixel(buffer, x, y, width):
-    page = y // 8
-    bit = y % 8
-    index = page * width + x
-    buffer[index] |= 1 << bit
-```
-
-This version focuses on the mapping. A robust version should also validate the coordinates and buffer dimensions.
+**Byte values describe a pattern; the layout tells us where that pattern belongs.** Width is part of interpreting the memory.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q16: How do you turn a pixel off?
+{{< lesson-exercise number="7" level="4" title="Build a pixel writer that respects the edges" difficulty="2" id="q7-build-a-pixel-writer-that-respects-the-edges" >}}
 
-**Problem:** Write an operation that clears only the selected pixel and preserves the other seven bits in its byte.
+Write `write_pixel(buffer, width, height, x, y, on)` to set or clear one pixel while preserving its neighbors. Return `False` without editing memory if the coordinate is outside the screen; otherwise update the byte and return `True`. Assume integer coordinates, a positive width, a height divisible by eight, and a buffer of the matching size.
+
+Test two neighboring bits, clearing one, and rejecting `(-1, 0)` and `(128, 0)` on the real display's dimensions. Also test `(2, 14)` in a separate 8 × 16 buffer. Explain why checking only the resulting index would miss some bad coordinates.
 
 {{< hints >}}
-- First make the same one-bit mask.
-- Invert the mask, then use AND to preserve every other bit.
+- Check both coordinate ranges first; an early `return False` ends the function before any edit.
+- Use the supplied width when skipping complete pages.
+- Set with OR, clear with AND and an inverted mask.
 {{< /hints >}}
-
 {{< answer >}}
-Clear the selected bit with:
-
 ```python
-buffer[index] &= ~(1 << bit)
-```
-
-A combined function can select whether to set or clear it:
-
-```python
-def set_pixel(buffer, x, y, width, on):
+def write_pixel(buffer, width, height, x, y, on):
+    if not (0 <= x < width and 0 <= y < height):
+        return False
     page = y // 8
     bit = y % 8
     index = page * width + x
     mask = 1 << bit
-
     if on:
         buffer[index] |= mask
     else:
         buffer[index] &= ~mask
+    return True
+
+write_pixel(buffer, 128, 64, 37, 29, True)
+write_pixel(buffer, 128, 64, 37, 30, True)
+write_pixel(buffer, 128, 64, 37, 29, False)
+print(buffer[421])  # 64: only bit 6 remains on
+print(write_pixel(buffer, 128, 64, -1, 0, True))   # False
+print(write_pixel(buffer, 128, 64, 128, 0, True))  # False
+
+tiny = bytearray(16)
+write_pixel(tiny, 8, 16, 2, 14, True)
+print(tiny[10])  # 64
 ```
 
-Python integers can be wider than a byte, but assignment back into a `bytearray` stores the result as one byte.
+Without checking `x`, `(128, 0)` would produce index 128, a valid byte that belongs to another page. Negative indices can silently refer to the end of the buffer.
+
+**A reusable drawing operation combines representation, masking, and a clear rule for invalid inputs.** This is a small piece of the graphics machinery we will eventually investigate.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q17: Do the four corners fit in the buffer?
+## What's next {#next-the-frame-buffer}
 
-**Problem:** For a 128 × 64 screen, find the byte index and bit for `(0, 0)`, `(127, 0)`, `(0, 63)`, and `(127, 63)`.
+You can now connect a coordinate to a stored bit and edit it deliberately. Phase 1 showed that drawing and displaying happen separately; Phase 4 will connect that observation to the exact bytes you just learned to change. **Where do those bytes wait, and what does `show()` actually send?**
 
-{{< hints >}}
-- The first row is Page 0, bit 0.
-- The last row is Page 7, bit 7.
-- Check that the last byte index is one less than the buffer length.
-{{< /hints >}}
+[Continue to Phase 4: The Frame Buffer →](/post/the-frame-buffer/) · [Back to Phase 2 ←](/post/pictures-as-data/) · [Project roadmap](/post/pico-oled-project/)
 
-{{< answer >}}
-| Coordinate | Page | Bit | Byte index |
-| --- | ---: | ---: | ---: |
-| `(0, 0)` | 0 | 0 | 0 |
-| `(127, 0)` | 0 | 0 | 127 |
-| `(0, 63)` | 7 | 7 | 896 |
-| `(127, 63)` | 7 | 7 | 1023 |
-
-The last coordinate lands in byte 1023, the final byte of a 1,024-byte buffer. The boundaries line up.
-{{< /answer >}}
-
-### Q18: Can you recover a coordinate from a byte and bit?
-
-**Problem:** A pixel is stored at `buffer[421]`, bit 5. Recover its `(x, y)` coordinate on a 128-pixel-wide display.
-
-{{< hints >}}
-- Divide the byte index by the page width to find the page.
-- The remainder is the column within that page.
-- Convert the page and bit back into a row.
-{{< /hints >}}
-
-{{< answer >}}
-Work backward:
-
-```text
-page = 421 // 128 = 3
-x = 421 % 128 = 37
-y = page * 8 + bit = 3 * 8 + 5 = 29
-```
-
-So the coordinate is `(37, 29)`. The byte index records page and column; the bit records the row within that page.
-{{< /answer >}}
-
-## Put the Mapping Together
-
-### Q19: What changes inside the bytearray?
-
-**Problem:** Start with `buffer = bytearray(1024)`. Set pixel `(37, 29)`, then clear pixel `(37, 30)`. What is the final value of `buffer[421]`?
-
-{{< hints >}}
-- Pixel `(37, 29)` is bit 5 of byte 421; `(37, 30)` is bit 6 of that same byte.
-- Set bit 5, then clear bit 6 without changing the others.
-{{< /hints >}}
-
-{{< answer >}}
-Setting bit 5 gives `00100000`. Clearing bit 6 leaves it unchanged because bit 6 was already off:
-
-```python
-buffer[421] |= 1 << 5
-buffer[421] &= ~(1 << 6)
-```
-
-The final byte is `00100000`, or `0x20`. We have changed the image data in the Pico's memory. We have not yet explained how that memory reaches the physical screen; that is the next phase.
-{{< /answer >}}
-
-### Q20: How does `(x, y)` become one changed pixel?
-
-**Problem:** Explain how a screen coordinate leads to a byte and a bit, then give the operation that turns that pixel on.
-
-{{< hints >}}
-- `y` chooses the page and position within that page.
-- `x` selects the byte within the page.
-- A one-bit mask changes just the target pixel.
-{{< /hints >}}
-
-{{< answer >}}
-For this page-organized display:
-
-```python
-page = y // 8
-bit = y % 8
-index = page * width + x
-mask = 1 << bit
-buffer[index] |= mask
-```
-
-The page locates a group of eight rows. The index locates the byte for column `x` within that page. The bit selects one row inside that byte. For `(37, 29)` on a 128 × 64 display, that gives byte 421 and bit 5.
-{{< /answer >}}
-
-## Next: The Frame Buffer
-
-We can now translate coordinates into bytes and bits, then change that data in a `bytearray`. But the bytes we changed live in the Pico's RAM. Why doesn't a call such as `text()` immediately change the physical screen? What does `show()` do with the frame waiting in memory?
-
-That is [Phase 4: **The Frame Buffer**](/post/the-frame-buffer/). We will follow a drawing operation from the Pico's RAM to the display and learn why drawing and displaying are separate steps.
-
-[Back to Phase 2: Pictures as Data ←](/post/pictures-as-data/)
-
-## Glossary
-
-| Term | Definition | Example |
-| --- | --- | --- |
-| Coordinate | A screen location written `(x, y)`, with `x` across and `y` down. | `(37, 29)` means column 37, row 29. |
-| Buffer | A region of memory holding the display's pixel data. | `bytearray(1024)` creates 1,024 editable byte slots. |
-| 2D arrangement | Values located by a row and a column. | `board[1][2]` selects row 1, column 2 in a list of lists. |
-| Flat (1D) list | Values located by one index. | `flat[5]` selects the sixth entry. |
-| Row-major order | Store a complete row, then the next row. | `index = row * width + column`. |
-| Byte | Eight bits; in this layout, one byte stores eight vertical pixels in one column. | `0b00100000` turns on the pixel at bit 5 in that group. |
-| Page | A horizontal band eight pixels tall. | Page 3 contains rows 24 through 31. |
-| Page number | The eight-row group containing row `y`. | `29 // 8` gives page 3. |
-| Bit position | The row's position within its page, numbered 0 through 7. | `29 % 8` gives bit 5. |
-| Byte index | The position of a byte in the buffer, starting at zero. | For `(37, 29)`, `3 * 128 + 37` is index 421. |
-| Integer division (`//`) | Division that keeps the whole-number quotient. | `29 // 8` is `3`. |
-| Modulo (`%`) | The remainder after division. | `29 % 8` is `5`. |
-| Bit mask | A value with a selected bit used to change or test that position. | `1 << 5` creates `00100000`. |
-| Bitwise OR (`\|=`) | Sets selected bits while preserving the other bits. | `buffer[421] |= 1 << 5` turns on bit 5. |
-| `MONO_VLSB` | A monochrome layout packed vertically, with the least-significant bit at the top of each group. | Bit 0 represents the top pixel; bit 7 the bottom. |
+For reference: [MicroPython's description of the `MONO_VLSB` layout](https://docs.micropython.org/en/v1.26.0/library/framebuf.html#framebuf.MONO_VLSB).

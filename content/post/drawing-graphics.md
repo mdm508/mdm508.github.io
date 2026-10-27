@@ -2,96 +2,75 @@
 title: "Phase 5: Drawing Graphics — Shapes, Scenes, and Animation"
 date: 2026-10-25T09:00:00-07:00
 draft: false
-description: "Draw pixels, lines, rectangles, and text on a Pico OLED, assemble a scene, then animate it by preparing and displaying successive frames."
+description: "Place shapes and character cells precisely, compose a complete scene, and animate it by preparing and sending successive frames."
 tags: ["python", "micropython", "raspberry-pi-pico", "electronics", "animation"]
-summary: "Build a scene from simple drawing commands, then explore motion, trails, screen boundaries, and timing in a frame-by-frame animation lab."
+summary: "Connect counts to coordinates, place neighboring characters, and turn a scene function into a finite animation."
 reading_time: 90
+toc_depth: 3
 ---
 
-Part of the [Pico OLED project: start here and see all phases](/post/pico-oled-project/).
+<aside class="lesson-context" aria-label="Related guides">Part of the <a href="/post/pico-oled-project/">Pico OLED project: guide and lesson roadmap</a>. Previously: <a href="/post/the-frame-buffer/">Phase 4: The Frame Buffer</a>.</aside>
 
-## Where This Lesson Fits
+You can prepare an image, inspect its bytes, and choose when to show it. Now let's build a scene and make part of it move. **The pixels stay fixed; the pictures change.** We'll use simple drawing tools, precise coordinates, and one changing value to create that effect.
 
-In [Phase 3](/post/pages-and-display-memory/), we mapped a coordinate to a byte and a bit. In [Phase 4](/post/the-frame-buffer/), we separated drawing in Pico RAM from sending that image with `show()`.
+## What You Will Be Able to Do
 
-Now we can build something with those ideas. **How do a few drawing commands become a scene—and how does a sequence of scenes become movement?**
+- Distinguish an ending coordinate from a size, and calculate the last fitting position.
+- Lay out text using 8 × 8 character cells, including two directly adjacent characters.
+- Use a function to rebuild a complete scene from its current state.
+- Animate it with a finite draw–show–pause loop and explain its bounds and timing.
 
-Today's goal is to assemble one complete picture, then change one part of it across several frames. We will keep using the supplied driver. Opening its classes is Phase 6.
+## Get Ready
+
+{{< download "/downloads/pico/phase-5-graphics-lab.py" "Download the Phase 5 graphics lab" >}}. Only setup runs; write your experiments below it. Keep `ssd1306.py` in the **same folder on the Pico**, using the [Phase 1 kit](/downloads/pico/phase-1-kit.zip) if needed. Wiring remains GP0 → SDA, GP1 → SCL, 3V3(OUT) → VCC, GND → GND.
+
+Run the whole file on the Pico through Thonny or MicroPico in VS Code. Keep setup, replace earlier drawing experiments, and keep any function a later problem uses. Our loops finish by themselves. You do not need `input()` or a session that preserves names between runs.[^vscode-session]
+
+Without the hardware, use the animation model and calculate layouts on paper. Your Python functions and loops are the same ones you will use on the Pico.
+
+[^vscode-session]: **Optional, for VS Code users:** If you choose to experiment at `>>>` and names such as `oled` are unavailable, see [Phase 4's grey Python-session note](/post/the-frame-buffer/#keep-your-python-session). Whole-file runs do not require that setting.
 
 ## Start with One Moving Shape
 
-A **frame** is one complete still image. In an animation, we display successive frames with small changes between them. A square can appear to move right when we turn off its old pixels and light pixels farther right in the next image.
+An **animation** displays successive frames with changes between them. Step through three frames in the toy with clearing enabled. Reset, turn clearing off, and repeat. Old square pixels remain in the second version, forming a **trail**. Drawing a new position does not automatically erase the old one.
 
-Try stepping through those images before writing a loop. The toy sends each frame for you; its code panel shows the drawing commands that produced the current picture.
+The toy prepares and sends each frame for you. Its code panel shows the calls used for the current picture; we'll learn those tools next.
 
 {{< graphics-animation-lab >}}
 
-### Q1: What makes a trail?
-
-**Problem:** Step through three frames with clearing enabled. Reset, turn clearing off, and repeat. What stays in the second version's memory?
-
-{{< hints >}}
-- Drawing the next square does not automatically erase the previous one.
-- `fill(0)` removes old pixels from the prepared image.
-{{< /hints >}}
-
-{{< answer >}}
-With clearing enabled, each frame contains only the square at its current position. Without clearing, pixels from earlier squares remain. Overlapping positions build a trail.
-
-The trail is part of the picture stored in RAM. Every `show()` sends that accumulated picture.
-{{< /answer >}}
-
-## Get Ready on the Pico
-
-{{< download "/downloads/pico/phase-5-graphics-lab.py" "Download the Phase 5 graphics lab" >}}. **Only setup is executable**; the rest contains instructions for code you write yourself. The lesson link is at the top.
-
-Keep `ssd1306.py` in the **same folder on the Pico** as the lab file. Upload the driver from the [Phase 1 kit](/downloads/pico/phase-1-kit.zip) if needed. Use the same wiring as before.
-
-Run setup using MicroPico in VS Code or Thonny. Enter short experiments at the Pico's `>>>` prompt or Thonny's Shell. Write complete functions and animation loops in the lab file, then run the file with setup. Our loops will finish by themselves.
-
-In VS Code, first read the [grey Python-session note in Phase 4](/post/the-frame-buffer/#keep-your-python-session). It explains how to keep names such as `oled` available after running setup. No `input()` pauses are needed here.
-
 ## Learn the Drawing Tools
 
-A **drawing primitive** is a basic operation we can combine with others: a pixel, a line, a rectangle, or text. All the drawing operations below edit the same frame buffer. After preparing a picture, call `oled.show()` to display it.
-
-For this monochrome display, `1` draws lit pixels and `0` draws dark pixels. Zero is useful as an eraser inside a larger picture.
+A **drawing primitive** is a basic operation we can combine with others. These operations all edit the same frame buffer. `show()` sends their combined result.
 
 | Operation | Meaning |
 | --- | --- |
 | `oled.fill(0)` | Clear the whole prepared image. |
-| `oled.pixel(x, y, 1)` | Turn on one pixel. |
-| `oled.line(x1, y1, x2, y2, 1)` | Draw a one-pixel-thick line between two endpoints. |
-| `oled.hline(x, y, width, 1)` | Draw a horizontal line using a pixel count. |
-| `oled.vline(x, y, height, 1)` | Draw a vertical line using a pixel count. |
+| `oled.pixel(x, y, 1)` | Light one pixel. |
+| `oled.line(x1, y1, x2, y2, 1)` | Draw a one-pixel-thick line between two endpoints, including both. |
+| `oled.hline(x, y, width, 1)` | Draw a horizontal line with a given pixel count. |
+| `oled.vline(x, y, height, 1)` | Draw a vertical line with a given pixel count. |
 | `oled.rect(x, y, width, height, 1)` | Draw a rectangle's outline. |
 | `oled.fill_rect(x, y, width, height, 1)` | Draw a filled rectangle. |
-| `oled.text("PICO", x, y, 1)` | Draw text beginning at its top-left position. |
+| `oled.text("PICO", x, y, 1)` | Draw text from its top-left starting position. |
 
-The line methods are described in the [MicroPython drawing reference](https://docs.micropython.org/en/v1.26.0/library/framebuf.html#drawing-primitive-shapes); `fill_rect()` is also provided by the [frame-buffer implementation](https://github.com/micropython/micropython/blob/v1.26.0/extmod/modframebuf.c).
+The drawing tools come from MicroPython's **`framebuf.FrameBuffer`** type. The SSD1306 driver builds on that type, adding the display-specific setup and transfer operations. You can use the tools now; Phase 6 will open the classes and explain how they share this work.
 
-### Coordinates and Sizes Have Different Jobs
+For this monochrome picture, color `1` draws lit pixels and `0` draws dark pixels. Drawing with zero can erase just part of a picture.
 
-In `rect(10, 20, 12, 8, 1)`, `(10, 20)` is the top-left corner. The next two numbers are a **width of 12 pixels** and a **height of 8 pixels**. They are counts, not the opposite corner.
+{{< lesson-exercise number="1" title="Are these two line descriptions equivalent?" id="q1-are-these-two-line-descriptions-equivalent" >}}
 
-Starting at column 10, twelve columns end at `10 + 12 - 1 = 21`. The last row is `20 + 8 - 1 = 27`.
-
-```text
-right edge  = x + width - 1
-bottom edge = y + height - 1
-```
-
-### Q2: Do these two lines occupy the same pixels?
-
-**Problem:** Compare `oled.line(4, 12, 11, 12, 1)` with `oled.hline(4, 12, 8, 1)`. Predict the occupied columns and number of pixels, then test each on a cleared frame.
+Compare `oled.line(4, 12, 11, 12, 1)` with `oled.hline(4, 12, 8, 1)`. Predict their occupied columns and pixel counts. Test each separately on a cleared picture, then explain what would change if the `hline()` length were 11 instead of 8.
 
 {{< hints >}}
-- `line()` takes an ending coordinate.
-- `hline()` takes a length. Count both endpoints of the first line.
+- `line()` takes an ending coordinate; `hline()` takes a count.
+- Count both endpoints, not just the steps between them.
 {{< /hints >}}
-
 {{< answer >}}
-Both light columns 4 through 11 in row 12: `11 - 4 + 1 = 8` pixels.
+Both light columns 4 through 11 at row 12:
+
+{{< math >}}
+N = b - a + 1 = 11 - 4 + 1 = 8
+{{< /math >}}
 
 ```python
 oled.fill(0)
@@ -99,176 +78,216 @@ oled.line(4, 12, 11, 12, 1)
 oled.show()
 ```
 
-Replace the line call with `oled.hline(4, 12, 8, 1)` and run again. The image should match. Passing `11` as the horizontal line's length would instead extend through column 14.
+Replace the line call with `oled.hline(4, 12, 8, 1)` and rerun. A length of 11 would instead occupy columns 4 through 14.
+
+**A coordinate difference counts steps; add one to count both endpoints' pixels.**
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q3: What changes when a rectangle is filled?
+## Fit a Square at the Edge
 
-**Problem:** Draw `rect(10, 20, 12, 8, 1)`, then draw `fill_rect(10, 20, 12, 8, 1)` on a separately cleared frame. Find the last occupied column and row. Does filling change those bounds?
+In `rect(10, 20, 12, 8, 1)`, `(10, 20)` is a starting coordinate; 12 and 8 are counts. The right edge is `10 + 12 - 1 = 21`; the bottom edge is `20 + 8 - 1 = 27`.
 
-{{< hints >}}
-- Add the size to the starting coordinate, then subtract one.
-- Both versions have the same outer dimensions.
-{{< /hints >}}
-
-{{< answer >}}
-The right edge is `10 + 12 - 1 = 21`; the bottom edge is `20 + 8 - 1 = 27`. Filling adds the interior pixels and keeps those same bounds.
-
-```python
-oled.fill(0)
-oled.rect(10, 20, 12, 8, 1)
-oled.show()
-```
-
-For the second picture, change `rect` to `fill_rect`. A filled 12 × 8 rectangle lights 96 pixels when drawn on a blank frame.
-{{< /answer >}}
-
-### Q4: Where can an 8 × 8 square fit?
-
-**Problem:** Find the largest top-left `x` and `y` that keep an 8 × 8 square completely inside a 128 × 64 display.
-
-{{< hints >}}
-- The final screen column is 127 and the final row is 63.
-- The square extends seven positions beyond its starting position.
-{{< /hints >}}
-
-{{< answer >}}
 ```text
-x + 8 - 1 ≤ 127  →  x ≤ 120
-y + 8 - 1 ≤ 63   →  y ≤ 56
+last occupied column = x + width - 1
+last occupied row    = y + height - 1
 ```
 
-So the last fitting top-left corner is `(120, 56)`.
+An **off-by-one error** makes a count or boundary one too large or too small. An outlined square is a useful test: if its right edge lies outside the screen, that border disappears. **Clipping** means the part outside the drawable area is not drawn.
 
-```python
-oled.fill(0)
-oled.fill_rect(120, 56, 8, 8, 1)
-oled.show()
-```
+{{< lesson-exercise number="2" title="Why subtract eight rather than seven?" id="q2-why-subtract-eight-rather-than-seven" >}}
 
-This also explains why the toy stops the square at x = 120, while a single pixel can reach x = 127.
-{{< /answer >}}
-
-## Add Text and Compose a Scene
-
-The built-in text font uses **8 × 8 character cells**. A four-character word therefore occupies a 32-pixel-wide text area. The coordinates passed to `text()` locate the area's top-left corner. These are the dimensions of the character cells; individual letters can have blank space inside them. See [MicroPython's text reference](https://docs.micropython.org/en/v1.26.0/library/framebuf.html#drawing-text).
-
-Drawing order matters too. A later operation can overwrite earlier pixels. Clearing after drawing a heading erases that heading. Clearing first, then adding every part, prepares a complete scene.
-
-### Q5: Can you center PICO?
-
-**Problem:** Center the text area for PICO horizontally on our 128-pixel-wide display. Put its top at y = 4. Calculate x before drawing it.
+{{< exercise-step "predict" >}}
+Find the last column and row of `oled.rect(120, 56, 8, 8, 1)`. Will all four borders fit? What changes if its starting x is 121?
+{{< /exercise-step >}}
+{{< exercise-step "try" >}}
+Display each version on a cleared picture. Use an outline so a missing border is easy to spot.
+{{< /exercise-step >}}
+{{< exercise-step "explain" >}}
+Why is the last fitting x `128 - 8`, even though the last column is seven steps beyond the start?
+{{< /exercise-step >}}
 
 {{< hints >}}
-- Four character cells use `4 * 8` horizontal pixels.
-- Split the remaining width equally between the left and right margins.
+- The final screen column is 127, not 128.
+- An eight-pixel width includes its starting column.
+- Apply `last = start + size - 1` before deciding whether it fits.
 {{< /hints >}}
-
 {{< answer >}}
-```text
-text width = 4 × 8 = 32
-remaining width = 128 - 32 = 96
-left margin = 96 ÷ 2 = 48
-```
+At `(120, 56)`, the square ends at `(127, 63)`. All four borders fit:
 
 ```python
 oled.fill(0)
-oled.text("PICO", 48, 4, 1)
+oled.rect(120, 56, 8, 8, 1)
 oled.show()
 ```
 
-The character-cell area runs from x = 48 through 79, leaving 48 columns on each side.
+At x = 121, the right border would be at column 128, so it is clipped.
+
+{{< pixel-spacing-diagram "edge" >}}
+
+For a screen width `W` and an object width `w`:
+
+{{< math >}}
+x + w - 1 \le W - 1 \quad\Longrightarrow\quad x \le W - w
+{{< /math >}}
+
+The last fitting start is `128 - 8 = 120`, with y at most `64 - 8 = 56`.
+
+**Subtract one to find an occupied edge; subtract the whole size to find the last fitting start.**
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q6: Can several primitives make one picture?
+## From a Square to a Character
 
-**Problem:** Prepare a scene with a border around the full screen, the centered PICO heading, a ground line from `(4, 56)` to `(123, 56)`, and a filled 8 × 8 square at `(12, 28)`. Send the finished scene once.
+The built-in font gives each character an **8 × 8 cell**. The `(x, y)` in `text()` locates that cell's top-left corner. A **glyph** is the visible letter shape inside it; some rows or columns can be blank.
+
+That means `oled.text("A", 120, 56, 1)` uses the same cell bounds as our square: columns 120–127 and rows 56–63. If A still looks complete at x = 121, that does not prove the cell fits. A blank edge column can hide the clipping. Use the cell dimensions to plan the layout.
+
+{{< lesson-exercise number="3" title="Put two characters directly beside each other" id="q3-put-two-characters-directly-beside-each-other" >}}
+
+Put B in the rightmost fitting cell at `(120, 56)`. Where should A start so its cell sits directly to B's left, with no gap or overlap: x = 112 or x = 113? Explain, then draw both on a blank picture. Could one `text()` call create the same layout?
 
 {{< hints >}}
-- Clear before drawing any part of the scene.
-- A full-screen border has width 128 and height 64.
-- Put `show()` after all the drawing operations.
+- The column immediately before B is 119.
+- A's cell ends seven positions beyond its start.
+- `text()` advances eight pixels for each character, including a space.
 {{< /hints >}}
-
 {{< answer >}}
+A starts at `120 - 8 = 112`, occupying 112–119. B occupies 120–127. Starting A at 113 would make its cell end at 120, overlapping B's first column.
+
+{{< pixel-spacing-diagram "neighbors" >}}
+
 ```python
 oled.fill(0)
-oled.rect(0, 0, 128, 64, 1)
-oled.text("PICO", 48, 4, 1)
-oled.line(4, 56, 123, 56, 1)
-oled.fill_rect(12, 28, 8, 8, 1)
+oled.text("A", 112, 56, 1)
+oled.text("B", 120, 56, 1)
 oled.show()
 ```
 
-The drawing calls all contribute to one frame in RAM. Only the last call transfers that prepared picture to the OLED.
+On a blank picture, `oled.text("AB", 112, 56, 1)` gives the same layout. The glyph strokes can still have visible space between them because the cells include blank pixels.
+
+{{< math >}}
+x_{\text{next}} = x + w \qquad x_{\text{last}} = x + w - 1
+{{< /math >}}
+
+**Add eight to reach the next cell's start; add seven to reach this cell's last column.**
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-## Describe the Scene with One Changing Value
+## Compose and Rebuild a Scene
 
-To move the square, its x-coordinate must change between frames. The heading and ground can stay at fixed positions. The changing value is part of our program's **state**.
+A **scene** combines several parts into one picture. To center a heading with `n` character cells, calculate its width, subtract it from the screen width, and split the remaining space between two margins:
 
-A function can describe the whole scene using an argument such as `x`. Calling `draw_scene(12)` prepares the square at x = 12; calling `draw_scene(16)` prepares it four pixels farther right.
+{{< math >}}
+x = \left\lfloor\frac{W - 8n}{2}\right\rfloor
+{{< /math >}}
 
-If the function clears the buffer, it must redraw the background too. The OLED can keep showing the previous frame while the Pico prepares the replacement. We will leave `show()` outside the function so drawing and sending remain separate.
+The floor brackets mean round down to a whole pixel; Python uses `// 2`. For PICO, four cells use 32 pixels. On a 128-wide screen, `(128 - 32) // 2 = 48`. Its cell area occupies 48–79, leaving 48 columns on each side. With an odd amount of spare space, the margins differ by one pixel.
 
-### Q7: Can one argument move only the square?
+Drawing order matters where parts overlap. To make a dark label on a lit panel, draw a filled rectangle in color 1 first, then its text in color 0. The text method draws glyph strokes; it does not paint a whole cell's background. Reversing those two calls lets the panel cover the lettering.
 
-**Problem:** Turn Q6's drawing code into `draw_scene(x)`. Make the square's x-coordinate depend on the argument, and keep the other positions fixed. Prepare and display the scene at x = 12, then at x = 16.
+For movement, a function can rebuild a scene from one changing value. `draw_scene(12)` prepares a square at x = 12; `draw_scene(16)` prepares it farther right. We can reuse the same working buffer for every position, with no need to save a separate bitmap for each one. If the function clears the buffer, it must redraw the background too. Keep `show()` outside it so preparation and transfer remain separate.
+
+{{< lesson-exercise number="4" title="Can one argument move only the square?" id="q4-can-one-argument-move-only-the-square" >}}
+
+Write `draw_scene(x)` to prepare a full-screen border, PICO centered at y = 4, a ground line from `(4, 56)` through `(123, 56)`, and a filled 8 × 8 square at `(x, 28)`. Clear first; leave sending to the caller.
+
+Display the scene at x = 12. Change that call to x = 16 and rerun the whole file. Explain why the background remains in the same place even though the function clears it each time.
 
 {{< hints >}}
-- Replace only the square's starting x-coordinate with `x`.
-- Keep clearing and background drawing inside the function.
-- Call `show()` after each call to your function.
+- The border uses dimensions 128 × 64; the heading starts at x = 48.
+- Only the square's x-coordinate comes from the argument.
+- Redraw the fixed background after clearing, then call `show()` after your function returns.
 {{< /hints >}}
-
 {{< answer >}}
 ```python
 def draw_scene(x):
     oled.fill(0)
     oled.rect(0, 0, 128, 64, 1)
     oled.text("PICO", 48, 4, 1)
-    oled.line(4, 56, 123, 56, 1)
+    oled.hline(4, 56, 120, 1)
     oled.fill_rect(x, 28, 8, 8, 1)
-```
 
-After defining the function, enter these pairs separately so you can inspect each picture:
-
-```python
 draw_scene(12)
 oled.show()
-# STOP: inspect the scene before entering the next pair.
-draw_scene(16)
-oled.show()
 ```
 
-The program rebuilds the whole frame each time. The square's position changes; the background is drawn again at its original positions.
+Change 12 to 16 for the second run. The ground's 120 pixels include both endpoint columns. The function redraws the background at fixed positions and draws the square from its argument.
+
+**One changing value can describe motion while one function keeps the whole picture consistent.** Keep this function for the animation problems below.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
 ## Turn Frames into Animation
 
-Now repeat that process with a loop:
+Repeat this sequence for each position:
 
 ```text
-choose a position → prepare the whole frame → show it → pause
-        ↑                                                   |
-        └──────────────── next position ────────────────────┘
+choose state → prepare the whole frame → show it → pause
+     ↑                                              |
+     └──────────────── next frame ──────────────────┘
 ```
 
-`range(start, stop, step)` produces positions starting at `start`, stopping before `stop`, and changing by `step`. For example, `range(0, 121, 4)` gives 0, 4, 8, …, 120. It finishes, so we can inspect the last picture afterward.
+The x-coordinate is part of the program's **state**. Changing it changes which fixed pixels light up; no physical pixel moves.
 
-`sleep_ms(100)` pauses for at least 100 milliseconds; 1,000 milliseconds make one second. The starter imports it from `time`. Drawing and sending also take time, so a 100 ms pause alone does not guarantee ten frames per second. See the [MicroPython timing reference](https://docs.micropython.org/en/v1.26.0/library/time.html#time.sleep_ms).
+`range(start, stop, step)` supplies a finite sequence of positions, excluding `stop`. For example, `range(2, 7, 2)` gives 2, 4, 6. `sleep_ms(100)`, imported by the starter, pauses for at least 100 milliseconds, or 0.1 seconds. Drawing and I²C transfer take additional time, so that pause alone does not guarantee ten frames per second.
 
-### Q8: Can you animate the scene across the screen?
+Speed and smoothness are different choices. Ignoring drawing and transfer time, steps of four pixels every 0.1 seconds and eight pixels every 0.2 seconds both give 40 pixels per second. The smaller, more frequent steps show more intermediate positions and should look smoother.
 
-**Problem:** After defining `draw_scene(x)`, write a finite loop that moves the square from x = 0 to x = 120 in steps of four, displaying every frame and pausing 100 ms after each transfer. How many frames does it send?
+<hr class="lesson-review-divider">
+
+## Homework
+
+### Explain yourself
+
+Explain the terms before opening their definitions. Use a square and a character cell to connect sizes, endpoints, and boundaries. Then connect state, a scene function, and a sequence of displayed frames. How does Phase 4 explain a trail or a picture that is one frame behind?
+
+<span id="glossary"></span>
+
+{{< reveal-controls scope="glossary" >}}
+{{< recall-glossary data="phase5_glossary" >}}
+
+### Exercises
+
+Keep setup and any function you need above your new code. ★ Challenging · ★★ Very challenging.
+
+{{< lesson-exercise number="5" level="4" title="Center a greeting inside a panel" id="q5-center-a-greeting-inside-a-panel" >}}
+
+On a blank picture, draw **Hi Yush** as dark text on a lit panel. Center the text area horizontally on the 128-wide screen, with its top at y = 20. Give it four pixels of panel padding on every side. Calculate the text start, panel start, panel dimensions, and final occupied coordinates before drawing. Show once when complete.
 
 {{< hints >}}
-- `range()` excludes its stop value.
-- Each iteration needs drawing, sending, and a pause, in that order.
-- Count both the first and last positions.
+- Count the space too: Hi Yush uses seven character cells.
+- Four pixels on each side add eight pixels to each dimension.
+- Draw the lit panel before the dark text.
 {{< /hints >}}
-
 {{< answer >}}
+The text area is `7 * 8 = 56` pixels wide, so x is `(128 - 56) // 2 = 36`. It occupies columns 36–91 and rows 20–27. The panel starts four pixels earlier at `(32, 16)` and is `64 × 16`, ending at `(95, 31)`.
+
+```python
+oled.fill(0)
+oled.fill_rect(32, 16, 64, 16, 1)
+oled.text("Hi Yush", 36, 20, 0)
+oled.show()
+```
+
+The panel has 32 columns of screen margin on each side; the text cell area has four pixels of padding inside it. Visible glyph strokes can leave additional blank space within the cells.
+
+**Layout combines counts and positions; contrast and drawing order make that layout visible.**
+{{< /answer >}}
+{{< /lesson-exercise >}}
+
+{{< lesson-exercise number="6" level="4" title="Reach the final fitting position" difficulty="1" id="q6-reach-the-final-fitting-position" >}}
+
+Use your `draw_scene(x)` function in a finite loop. Move the square from x = 0 through its last fitting x in steps of four. Prepare, show, and pause 100 ms for each frame. Would `range(0, 120, 4)` include the last position? Calculate the number of frames and the image bytes sent by those calls to `show()`.
+
+{{< hints >}}
+- The final fitting start is screen width minus square width.
+- `range()` excludes its stop. Count the first position as a frame too.
+- Phase 4 found that each `show()` sends 1,024 image bytes in this driver.
+{{< /hints >}}
+{{< answer >}}
+After your function definition:
+
 ```python
 for x in range(0, 121, 4):
     draw_scene(x)
@@ -276,54 +295,25 @@ for x in range(0, 121, 4):
     sleep_ms(100)
 ```
 
-There are `(120 - 0) // 4 + 1 = 31` positions and therefore 31 frames. The square ends at x = 120, occupying columns 120–127. The loop finishes and the last frame remains visible.
+Using a stop of 120 would end at 116. A stop of 121 includes 120, where the square occupies columns 120–127.
 
-The square appears to move because successive frames light different pixels. No physical pixel changes its location.
+{{< math >}}
+N = \frac{120 - 0}{4} + 1 = 31
+{{< /math >}}
+
+There are 31 frames, sending `31 * 1024 = 31744` image bytes, apart from setup and bus control information. The 31 pauses total 3.1 seconds; drawing and sending add time. The loop finishes with the final scene visible.
+
+**The final screen coordinate is inclusive; the loop's stop is exclusive.** Correct bounds need both the object's size and the loop's counting rule.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q9: What happens if you stop clearing?
+{{< lesson-exercise number="7" level="4" title="Repair the animation that is one frame behind" difficulty="2" id="q7-repair-the-animation-that-is-one-frame-behind" >}}
 
-**Problem:** Remove `oled.fill(0)` from `draw_scene(x)` and rerun the animation, starting from a cleared image. Predict what remains behind the square. Then restore clearing.
-
-{{< hints >}}
-- Redrawing the background's lit pixels does not erase old square pixels.
-- The new square overlaps some previous positions and extends farther right.
-{{< /hints >}}
-
-{{< answer >}}
-Earlier square pixels remain in RAM, so the square leaves a growing horizontal trail. Sending more often cannot remove it: the old pixels are still part of every frame you send.
-
-Restoring `fill(0)` removes the old image before the background and current square are drawn. Clearing only a moving object's old rectangle is another possible strategy, but it can erase background pixels too. Rebuilding this small scene keeps the steps easy to reason about.
-{{< /answer >}}
-
-### Q10: How can you slow the same movement?
-
-**Problem:** Keep the same positions and change only the pause from 100 ms to 200 ms. Which parts of the animation stay the same? How much total deliberate pause does each version contain?
-
-{{< hints >}}
-- There are still 31 positions.
-- Multiply the pause per frame by the frame count.
-{{< /hints >}}
-
-{{< answer >}}
-The path, frame count, and four-pixel step stay the same. The longer pause makes the movement slower.
-
-```text
-31 × 100 ms = 3,100 ms = 3.1 seconds of pauses
-31 × 200 ms = 6,200 ms = 6.2 seconds of pauses
-```
-
-Actual running time also includes preparing and transferring the frames. These totals include a pause after the last frame, as written in our loop.
-{{< /answer >}}
-
-### Q11: Why is this animation one frame behind?
-
-**Problem:** Begin with a blank buffer and display, then run this code. What does the first `show()` send? After the loop finishes, where is the square in RAM and where is it on the OLED?
+Keep `draw_scene(x)` above this block. The aim is to show the scenes at x = 0, 4, and 8, pausing after each new frame. Trace what the following code actually sends on each iteration and where the square ends in RAM and on the OLED. Then repair the order without changing the range, adding a final transfer, or sending more than once per iteration.
 
 ```python
 oled.fill(0)
 oled.show()
-
 for x in range(0, 9, 4):
     oled.show()
     draw_scene(x)
@@ -331,58 +321,38 @@ for x in range(0, 9, 4):
 ```
 
 {{< hints >}}
-- The three x values are 0, 4, and 8.
-- Each transfer happens before the new frame is prepared.
-- The final prepared frame has no later transfer.
+- The loop positions are 0, 4, and 8.
+- Ask which picture exists when each `show()` begins.
+- Preparing, sending, and pausing are three separate steps; putting them in the right order fixes every iteration.
 {{< /hints >}}
-
 {{< answer >}}
-The first transfer inside the loop sends a blank frame. The second sends the scene at x = 0, and the third sends the scene at x = 4. The loop leaves x = 8 prepared in RAM but unsent.
+| Iteration's x | Picture sent by the broken loop | Picture prepared afterward |
+| ---: | --- | --- |
+| 0 | Blank | Scene at x = 0 |
+| 4 | Scene at x = 0 | Scene at x = 4 |
+| 8 | Scene at x = 4 | Scene at x = 8 |
 
-The fix is the Q8 order: `draw_scene(x)`, then `oled.show()`, then the pause.
+It finishes with x = 8 prepared and x = 4 displayed. Repair the loop:
+
+```python
+for x in range(0, 9, 4):
+    draw_scene(x)
+    oled.show()
+    sleep_ms(100)
+```
+
+Appending a transfer to the broken loop would reveal the last frame, but would still leave the earlier pauses following the wrong pictures. Reordering fixes the cause.
+
+**A correct final image is not enough to prove a sequence is correct.** Animation requires the right picture at each step, which is why we track prepared and displayed state separately.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-## Make Your Own Scene
+## What's next {#next-the-ssd1306-driver}
 
-### Q12: Can you explain and animate a scene you designed?
+You can now explain a scene's positions, prepare it from a changing value, and send it at the right point in a loop. We have used the driver extensively; next we'll open it. **How does it share work with `framebuf.FrameBuffer`, and which parts are specific to this OLED?**
 
-**Problem:** Create a scene with a short heading, at least two kinds of drawing primitive, and one moving part. Sketch it first. Choose safe movement bounds and use a finite loop. Explain which values change and why the background remains visible.
+Phase 6 is planned. Until it is available, try changing your scene's artwork or square size and recalculate its safe movement bounds.
 
-{{< hints >}}
-- Begin with a small variation on `draw_scene(x)`.
-- Account for the moving object's size when choosing its final position.
-- Rebuild the background after clearing and send once per frame.
-{{< /hints >}}
+[Back to Phase 4 ←](/post/the-frame-buffer/) · [Project roadmap and planned phases](/post/pico-oled-project/)
 
-{{< answer >}}
-There are many valid designs. One is a small square crossing a star field: use `pixel()` for fixed stars, `text()` for a heading, and `fill_rect()` for the moving object.
-
-Define a scene function that clears RAM, redraws the fixed stars and heading, then places the square using its changing x-coordinate. Reuse the finite loop from Q8. For an 8 × 8 square, x values from 0 through 120 keep it inside the display.
-
-A successful solution shows a complete scene each frame, preserves the background by redrawing it, and stops at a position you can justify. Explain what would change if you moved vertically instead.
-{{< /answer >}}
-
-## Next: The SSD1306 Driver
-
-We can now combine drawing primitives, prepare a scene with a function, and animate it by changing state between transfers. Where do `pixel()`, `rect()`, and `text()` actually come from? Why does the driver contain `show()` but so little drawing code?
-
-Phase 6 will open `ssd1306.py` and follow how its classes share work with MicroPython's frame-buffer tools.
-
-[Back to Phase 4: The Frame Buffer ←](/post/the-frame-buffer/) · [See the full project roadmap](/post/pico-oled-project/)
-
-## Glossary
-
-| Term | Definition | Example |
-| --- | --- | --- |
-| Drawing primitive | A basic operation used to assemble a picture. | A pixel, line, or rectangle. |
-| Endpoint | A coordinate where a line begins or ends. | `line(4, 12, 11, 12, 1)` ends at `(11, 12)`. |
-| Dimensions | An object's width and height, measured as counts. | An 8 × 8 square extends seven positions beyond its starting coordinate. |
-| Outline | Only the boundary of a shape. | `oled.rect(...)`. |
-| Filled shape | A shape whose interior is drawn too. | `oled.fill_rect(...)`. |
-| Character cell | The area reserved for one character. | The built-in font uses 8 × 8 cells. |
-| Scene | A picture assembled from several parts. | A heading, stars, and a moving square. |
-| State | Values describing the program's current situation. | The square's current x-coordinate. |
-| Frame | One complete still image. | A scene with the square at x = 12. |
-| Animation | A sequence of displayed frames that creates apparent change or movement. | Show the square at x = 0, then 4, then 8. |
-| Trail | Pixels left from earlier object positions. | Moving without clearing leaves old squares behind. |
-| Millisecond | One thousandth of a second. | `sleep_ms(100)` pauses for at least 0.1 seconds. |
+For reference: [MicroPython drawing and 8 × 8 text](https://docs.micropython.org/en/v1.26.0/library/framebuf.html), the [implementation that provides `fill_rect()`](https://github.com/micropython/micropython/blob/v1.26.0/extmod/modframebuf.c), and [`sleep_ms()` timing](https://docs.micropython.org/en/v1.26.0/library/time.html#time.sleep_ms).

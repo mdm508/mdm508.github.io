@@ -1,0 +1,42 @@
+<style>
+.oled-players{margin:1.5rem 0;color:var(--deep-brown)}
+.oled-players__layout{display:grid;grid-template-columns:minmax(0,3fr) auto minmax(150px,1fr);align-items:center;gap:.75rem}
+.oled-players__pico{padding:1rem;border:1px solid var(--medium-brown);border-radius:8px;background:#ece4d3}
+.oled-players__heading{margin:0 0 .6rem;font-weight:700}
+.oled-players__driver{margin:0 0 .9rem;font-size:.85rem;line-height:1.5}
+.oled-players__software{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.3fr) auto minmax(0,1fr);align-items:stretch;gap:.5rem}
+.oled-players__card{min-width:0;padding:.75rem;border:1px solid #8c745f;border-radius:6px;background:var(--cream);font-size:.85rem;line-height:1.5}
+.oled-players__card strong{display:block;margin-bottom:.4rem}
+.oled-players__card p{margin:.4rem 0 0}
+.oled-players__arrow{align-self:center;font-size:1.5rem;line-height:1}
+.oled-players__wire{text-align:center;font-size:.8rem;line-height:1.5}
+.oled-players__wire span{display:block}
+.oled-players__screen{margin:.8rem 0;padding:1rem .4rem;text-align:center;background:#292b25;color:#f3d18a;border-radius:4px;font-family:ui-monospace,monospace}
+.oled-players figcaption{margin-top:.65rem;font-size:.85rem;color:var(--text-secondary)}
+@media(max-width:900px){
+.oled-players__layout{grid-template-columns:minmax(0,1fr)}
+.oled-players__software{grid-template-columns:minmax(0,1fr)}
+.oled-players__card{font-size:.95rem}
+.oled-players__arrow{justify-self:center;transform:rotate(90deg)}
+.oled-players__wire span{display:inline}
+.oled-players__wire .oled-players__arrow{display:block;width:1.5rem;margin:.35rem auto;}
+}
+</style>
+<figure class="oled-players" aria-label="How our Python objects and the physical OLED cooperate">
+<div class="oled-players__layout">
+<div class="oled-players__pico">
+<p class="oled-players__heading">On the Pico: our program and objects</p>
+<p class="oled-players__driver">We import display code from <code>ssd1306.py</code>, the borrowed driver.</p>
+<div class="oled-players__software">
+<div class="oled-players__card"><strong><code>main.py</code></strong>Our instructions: choose what to draw, where, and when.<p>Calls methods on <code>oled</code>.</p></div>
+<span class="oled-players__arrow" aria-hidden="true">→</span>
+<div class="oled-players__card"><strong><code>oled</code> object</strong>Holds the prepared picture in RAM.<p><code>fill()</code>, <code>text()</code>, and <code>pixel()</code> draw into it.</p><p><code>show()</code> uses the connection to send it.</p></div>
+<span class="oled-players__arrow" aria-hidden="true">→</span>
+<div class="oled-players__card"><strong><code>i2c</code> object</strong>Controls the communication link.<p>I2C0<br>GP0 → SDA<br>GP1 → SCL</p></div>
+</div>
+</div>
+<div class="oled-players__wire"><span>SDA: data</span> <span>SCL: clock</span><span class="oled-players__arrow" aria-hidden="true">→</span></div>
+<div class="oled-players__card"><strong>Physical OLED</strong>The SSD1306 controller receives commands and picture data.<div class="oled-players__screen">HELLO</div>It drives the pixels.</div>
+</div>
+<figcaption>The drawing calls prepare a picture; <code>show()</code> sends it. Power and ground are also required. <a href="/images/pico/phase-1-players.svg">Open the wide diagram</a>.</figcaption>
+</figure>

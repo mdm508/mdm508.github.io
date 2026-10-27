@@ -1,0 +1,86 @@
+[
+  {
+    "id": "frame",
+    "term": "Frame",
+    "definition": "One complete image.",
+    "example": "A screen containing READY and PICO."
+  },
+  {
+    "id": "frame-buffer",
+    "term": "Frame buffer",
+    "definition": "Memory holding the pixels of a prepared image.",
+    "example": "`oled.buffer` contains 1,024 bytes for our display."
+  },
+  {
+    "id": "ram",
+    "term": "RAM",
+    "definition": "Random-access memory: working memory used while a program runs.",
+    "example": "The Pico stores the prepared frame in RAM."
+  },
+  {
+    "id": "python-session",
+    "term": "Python session",
+    "definition": "A running interpreter and the variables and objects it currently remembers.",
+    "example": "Create `oled` during setup, then use it at `>>>`."
+  },
+  {
+    "id": "soft-reset",
+    "term": "Soft reset",
+    "definition": "Restart MicroPython, clearing variables while keeping saved files.",
+    "example": "Run setup again after a reset."
+  },
+  {
+    "id": "display-memory",
+    "term": "Display memory",
+    "definition": "Memory inside the OLED controller holding received image data.",
+    "example": "It keeps OLD while the Pico prepares NEW."
+  },
+  {
+    "id": "drawing-operation",
+    "term": "Drawing operation",
+    "definition": "An operation that changes the prepared image.",
+    "example": "`text(\"HI\", 0, 0)`, `pixel(x, y, 1)`, and `fill(0)` change pixels. `pixel(x, y)` reads a pixel instead."
+  },
+  {
+    "id": "transfer",
+    "term": "Transfer",
+    "definition": "Sending data from one place to another.",
+    "example": "`show()` sends image bytes over I²C."
+  },
+  {
+    "id": "show",
+    "term": "`show()`",
+    "definition": "The driver's method for sending the current frame to the controller.",
+    "example": "Draw two lines, then call `oled.show()`."
+  },
+  {
+    "id": "fill-0",
+    "term": "`fill(0)`",
+    "definition": "Set every pixel in the frame buffer to off.",
+    "example": "Prepare a blank image without immediately changing the OLED."
+  },
+  {
+    "id": "payload",
+    "term": "Payload",
+    "definition": "The useful data carried by a transfer, apart from control information.",
+    "example": "The 1,024 image bytes in a full-screen update."
+  },
+  {
+    "id": "snapshot",
+    "term": "Snapshot",
+    "definition": "An independent copy of data at a particular moment.",
+    "example": "`saved = bytes(oled.buffer)` keeps the current frame even after more drawing."
+  },
+  {
+    "id": "shared-reference",
+    "term": "Shared reference",
+    "definition": "Two names referring to the same object, so both see changes made to it.",
+    "example": "`saved = oled.buffer` does not preserve an earlier frame."
+  },
+  {
+    "id": "slice-assignment",
+    "term": "Slice assignment",
+    "definition": "Replace a range of values inside an existing sequence.",
+    "example": "`oled.buffer[:] = saved` restores a matching frame without replacing the buffer object."
+  }
+]

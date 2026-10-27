@@ -1,0 +1,46 @@
+{{ $kind := .Get 0 }}
+{{ $id := printf "pixel-spacing-%s-%d" $kind .Ordinal }}
+<figure style="margin:1.25rem 0;">
+<div tabindex="0" aria-label="Pixel coordinate diagram; scroll horizontally on a narrow screen" style="overflow-x:auto;">
+{{ if eq $kind "edge" }}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 220" role="img" aria-labelledby="{{ $id }}-title {{ $id }}-desc" style="display:block; width:100%; min-width:540px; max-width:680px; font-family:ui-monospace,monospace; color:var(--deep-brown);">
+<title id="{{ $id }}-title">Eight pixels fit from column 120 through 127, but not from 121 through 128</title>
+<desc id="{{ $id }}-desc">The first row counts eight pixels starting at 120. The second row starts at 121, so its eighth pixel falls outside the screen at 128. The vertical boundary follows column 127.</desc>
+<text x="12" y="27" fill="currentColor" font-size="14">coordinate</text>
+{{ range $i, $column := seq 120 128 }}
+{{ $x := add 148 (mul $i 52) }}
+<text x="{{ add $x 26 }}" y="27" fill="currentColor" text-anchor="middle" font-size="15">{{ $column }}</text>
+<rect x="{{ $x }}" y="52" width="52" height="40" fill="{{ if lt $i 8 }}#f3d18a{{ else }}#eeedea{{ end }}" stroke="#8c745f"/>
+{{ if lt $i 8 }}<text x="{{ add $x 26 }}" y="78" fill="currentColor" text-anchor="middle" font-size="15">{{ add $i 1 }}</text>{{ end }}
+<rect x="{{ $x }}" y="120" width="52" height="40" fill="{{ if eq $i 0 }}#eeedea{{ else if eq $i 8 }}#e7b9a6{{ else }}#f3d18a{{ end }}" stroke="#8c745f"/>
+{{ if ge $i 1 }}<text x="{{ add $x 26 }}" y="146" fill="currentColor" text-anchor="middle" font-size="15">{{ $i }}</text>{{ end }}
+{{ end }}
+<text x="12" y="78" fill="currentColor" font-size="15">start: 120</text>
+<text x="12" y="146" fill="currentColor" font-size="15">start: 121</text>
+<path d="M564 34V181" stroke="#684421" stroke-width="3"/>
+<text x="564" y="205" fill="currentColor" text-anchor="middle" font-size="14">screen ends after 127</text>
+</svg>
+{{ else if eq $kind "neighbors" }}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 160" role="img" aria-labelledby="{{ $id }}-title {{ $id }}-desc" style="display:block; width:100%; min-width:540px; max-width:680px; font-family:ui-monospace,monospace; color:var(--deep-brown);">
+<title id="{{ $id }}-title">Two neighboring eight-column character cells start at 112 and 120</title>
+<desc id="{{ $id }}-desc">A occupies columns 112 through 119. B occupies columns 120 through 127. Their starts differ by eight, leaving no unused column and sharing no column.</desc>
+<text x="188" y="28" fill="currentColor" text-anchor="middle" font-size="16">A: starts at 112</text>
+<text x="476" y="28" fill="currentColor" text-anchor="middle" font-size="16">B: starts at 120</text>
+{{ range $i, $column := seq 112 127 }}
+{{ $x := add 44 (mul $i 36) }}
+<rect x="{{ $x }}" y="48" width="36" height="44" fill="{{ if lt $i 8 }}#e2d7c3{{ else }}#f3d18a{{ end }}" stroke="#8c745f"/>
+<text x="{{ add $x 18 }}" y="76" fill="currentColor" text-anchor="middle" font-size="13">{{ $column }}</text>
+{{ end }}
+<path d="M332 40V102" stroke="#684421" stroke-width="3"/>
+<text x="188" y="131" fill="currentColor" text-anchor="middle" font-size="15">112–119: eight columns</text>
+<text x="476" y="131" fill="currentColor" text-anchor="middle" font-size="15">120–127: eight columns</text>
+</svg>
+{{ else }}
+{{ errorf "Unknown pixel-spacing-diagram variant %q at %s" $kind .Position }}
+{{ end }}
+</div>
+<figcaption style="font-size:0.9rem; color:var(--text-secondary);">
+{{ if eq $kind "edge" }}Labels above are coordinates; numbers inside count the eight pixels in one horizontal row. Column 128 is outside the screen.
+{{ else }}These blocks describe character-cell positions, not the shapes of the letters. The cells meet without a gap or overlap.{{ end }}
+</figcaption>
+</figure>

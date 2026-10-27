@@ -1,0 +1,15 @@
+[
+  {"id":"oled","term":"OLED","definition":"A display whose pixels produce their own light.","example":"The small screen connected to your Pico."},
+  {"id":"pixel","term":"Pixel","definition":"One individually controlled point in the picture.","example":"`oled.pixel(10, 5, 1)` lights the prepared picture's pixel at `(10, 5)`."},
+  {"id":"resolution","term":"Resolution","definition":"The picture's width and height measured in pixels.","example":"128 × 64 means 128 columns and 64 rows."},
+  {"id":"coordinate","term":"Coordinate","definition":"A position described by `(x, y)`, counted from the top-left.","example":"`(127, 63)` is our screen's bottom-right pixel."},
+  {"id":"object","term":"Object","definition":"A Python value with data and operations we can use.","example":"`oled` refers to an object that holds our prepared picture and provides drawing and display methods."},
+  {"id":"method","term":"Method","definition":"An operation called through an object.","example":"In `oled.show()`, we call the `show` method of the object named `oled`."},
+  {"id":"driver","term":"Driver","definition":"Code that provides operations for using a hardware device.","example":"We import `SSD1306_I2C` from the borrowed `ssd1306.py` driver."},
+  {"id":"i2c","term":"I²C","definition":"A communication method for exchanging information between devices using data and clock signals.","example":"Our Pico sends display commands and image data over I²C."},
+  {"id":"sda-scl","term":"SDA / SCL","definition":"I²C's data and clock signals: SDA carries information; SCL times the exchange.","example":"Our wiring uses GP0 for SDA and GP1 for SCL. The devices also share ground."},
+  {"id":"address","term":"Address","definition":"A number used to identify a device during communication.","example":"Our OLED commonly answers a scan at decimal 60, also written `0x3C`."},
+  {"id":"controller","term":"OLED controller","definition":"The chip on the OLED module that receives commands and data and drives its pixels.","example":"Our display uses an SSD1306 controller."},
+  {"id":"frame-buffer","term":"Frame buffer","definition":"Memory holding the picture being prepared.","example":"`oled.text(\"HI\", 0, 0)` changes the frame buffer; it does not immediately change the physical screen."},
+  {"id":"show","term":"`show()`","definition":"The method that sends the prepared picture to the physical OLED.","example":"Call `oled.show()` after drawing all the parts you want to display."}
+]

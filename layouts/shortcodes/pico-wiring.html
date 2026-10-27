@@ -1,0 +1,8 @@
+{{ $kind := .Get 0 }}
+{{ if not (in (slice "ups" "breadboard") $kind) }}{{ errorf "Unknown Pico wiring illustration: %s" $kind }}{{ end }}
+<figure style="margin:1.5rem 0;">
+<div style="overflow-x:auto;" tabindex="0" aria-label="Wiring illustration; scroll horizontally on a narrow screen">
+<img src="/images/pico/oled-{{ $kind }}-wiring.svg" width="900" height="{{ if eq $kind "ups" }}490{{ else }}670{{ end }}" loading="lazy" style="display:block;width:100%;min-width:560px;height:auto;" alt="{{ if eq $kind "ups" }}Four female-to-female leads join UPS breakout GND to OLED GND, 3V3 to VCC, GP1 to SCL, and GP0 to SDA. Terminals are grouped for clarity; match the board's printed labels.{{ else }}Example breadboard: Pico headers in columns B and I, starting at row 1; A1 to OLED SDA, A2 to SCL, A3 to GND, and J5 to VCC. Each lead shares a five-hole group with its Pico pin.{{ end }}">
+</div>
+<figcaption>{{ if eq $kind "ups" }}Match names on the actual boards. These enlarged terminals show the connections; their positions are schematic.{{ else }}A worked placement, not required row numbers. If you move the Pico down the breadboard, move the lead connections to the matching rows too.{{ end }}</figcaption>
+</figure>

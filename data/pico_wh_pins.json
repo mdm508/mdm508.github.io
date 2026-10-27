@@ -1,0 +1,322 @@
+[
+  {
+    "number": 1,
+    "name": "GP0",
+    "category": "gpio",
+    "description": "General-purpose input/output 0: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. In Python, Pin(0) names this GPIO; its physical header position is 1.",
+    "oled": true,
+    "oled_description": "General-purpose input/output 0: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. In our OLED wiring, GP0 carries SDA. In Python, Pin(0) names this GPIO; its physical header position is 1."
+  },
+  {
+    "number": 2,
+    "name": "GP1",
+    "category": "gpio",
+    "description": "General-purpose input/output 1: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function. In Python, Pin(1) names this GPIO; its physical header position is 2.",
+    "oled": true,
+    "oled_description": "General-purpose input/output 1: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function. In our OLED wiring, GP1 carries SCL. In Python, Pin(1) names this GPIO; its physical header position is 2."
+  },
+  {
+    "number": 3,
+    "name": "GND",
+    "category": "ground",
+    "description": "Ground is the shared electrical reference. All GND pins are connected on the Pico.",
+    "oled": true,
+    "oled_description": "Ground is the shared electrical reference. All GND pins are connected on the Pico. Connect the OLED GND lead to any one of them."
+  },
+  {
+    "number": 4,
+    "name": "GP2",
+    "category": "gpio",
+    "description": "General-purpose input/output 2: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 2: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 5,
+    "name": "GP3",
+    "category": "gpio",
+    "description": "General-purpose input/output 3: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 3: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 6,
+    "name": "GP4",
+    "category": "gpio",
+    "description": "General-purpose input/output 4: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 4: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 7,
+    "name": "GP5",
+    "category": "gpio",
+    "description": "General-purpose input/output 5: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 5: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 8,
+    "name": "GND",
+    "category": "ground",
+    "description": "Ground is the shared electrical reference. All GND pins are connected on the Pico.",
+    "oled": false,
+    "oled_description": "Ground is the shared electrical reference. All GND pins are connected on the Pico. Connect the OLED GND lead to any one of them."
+  },
+  {
+    "number": 9,
+    "name": "GP6",
+    "category": "gpio",
+    "description": "General-purpose input/output 6: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 6: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 10,
+    "name": "GP7",
+    "category": "gpio",
+    "description": "General-purpose input/output 7: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 7: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 11,
+    "name": "GP8",
+    "category": "gpio",
+    "description": "General-purpose input/output 8: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 8: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 12,
+    "name": "GP9",
+    "category": "gpio",
+    "description": "General-purpose input/output 9: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 9: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 13,
+    "name": "GND",
+    "category": "ground",
+    "description": "Ground is the shared electrical reference. All GND pins are connected on the Pico.",
+    "oled": false,
+    "oled_description": "Ground is the shared electrical reference. All GND pins are connected on the Pico. Connect the OLED GND lead to any one of them."
+  },
+  {
+    "number": 14,
+    "name": "GP10",
+    "category": "gpio",
+    "description": "General-purpose input/output 10: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 10: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 15,
+    "name": "GP11",
+    "category": "gpio",
+    "description": "General-purpose input/output 11: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 11: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 16,
+    "name": "GP12",
+    "category": "gpio",
+    "description": "General-purpose input/output 12: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 12: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 17,
+    "name": "GP13",
+    "category": "gpio",
+    "description": "General-purpose input/output 13: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 13: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 18,
+    "name": "GND",
+    "category": "ground",
+    "description": "Ground is the shared electrical reference. All GND pins are connected on the Pico.",
+    "oled": false,
+    "oled_description": "Ground is the shared electrical reference. All GND pins are connected on the Pico. Connect the OLED GND lead to any one of them."
+  },
+  {
+    "number": 19,
+    "name": "GP14",
+    "category": "gpio",
+    "description": "General-purpose input/output 14: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 14: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 20,
+    "name": "GP15",
+    "category": "gpio",
+    "description": "General-purpose input/output 15: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 15: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 21,
+    "name": "GP16",
+    "category": "gpio",
+    "description": "General-purpose input/output 16: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 16: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 22,
+    "name": "GP17",
+    "category": "gpio",
+    "description": "General-purpose input/output 17: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 17: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 23,
+    "name": "GND",
+    "category": "ground",
+    "description": "Ground is the shared electrical reference. All GND pins are connected on the Pico.",
+    "oled": false,
+    "oled_description": "Ground is the shared electrical reference. All GND pins are connected on the Pico. Connect the OLED GND lead to any one of them."
+  },
+  {
+    "number": 24,
+    "name": "GP18",
+    "category": "gpio",
+    "description": "General-purpose input/output 18: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 18: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 25,
+    "name": "GP19",
+    "category": "gpio",
+    "description": "General-purpose input/output 19: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 19: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 26,
+    "name": "GP20",
+    "category": "gpio",
+    "description": "General-purpose input/output 20: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 20: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 27,
+    "name": "GP21",
+    "category": "gpio",
+    "description": "General-purpose input/output 21: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 21: your program can read or control a digital signal. One alternate function is I2C0 SCL (clock); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 28,
+    "name": "GND",
+    "category": "ground",
+    "description": "Ground is the shared electrical reference. All GND pins are connected on the Pico.",
+    "oled": false,
+    "oled_description": "Ground is the shared electrical reference. All GND pins are connected on the Pico. Connect the OLED GND lead to any one of them."
+  },
+  {
+    "number": 29,
+    "name": "GP22",
+    "category": "gpio",
+    "description": "General-purpose input/output 22: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 22: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function. We leave it free for later projects."
+  },
+  {
+    "number": 30,
+    "name": "RUN",
+    "category": "control",
+    "description": "Reset control. Pulling RUN low resets the RP2040. Leave it unconnected for ordinary projects; it is not an ordinary GPIO pin.",
+    "oled": false,
+    "oled_description": "Reset control. Pulling RUN low resets the RP2040. Leave it unconnected for this project; it is not an ordinary GPIO pin."
+  },
+  {
+    "number": 31,
+    "name": "GP26",
+    "category": "analogue",
+    "description": "General-purpose input/output 26: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function. It can also measure an analogue voltage using ADC0.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 26: your program can read or control a digital signal. One alternate function is I2C1 SDA (data); software must select that function. It can also measure an analogue voltage using ADC0. We leave it free for later projects."
+  },
+  {
+    "number": 32,
+    "name": "GP27",
+    "category": "analogue",
+    "description": "General-purpose input/output 27: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function. It can also measure an analogue voltage using ADC1.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 27: your program can read or control a digital signal. One alternate function is I2C1 SCL (clock); software must select that function. It can also measure an analogue voltage using ADC1. We leave it free for later projects."
+  },
+  {
+    "number": 33,
+    "name": "AGND",
+    "category": "ground",
+    "description": "Analogue ground, intended as a quiet reference for analogue measurements. It is connected to ground on the board.",
+    "oled": false,
+    "oled_description": "Analogue ground, intended as a quiet reference for analogue measurements. It is connected to ground on the board; our OLED can use an ordinary GND pin."
+  },
+  {
+    "number": 34,
+    "name": "GP28",
+    "category": "analogue",
+    "description": "General-purpose input/output 28: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. It can also measure an analogue voltage using ADC2.",
+    "oled": false,
+    "oled_description": "General-purpose input/output 28: your program can read or control a digital signal. One alternate function is I2C0 SDA (data); software must select that function. It can also measure an analogue voltage using ADC2. We leave it free for later projects."
+  },
+  {
+    "number": 35,
+    "name": "ADC_VREF",
+    "category": "control",
+    "description": "Reference voltage for analogue-to-digital measurements. Leave this connected as supplied on the board; it is not a general-purpose power output.",
+    "oled": false,
+    "oled_description": "Reference voltage for analogue-to-digital measurements. Leave this connected as supplied on the board; it is not our OLED power connection."
+  },
+  {
+    "number": 36,
+    "name": "3V3(OUT)",
+    "category": "power",
+    "description": "Regulated 3.3 V output from the Pico. This can power small external circuits that use 3.3 V. This is physical pin 36, not GP36.",
+    "oled": true,
+    "oled_description": "Regulated 3.3 V output from the Pico. Connect this to the OLED VCC lead. This is physical pin 36, not GP36."
+  },
+  {
+    "number": 37,
+    "name": "3V3_EN",
+    "category": "control",
+    "description": "Enable control for the 3.3 V regulator. Pulling this low turns the regulator off. This is not the 3.3 V output; leave it unconnected for ordinary projects.",
+    "oled": false,
+    "oled_description": "Enable control for the 3.3 V regulator. Pulling this low turns the regulator off. This is not the 3.3 V output; leave it alone here."
+  },
+  {
+    "number": 38,
+    "name": "GND",
+    "category": "ground",
+    "description": "Ground is the shared electrical reference. All GND pins are connected on the Pico.",
+    "oled": false,
+    "oled_description": "Ground is the shared electrical reference. All GND pins are connected on the Pico. Connect the OLED GND lead to any one of them."
+  },
+  {
+    "number": 39,
+    "name": "VSYS",
+    "category": "power",
+    "description": "Main system power input. Its job is supplying the board, rather than acting as a GPIO. It supplies the board's regulator and is not an ordinary GPIO pin.",
+    "oled": false,
+    "oled_description": "Main system power input. Its job is supplying the board, rather than acting as a GPIO. Use 3V3(OUT) for the OLED in this project."
+  },
+  {
+    "number": 40,
+    "name": "VBUS",
+    "category": "power",
+    "description": "USB supply voltage, normally about 5 V when USB is connected. It has a different voltage and purpose from 3V3(OUT).",
+    "oled": false,
+    "oled_description": "USB supply voltage, normally about 5 V when USB is connected. Do not substitute this for the 3.3 V OLED connection in our wiring."
+  }
+]

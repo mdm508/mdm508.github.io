@@ -1,0 +1,21 @@
+<style>
+  .lesson-code-comparison {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .lesson-code-comparison__column { min-width: 0; }
+  .lesson-code-comparison__column > :first-child { margin-top: 0; }
+  .lesson-code-comparison__column pre { overflow-x: auto; }
+  @media (max-width: 760px) {
+    .lesson-code-comparison { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+<div class="lesson-code-comparison">
+  {{ range split .Inner "<!-- next -->" }}
+    <section class="lesson-code-comparison__column">
+      {{ . | markdownify }}
+    </section>
+  {{ end }}
+</div>

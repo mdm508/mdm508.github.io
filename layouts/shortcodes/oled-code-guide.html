@@ -1,0 +1,23 @@
+<div class="oled-code-guide" data-oled-code-guide role="group" aria-label="Trace the display code">
+<p class="oled-code-guide__instruction">Select a line to trace its job. This explains the code; it does not run it on your Pico.</p>
+<div class="oled-code-guide__lines">
+<button type="button" aria-pressed="false" data-explanation="The driver file supplies SSD1306_I2C: the type of display object we will create. Importing it makes that code available; it does not create our oled object."><code>from ssd1306 import SSD1306_I2C</code></button>
+<button type="button" aria-pressed="false" data-explanation="Create the connection object and name it i2c. These pin choices must match the wires: GP1 for SCL and GP0 for SDA. This object handles communication; it does not decide what picture to draw."><code>i2c = I2C(0, scl=Pin(1), sda=Pin(0), freq=200_000)</code></button>
+<button type="button" aria-pressed="false" data-explanation="Create a display object for a 128-by-64 screen and name it oled. Passing i2c gives it the connection to use. The object holds the picture we prepare in Pico memory and provides methods for working with the display. The driver also initializes the physical display here."><code>oled = SSD1306_I2C(128, 64, i2c)</code></button>
+<button type="button" aria-pressed="false" data-explanation="Call the text method on oled. It draws Hi Yush at (0, 0) in the picture held in Pico memory. This call does not send the new picture down the wires."><code>oled.text("Hi Yush", 0, 0)</code></button>
+<button type="button" aria-pressed="false" data-explanation="Call the show method on oled. The driver uses the i2c connection to send commands and picture data to the SSD1306 chip on the OLED module. That chip controls the physical pixels."><code>oled.show()</code></button>
+</div>
+<p class="oled-code-guide__explanation" data-code-explanation role="status">First predict: which line gives the display object its connection? Then select it to check.</p>
+</div>
+<script>
+(() => {
+ const guide = document.currentScript.previousElementSibling;
+ if (!guide || !guide.matches('[data-oled-code-guide]')) return;
+ const buttons = [...guide.querySelectorAll('button')];
+ const explanation = guide.querySelector('[data-code-explanation]');
+ buttons.forEach(button => button.addEventListener('click', () => {
+  buttons.forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+  explanation.textContent = button.dataset.explanation;
+ }));
+})();
+</script>

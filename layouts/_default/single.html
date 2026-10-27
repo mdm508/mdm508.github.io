@@ -8,6 +8,9 @@
     {{ end }}
   {{ end }}
   {{ $tocHTML := .TableOfContents | replaceRE `id="TableOfContents"` `class="article-outline__links"` | safeHTML }}
+  {{ with .Params.toc_depth }}
+    {{ $tocHTML = $.Fragments.ToHTML 2 (int .) false | replaceRE `id="TableOfContents"` `class="article-outline__links"` | safeHTML }}
+  {{ end }}
 
   <article class="article-page">
     <div class="article-meta">

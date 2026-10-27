@@ -1,0 +1,16 @@
+{{ $courses := (where .Site.RegularPages "Params.curriculum" true).ByParam "course_order" }}
+{{ with $courses }}
+<section class="course-links" aria-labelledby="course-links-title">
+  <h2 id="course-links-title">Courses &amp; projects</h2>
+  <p class="course-links__intro">Follow a sequence of lessons, with explanations, questions, and experiments.</p>
+  <div class="course-links__grid">
+    {{ range . }}
+    <a class="course-links__card" href="{{ .RelPermalink }}">
+      <h3>{{ .Title }}</h3>
+      <p>{{ .Params.summary }}</p>
+      <span class="course-links__action">View lessons in order <span aria-hidden="true">→</span></span>
+    </a>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

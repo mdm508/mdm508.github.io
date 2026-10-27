@@ -2,325 +2,293 @@
 title: "Phase 4: The Frame Buffer — Draw First, Show Second"
 date: 2026-10-18T09:00:00-07:00
 draft: false
-description: "Explore the image in the Pico's RAM, compare it with the OLED's display memory, and discover what show() sends."
+description: "Trace drawing into Pico RAM, compare it with the OLED's display memory, and investigate complete-frame transfers and snapshots."
 tags: ["python", "micropython", "raspberry-pi-pico", "electronics"]
-summary: "Draw in an interactive frame buffer, then trace text(), fill(), and show() from Pico RAM to the OLED."
+summary: "Connect raw pixel bytes to drawing methods, keep prepared and displayed images separate, and choose when to send a complete frame."
 reading_time: 90
+toc_depth: 3
 ---
 
-Part of the [Pico OLED project: start here and see all phases](/post/pico-oled-project/).
+<aside class="lesson-context" aria-label="Related guides">Part of the <a href="/post/pico-oled-project/">Pico OLED project: guide and lesson roadmap</a>. Previously: <a href="/post/pages-and-display-memory/">Phase 3: Memory Organization</a>.</aside>
 
-## Where This Lesson Fits
+In Phase 1, you saw that drawing and showing are separate steps. Now you can locate the exact bytes a drawing changes. **Let's connect those two ideas:** where do the bytes wait, and how do they become the picture on the physical OLED?
 
-In [Phase 1](/post/meet-the-oled/), we drew pixels and text, then called `show()`. [Phase 2](/post/pictures-as-data/) gave us bits and masks. In [Phase 3](/post/pages-and-display-memory/), we found the exact byte and bit for a screen coordinate.
+This time we will keep track of two images, compare a drawing method with our raw bit edit, and decide when to send a finished frame. That separation will let us prepare each new animation frame while the previous one stays visible.
 
-Now we can ask: **if drawing changes those bytes, why doesn't the physical screen change immediately?**
+## What You Will Be Able to Do
 
-Today's goal is to track two things separately: the image being prepared in the Pico's memory and the image currently held by the OLED controller.
+- Track the image in Pico memory separately from the image held by the OLED.
+- Show that drawing methods and raw edits change the same buffer.
+- Explain what this driver's `show()` sends and what it leaves behind.
+- Save an independent frame snapshot and restore its bytes.
+
+## Get Ready
+
+{{< download "/downloads/pico/phase-4-frame-lab.py" "Download the Phase 4 frame lab" >}}. Only connection and display setup run. Write the experiments below that setup and **run the whole file**. Replace earlier drawing experiments unless a problem says otherwise. No `input()` pauses or retained interactive variables are required.
+
+Keep `ssd1306.py` in the **same folder on the Pico** as the lab file; upload it from the [Phase 1 kit](/downloads/pico/phase-1-kit.zip) if needed. Use the same wiring: GP0 → SDA, GP1 → SCL, 3V3(OUT) → VCC, GND → GND. Run on the Pico through Thonny or MicroPico in VS Code.
+
+Setup creates a new `oled` object and initializes the display, including clearing it. Each experiment below establishes its own starting picture after setup. If you do not have the hardware, use the toy and trace the code on paper.
+
+{{< python-session-note >}}
+### Optional: Keep Your Python Session {#keep-your-python-session}
+
+You can skip this box when running whole files. For one-command-at-a-time experiments at the Pico's `>>>` prompt, a **Python session** is the running interpreter and the names it remembers. A **soft reset** restarts MicroPython and clears those names; files saved on the Pico remain.
+
+In VS Code, if you want names to survive **between file runs**, search Settings for `micropico.noSoftResetOnRun` and enable it for this workspace. The setting disables the automatic soft reset **before** running a file. It does not recover names lost in an earlier reset, and old variables can remain until you replace them. MicroPico also has a separate **Soft-reset after upload** setting, so uploading and running need not behave identically. See the [extension's setting descriptions](https://github.com/paulober/MicroPico/blob/main/package.nls.json).
+
+If `oled` is undefined, run setup successfully in the current Pico session before using it. If setup raises `EIO`, investigate the I²C connection; that is a different clue. The experiments in this lesson work without changing either setting.
+{{< /python-session-note >}}
 
 ## Try Two Screens
 
-A **frame** is one complete image. A **frame buffer** is memory holding the pixels of that image. Our program's frame buffer lives in the Pico's **RAM**, the working memory used while the program runs.
+A **frame** is one complete image. A **frame buffer** holds that image's pixel data. Our program's frame buffer lives in the Pico's **RAM**, its working memory.
 
-The OLED controller has its own display memory. Drawing in the Pico's RAM does not automatically change that separate memory. `show()` sends the prepared bytes to the controller.
-
-Try that separation on a small display first:
+The SSD1306 controller has separate **display memory**. Drawing in Pico RAM does not automatically change the controller's copy. `show()` sends the prepared bytes over I²C.
 
 {{< frame-buffer-toy >}}
 
-### Q1: Can you change the picture without changing the display?
+{{< lesson-exercise number="1" title="Can the two images disagree?" id="q1-can-the-two-images-disagree" >}}
 
-**Problem:** Draw a small pattern on the left. Press `show()`, then change one more pixel. Which picture changes at each step?
-
-{{< hints >}}
-- Watch the two rows of hexadecimal bytes.
-- Only one button sends the prepared image to the right-hand screen.
-{{< /hints >}}
-
-{{< answer >}}
-Drawing changes only the left picture and its RAM bytes. `show()` copies the prepared image to the right. The next pixel edit changes RAM again, while the right picture keeps the previous image.
-
-The frame buffer and display can disagree. That is an expected part of preparing the next frame.
-{{< /answer >}}
-
-### Q2: Does clearing RAM erase the visible picture?
-
-**Problem:** Send a pattern with `show()`. Press `fill(0): clear RAM`. Predict what another press of `show()` will do, then try it.
+In the toy, draw a pattern and press `show()`. Change one more pixel without sending, then clear RAM. Describe the two pictures after each action. What will one more `show()` do? Predict before pressing it.
 
 {{< hints >}}
-- Clearing changes the prepared frame.
-- A blank image is still image data that can be sent.
+- Track the RAM bytes and OLED bytes separately.
+- A cleared buffer is still a complete picture: its bytes are zero.
 {{< /hints >}}
-
 {{< answer >}}
-Clearing RAM leaves the displayed pattern visible. The next `show()` sends the zero-filled bytes, making the display blank too.
+After the first `show()`, both images match. Editing one pixel changes only RAM. Clearing RAM makes the left image blank while the OLED keeps the pattern already sent. Another `show()` sends the blank picture, so both are blank.
 
-`fill(0)` prepares a blank frame. `show()` makes that blank frame visible.
+**A disagreement between the prepared image and the displayed image can be intentional.** It lets us choose when a change becomes visible.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
 ## Follow the Real Bytes
 
-On our 128 × 64 OLED, the Pico's frame buffer contains 1,024 bytes. The driver exposes that same storage as `oled.buffer`. Drawing methods change these bytes; they do not create a separate picture hidden elsewhere.
-
-For the driver included in the [Phase 1 kit](/downloads/pico/phase-1-kit.zip), the path is:
+For our 128 × 64 display, `oled.buffer` exposes the same 1,024 bytes that the drawing methods edit. It is not a second, unrelated picture. Phase 3 tells us that `(37, 29)` belongs to byte 421, bit 5.
 
 ```text
-Pico RAM                     OLED controller
-┌──────────────────┐         ┌──────────────────┐
-│ oled.buffer      │ show()  │ display memory   │
-│ 1,024 image bytes│ ──────► │ drives the pixels│
-└──────────────────┘  I²C    └──────────────────┘
-  ↑ drawing changes this       keeps the last data sent
+Pico RAM                         OLED controller
+┌──────────────────┐             ┌──────────────────┐
+│ oled.buffer      │   show()     │ display memory   │
+│ 1,024 image bytes│ ───────────► │ drives the pixels│
+└──────────────────┘     I²C      └──────────────────┘
+  drawing changes this             keeps data already sent
 ```
 
-`pixel()`, `text()`, and `fill()` edit the frame buffer. `text()` turns character shapes into pixel changes in RAM; we will explore drawing shapes in Phase 5.
+`pixel(x, y, 1)` changes a bit in RAM. Without the color argument, `pixel(x, y)` **reads** that pixel's value from RAM. It does not ask the physical screen what it is showing.
 
-In this driver, `show()` sets the destination column and page ranges, then sends the **whole buffer**, even if only one pixel changed. It does not clear RAM afterward. The controller uses its own memory to keep driving the display between transfers; the Pico does not need to resend the picture continuously for it to remain visible while powered and configured normally.
+{{< lesson-exercise number="2" title="Does the drawing method reach the byte we found?" id="q2-does-the-drawing-method-reach-the-byte-we-found" >}}
 
-The transfer takes time. Preparing a complete frame before sending it avoids deliberately sending each unfinished drawing stage, but it does not make the physical transfer instantaneous. We will examine the I²C bytes and the controller itself in later phases.
+Write a drawing block that clears and displays a blank frame, draws pixel `(37, 29)` without sending again, and prints both `oled.buffer[421]` and `oled.pixel(37, 29)`. Predict the two printed values and the final physical screen.
 
-## Try It on the Pico
-
-[Download the Phase 4 frame lab](/downloads/pico/phase-4-frame-lab.py). It contains **only the setup as executable code**, followed by instructions for experiments you write yourself. The lesson link is at the top of the file.
-
-Keep **`ssd1306.py` in the same folder on the Pico** as the lab file; having it only on your computer is not enough. The driver is in the [Phase 1 kit](/downloads/pico/phase-1-kit.zip). Use the same wiring as Phase 1.
-
-Run the starter using **MicroPico's Run command** in VS Code, or run it in Thonny. After setup finishes without an error, enter your experiment commands one at a time at MicroPico's `>>>` prompt or in Thonny's Shell. Use the Pico terminal, not your computer's Python terminal. If you do not have the hardware, use the toy and trace the code on paper.
-
-{{< python-session-note >}}
-### Keep Your Python Session
-
-A **Python session** is the running interpreter and the variables and objects it currently remembers. When setup creates `oled`, later commands in that same session can use it. A soft reset restarts MicroPython and clears those variables; files saved on the Pico remain.
-
-For this lesson, enable **No Soft Reset On Run** in MicroPico so running a file does not automatically reset the session. This lets you run the setup, then keep using `oled` at `>>>` as you explore.
-
-1. Open VS Code Settings: **Ctrl+,** on Windows or **Cmd+,** on Mac.
-2. Search for `micropico.noSoftResetOnRun`.
-3. Enable **No Soft Reset On Run** for this workspace.
-
-If you edit `.vscode/settings.json` instead, add this property inside its existing settings object:
-
-```json
-"micropico.noSoftResetOnRun": true
-```
-
-Older MicroPico versions reset both before and after a file run; version 4.4.0 changed the default to reset only before. Different versions and settings can therefore behave differently. See the [MicroPico changelog](https://github.com/paulober/MicroPico/blob/main/CHANGELOG.md#440---2026-09-14).
-
-With this setting enabled, old variables also remain until you replace them or reset deliberately. After a reset or power disconnect, run setup again. If typing `oled` gives `NameError`, setup may not have completed in the current session. An `EIO` error during setup is a separate I²C communication problem.
-{{< /python-session-note >}}
-
-**You control the pauses.** In the examples below, a `# STOP` comment means: inspect the screen before entering the next command. Do not run the entire block at once. We use no `input()` pauses, so the experiment does not depend on how the editor handles interactive script input.
-
-### Q3: Where is WAITING before you send it?
-
-**Problem:** Enter the following commands one at a time. At the STOP point, what is in RAM and what is visible? Predict what the last command will change.
-
-```python
-oled.fill(0)
-oled.show()
-oled.text("WAITING", 0, 0)
-# STOP: inspect the screen before entering the next command.
-oled.show()
-```
+Then replace the drawing call with a raw bit edit that preserves neighbors. Will the results change? Run each version as a whole file.
 
 {{< hints >}}
-- The first `show()` sends a blank frame.
-- `text()` changes RAM before you enter the final command.
+- A cleared byte with bit 5 set has value `1 << 5`.
+- A pixel read returns its state, not the whole byte's value.
+- The only transfer happens before the new drawing.
 {{< /hints >}}
-
-{{< answer >}}
-At STOP, the OLED is blank. The pixels spelling WAITING already exist in `oled.buffer`, but have not been sent. When you enter the final `show()`, it sends them and the word appears.
-
-The text was drawn before it became visible.
-{{< /answer >}}
-
-### Q4: What does the buffer's length tell us?
-
-**Problem:** Predict `len(oled.buffer)` for our display. Explain why it is not the number of lit pixels.
-
-{{< hints >}}
-- Phase 3 counted eight pages, each containing 128 bytes.
-- Turning a bit off does not remove its byte slot.
-{{< /hints >}}
-
-{{< answer >}}
-The length is `8 * 128 = 1024`. That is the number of stored bytes. A blank picture and a fully lit picture use the same buffer size; their byte values differ.
-{{< /answer >}}
-
-### Q5: Can a drawing method change the byte you calculated?
-
-**Problem:** Write your commands for Experiment 3 in the starter. Begin with a cleared buffer and blank display. Draw pixel `(37, 29)`, inspect byte 421, stop to inspect the OLED, and finally display the pixel.
-
-{{< hints >}}
-- Phase 3 placed this pixel at byte 421, bit 5.
-- `1 << 5` is 32.
-- Print and inspect before entering the final `show()`.
-{{< /hints >}}
-
 {{< answer >}}
 ```python
 oled.fill(0)
 oled.show()
 oled.pixel(37, 29, 1)
-print("Byte 421:", oled.buffer[421])
-# STOP: inspect the blank screen before entering the next command.
-oled.show()
+print(oled.buffer[421])       # 32, or 0x20
+print(oled.pixel(37, 29))     # 1
 ```
 
-The printed value is 32 (`0x20`). The drawing method has performed the byte-and-bit change we worked out by hand. Only the final call sends it to the OLED.
+The physical OLED finishes blank. Replacing the third line with `oled.buffer[421] |= 1 << 5` produces the same results. Appending `oled.show()` and rerunning makes the pixel visible.
+
+**A drawing method and a raw edit operate on the same bytes.** A convenient interface does not imply a different image underneath it.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q6: Does a raw buffer edit follow the same rule?
+## A Frame Is a Result, Not a Replay
 
-**Problem:** Replace `oled.pixel(37, 29, 1)` in Q5 with a raw byte edit that preserves neighboring bits. Will the timing change?
+The buffer holds current pixel values, not a history of drawing instructions. Drawing A, clearing, and drawing B leaves only B to send. Likewise, drawing several parts before `show()` sends the resulting picture, rather than playing back every drawing stage.
 
-{{< hints >}}
-- Use OR to set bit 5 of byte 421.
-- Both approaches change the same storage in Pico RAM.
-{{< /hints >}}
+{{< lesson-exercise number="3" title="Follow two pictures through one program" id="q3-follow-two-pictures-through-one-program" >}}
 
-{{< answer >}}
-```python
-oled.buffer[421] |= 1 << 5
-```
-
-The timing is the same: RAM changes immediately, but the display waits for `show()`. A convenient drawing method and a raw buffer edit reach the same prepared image.
-{{< /answer >}}
-
-## Keep Track of Two Images
-
-### Q7: What survives a clear?
-
-**Problem:** Enter these commands one at a time. Trace the buffer and screen at each STOP point:
+Trace this block on paper. At A, B, and C, write what is prepared in Pico RAM and what is displayed. Then predict the final picture and run the whole file to check it. The checkpoints are for reasoning; comments do not pause the program, so the intermediate images may pass too quickly to inspect.
 
 ```python
 oled.fill(0)
 oled.text("OLD", 0, 0)
 oled.show()
-# STOP A: inspect RAM and the screen.
+# A
 oled.fill(0)
-# STOP B: inspect RAM and the screen.
+# B
 oled.text("NEW", 0, 0)
-# STOP C: inspect RAM and the screen.
+# C
 oled.show()
 ```
 
 {{< hints >}}
-- Track RAM and the visible display in separate columns.
-- `fill(0)` clears the old text in RAM before NEW is drawn.
+- Make two columns in your trace, one for each memory location.
+- `fill(0)` changes only the prepared image. Transfers happen at `show()`.
 {{< /hints >}}
-
 {{< answer >}}
-| Checkpoint | Pico frame buffer | OLED display |
+| Checkpoint | Prepared in Pico RAM | Displayed on the OLED |
 | --- | --- | --- |
-| STOP A | OLD | OLD |
-| STOP B | Blank | OLD |
-| STOP C | NEW | OLD |
+| A | OLD | OLD |
+| B | Blank | OLD |
+| C | NEW | OLD |
 | After final `show()` | NEW | NEW |
 
-The OLED keeps OLD while we prepare NEW. We do not need to display the blank intermediate frame.
+The program sends no blank intermediate picture. OLD remains visible while NEW is prepared.
+
+**Follow state changes in order, in the place where each operation acts.** The two-column trace makes a confusing sequence easier to explain.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q8: Is `show()` a list of drawing commands?
+## What Does This Driver Send?
 
-**Problem:** Suppose you draw A, clear RAM, then draw B, all before calling `show()`. Will the screen play back A, a blank frame, and B?
+In the [driver supplied with Phase 1](/downloads/pico/phase-1-kit.zip), `show()` sets the destination ranges and sends the **whole buffer**, even when only one pixel changed. Sending does not empty or clear that buffer.
+
+The controller keeps driving the display from its own memory while powered and configured normally. You do not need to resend an unchanged picture just to keep it visible. Send another frame when you want the prepared changes to appear.
+
+The transfer takes time. Sending one completed picture avoids deliberately displaying unfinished stages; it does not make I²C instantaneous or guarantee that every physical pixel updates at the same instant.
+
+{{< lesson-exercise number="4" title="Does sending consume the picture?" id="q4-does-sending-consume-the-picture" >}}
+
+Prepare a picture and display it. Without drawing again, call `show()` a second time. Predict whether the picture or buffer length changes. How many **image bytes** do those two calls send altogether? Would changing just one pixel before the second call reduce that count in this driver?
 
 {{< hints >}}
-- The buffer stores pixel values, not a history of function calls.
-- Ask which bytes remain when `show()` starts.
+- Eight pages of 128 bytes make one frame.
+- The driver sends all image bytes on each call and leaves RAM intact.
 {{< /hints >}}
-
 {{< answer >}}
-No. It receives the current frame containing B. Clearing removed A from RAM. The frame buffer holds the resulting image, not instructions to replay how you made it.
+The same picture remains, and `len(oled.buffer)` stays 1,024. Two calls send `2 * 1024 = 2048` image bytes. A one-pixel edit would not reduce the second transfer's image payload.
+
+Commands and I²C control information travel too, so this is not a count of every byte or bit on the bus.
+
+**Sending copies data; it does not consume the prepared image.** How much gets transferred depends on the driver's update strategy.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q9: Does `show()` consume the image?
+## Keep a Snapshot
 
-**Problem:** After drawing and displaying a picture, call `show()` again without changing RAM. What appears? How many image bytes does each call send on our 128 × 64 display?
+Sometimes we want to save a complete frame for later. `saved = bytes(oled.buffer)` makes an independent, unchangeable copy of the current bytes. By contrast, `saved = oled.buffer` only gives the same editable buffer another name; later drawing would affect what both names refer to.
+
+To restore a snapshot of the same length, use `oled.buffer[:] = saved`. The slice `[:]` means the whole buffer. This copies values into the **existing storage** that the drawing methods use. Reassigning `oled.buffer` to another object is not the same operation.
+
+Restoring bytes is still a RAM edit; you decide when to call `show()`.
+
+Each full-screen snapshot stores another 1,024 image bytes, in addition to the working buffer and Python object overhead. Keeping several frames has a memory cost—the same image-size calculation you made in Phase 2.
+
+<hr class="lesson-review-divider">
+
+## Homework
+
+### Explain yourself
+
+Explain each term with the definitions hidden. Tell the story of `text()` followed by `show()`, naming both memory locations. How does saving a frame differ from giving its buffer a second name? Sketch the story or invent an analogy, then check its limits.
+
+<span id="glossary"></span>
+
+{{< reveal-controls scope="glossary" >}}
+{{< recall-glossary data="phase4_glossary" >}}
+
+### Exercises
+
+Write each block below setup and run the whole file. ★ Challenging · ★★ Very challenging.
+
+{{< lesson-exercise number="5" level="4" title="Prepare a complete announcement" id="q5-prepare-a-complete-announcement" >}}
+
+After setup, display OLD at `(0, 0)`. Then replace it with READY at `(0, 0)` and PICO at `(0, 16)`. Do not send a blank frame or the unfinished one-line replacement between those two finished pictures. How many explicit `show()` calls does your drawing block need?
 
 {{< hints >}}
-- Sending does not erase `oled.buffer`.
-- This driver sends the whole frame, not just changed bytes.
+- Send OLD first to establish the starting image within this run.
+- Clear RAM, draw both new lines, then send the replacement.
 {{< /hints >}}
-
-{{< answer >}}
-The same picture remains. Each call sends 1,024 image bytes. Commands and I²C control information also travel, so 1,024 is the image payload, not a count of every byte or bit on the bus.
-{{< /answer >}}
-
-## Assemble a Complete Frame
-
-Drawing several things into RAM lets us decide when to send the result. For a static screen, we can clear the prepared image, add all its parts, then call `show()` once.
-
-### Q10: Can two lines arrive as one prepared frame?
-
-**Problem:** Write your commands for Experiment 4 in the starter: prepare READY at `(0, 0)` and PICO at `(0, 16)`, then send the finished frame once. Avoid displaying a blank frame between the previous picture and this one.
-
-{{< hints >}}
-- Clear RAM first.
-- Place both `text()` calls before `show()`.
-{{< /hints >}}
-
 {{< answer >}}
 ```python
+oled.fill(0)
+oled.text("OLD", 0, 0)
+oled.show()
+
 oled.fill(0)
 oled.text("READY", 0, 0)
 oled.text("PICO", 0, 16)
 oled.show()
 ```
 
-The previous picture remains visible while RAM is being prepared. The transfer then sends the image containing both lines. Putting `show()` after each drawing call would send unfinished stages and require extra transfers.
+The drawing block has two transfers: one per finished picture. There is no transfer between clearing RAM and completing the replacement. OLD may be visible only briefly when you run the whole file; the toy lets you step through the same principle slowly.
+
+**Choose transfers around complete pictures, rather than around individual drawing calls.**
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q11: Is one `show()` enough forever?
+{{< lesson-exercise number="6" level="4" title="Same final pixels, different transfer cost" difficulty="1" id="q6-same-final-pixels-different-transfer-cost" >}}
 
-**Problem:** You display a picture, change one pixel in RAM, and want that change to appear. Do you need another `show()`? What if you make no changes at all?
+Starting with a cleared buffer, light `(0, 0)`, `(1, 0)`, and `(2, 0)`. Write two versions: one sends after every pixel, the other sends once after all three. Calculate the image bytes sent by each version. Explain what intermediate pictures they send and why the final picture matches.
 
 {{< hints >}}
-- The display does not watch the Pico's RAM for edits.
-- Its own memory preserves the last image sent while operating normally.
+- A transfer sends the current result, including pixels drawn earlier.
+- Count explicit `show()` calls in each drawing block, then multiply by 1,024.
 {{< /hints >}}
-
 {{< answer >}}
-Send again when you want the new pixel to become visible. If the picture has not changed, there is no need to resend it merely to keep it visible.
+The first version is:
 
-A changing display usually follows a repeated sequence: prepare the next frame, send it, then prepare another. Phase 5 will use that pattern for simple animation.
+```python
+oled.fill(0)
+for x in range(3):
+    oled.pixel(x, 0, 1)
+    oled.show()
+```
+
+The second version moves the transfer outside the loop:
+
+```python
+oled.fill(0)
+for x in range(3):
+    oled.pixel(x, 0, 1)
+oled.show()
+```
+
+The first sends three frames—one dot, two dots, three dots—for 3,072 image bytes. The second sends only the three-dot picture, for 1,024 image bytes. Both end with those same three pixels lit. This counts the drawing block's calls, not display initialization.
+
+**Grouping edits can reduce communication without changing the final image.** It also gives us control over which intermediate states become visible.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-### Q12: Can you explain the whole journey?
+{{< lesson-exercise number="7" level="4" title="Save two frames, choose what to display" difficulty="2" id="q7-save-two-frames-choose-what-to-display" >}}
 
-**Problem:** Explain what happens from `oled.text("HI", 0, 0)` to seeing HI on the OLED. Include the two memory locations and the job of `show()`.
+Prepare and save two independent frames: ONE at `(0, 0)` and TWO at `(0, 16)`. Then restore and display ONE. Finish with TWO restored in Pico RAM but not yet sent. Use only one explicit `show()` in your drawing block.
+
+What should the final physical screen show? How would using `saved = oled.buffer` instead of a byte copy break your plan? Check the second prepared picture by adding one final transfer afterward.
 
 {{< hints >}}
-- Begin with pixels being changed in the Pico's RAM.
-- End with the controller using the received image data.
+- Clear before preparing each frame, and take a `bytes(...)` snapshot after drawing it.
+- Restore a snapshot into the existing buffer with slice assignment.
+- A restore changes RAM; the position of `show()` chooses what reaches the screen.
 {{< /hints >}}
-
 {{< answer >}}
-`text()` changes bits in `oled.buffer` in Pico RAM to form the letters. `show()` sends the prepared frame over I²C to the OLED controller's display memory. The controller uses that data to drive the physical pixels.
+```python
+oled.fill(0)
+oled.text("ONE", 0, 0)
+first = bytes(oled.buffer)
 
-Drawing prepares the image. Sending updates the display's image data. The controller keeps the pixels driven between transfers.
+oled.fill(0)
+oled.text("TWO", 0, 16)
+second = bytes(oled.buffer)
+
+oled.buffer[:] = first
+oled.show()
+oled.buffer[:] = second
+```
+
+The screen shows ONE while RAM holds TWO. Appending another `oled.show()` and rerunning displays TWO instead. If both saved names referred to `oled.buffer`, neither would preserve an earlier picture: both would refer to the same changing data.
+
+**Keeping a previous state requires a copy, not just another name.** We can choose when a saved image becomes the displayed image.
 {{< /answer >}}
+{{< /lesson-exercise >}}
 
-## Next: Drawing Graphics
+## What's next {#next-drawing-graphics}
 
-We can now explain where a picture waits and when it reaches the OLED. In [Phase 5: Drawing Graphics](/post/drawing-graphics/), we will use pixels, lines, rectangles, and text to build complete scenes, then change those scenes over time.
+You can now follow the same bytes through drawing, saving, and sending. In Phase 5, we'll prepare complete scenes with simple drawing tools and change their positions over time. **Animation is repeated preparation and transfer, with a deliberate change between frames.**
 
-[Continue to Phase 5: Drawing Graphics →](/post/drawing-graphics/)
+[Continue to Phase 5: Drawing Graphics →](/post/drawing-graphics/) · [Back to Phase 3 ←](/post/pages-and-display-memory/) · [Project roadmap](/post/pico-oled-project/)
 
-[Back to Phase 3: Memory Organization ←](/post/pages-and-display-memory/) · [Revisit Phase 1's drawing experiments](/post/meet-the-oled/)
-
-## Glossary
-
-| Term | Definition | Example |
-| --- | --- | --- |
-| Frame | One complete image. | A screen containing READY and PICO. |
-| Frame buffer | Memory holding the pixels of a prepared image. | `oled.buffer` contains 1,024 bytes for our display. |
-| RAM | Working memory used while a program runs. | The Pico stores the prepared frame in RAM. |
-| Python session | A running interpreter and the variables and objects it currently remembers. | Create `oled` during setup, then use it at `>>>`. |
-| Soft reset | Restart MicroPython, clearing variables while keeping saved files. | Run setup again after a reset. |
-| Display memory | Memory inside the OLED controller holding received image data. | It keeps OLD while the Pico prepares NEW. |
-| Drawing operation | An operation that changes the prepared image. | `text()`, `pixel()`, and `fill()`. |
-| Transfer | Sending data from one place to another. | `show()` sends image bytes over I²C. |
-| `show()` | The driver's method for sending the current frame to the controller. | Draw two lines, then call `oled.show()`. |
-| `fill(0)` | Set every pixel in the frame buffer to off. | Prepare a blank image without immediately changing the OLED. |
-| Payload | The useful data carried by a transfer, apart from control information. | The 1,024 image bytes in a full-screen update. |
+For reference: [MicroPython's frame-buffer drawing and pixel-reading methods](https://docs.micropython.org/en/v1.26.0/library/framebuf.html) and the [exact driver used in the kit](https://github.com/micropython/micropython-lib/blob/a08087249fda8a7994f7c54ccaad29fb9fcc448a/micropython/drivers/display/ssd1306/ssd1306.py).

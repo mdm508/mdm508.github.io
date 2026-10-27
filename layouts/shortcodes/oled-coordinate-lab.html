@@ -1,0 +1,98 @@
+{{ $id := printf "oled-coordinates-%d" .Ordinal }}
+<style>
+.oled-coordinates{margin:1.5rem 0;padding:1rem;background:var(--light-orange);border:1px solid var(--medium-brown);border-radius:8px;color:var(--deep-brown)}
+.oled-coordinates__screen{max-width:768px;margin:auto}
+.oled-coordinates canvas{display:block;width:100%;height:auto;background:#292b25;border:1px solid var(--medium-brown);border-radius:4px;touch-action:manipulation;cursor:crosshair}
+.oled-coordinates__axes{display:flex;justify-content:space-between;gap:1rem;font:.8rem/1.5 ui-monospace,monospace;margin:.35rem 0}
+.oled-coordinates__controls{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem;margin:1rem 0}
+.oled-coordinates :is(input,button){font:inherit;color:var(--deep-brown);background:var(--cream);border:1px solid var(--medium-brown);border-radius:4px;padding:.4rem .6rem}
+.oled-coordinates input{width:5rem}
+.oled-coordinates button{cursor:pointer}
+.oled-coordinates :is(canvas,input,button):focus-visible{outline:3px solid var(--accent-orange);outline-offset:3px}
+.oled-coordinates pre{white-space:pre-wrap;margin-bottom:0}
+.oled-coordinates [hidden]{display:none}
+</style>
+<section class="oled-coordinates" data-oled-coordinates aria-labelledby="{{ $id }}-title">
+<h3 id="{{ $id }}-title">Find a pixel</h3>
+<p>Click or tap the grid, or enter a coordinate. The gold square represents <strong>one pixel</strong> on a 128 × 64 OLED. Focus the grid and use the arrow keys to move one pixel at a time.</p>
+<div data-interactive hidden>
+<div class="oled-coordinates__screen">
+<div class="oled-coordinates__axes"><span>(0, 0) · top-left</span><span>x increases →</span></div>
+<canvas data-grid width="1024" height="512" tabindex="0" role="img" aria-label="OLED coordinate model"></canvas>
+<div class="oled-coordinates__axes"><span>y increases ↓</span><span>(127, 63) · bottom-right</span></div>
+</div>
+<div class="oled-coordinates__controls">
+<label for="{{ $id }}-x">x</label><input id="{{ $id }}-x" data-x type="number" min="0" max="127" step="1" value="8" inputmode="numeric">
+<label for="{{ $id }}-y">y</label><input id="{{ $id }}-y" data-y type="number" min="0" max="63" step="1" value="4" inputmode="numeric">
+<button type="button" data-move>Move pixel</button>
+<button type="button" data-corner="top">Top-left</button>
+<button type="button" data-corner="bottom">Bottom-right</button>
+</div>
+<p data-position role="status" aria-live="polite"></p>
+<pre><code data-code></code></pre>
+<p>Each example clears the model and shows its new picture. Copy the drawing commands below your Pico setup to try the same position on the real screen.</p>
+</div>
+<noscript>JavaScript is needed for this toy. You can still sketch a grid on paper: start at (0, 0) in the top-left, move right to increase x, and down to increase y.</noscript>
+</section>
+<script>
+(() => {
+ const root = document.currentScript.previousElementSibling;
+ if (!root || !root.matches('[data-oled-coordinates]')) return;
+ const find = selector => root.querySelector(selector);
+ const canvas = find('[data-grid]');
+ const ctx = canvas.getContext('2d');
+ if (!ctx) return;
+ const width = 128, height = 64, scale = 8;
+ let x = 8, y = 4;
+ function render() {
+  ctx.fillStyle = '#292b25';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.lineWidth = 1;
+  for (let col = 0; col <= width; col++) {
+   ctx.strokeStyle = col % 8 === 0 ? '#5e5c4e' : '#383b32';
+   ctx.beginPath(); ctx.moveTo(col * scale + .5, 0); ctx.lineTo(col * scale + .5, canvas.height); ctx.stroke();
+  }
+  for (let row = 0; row <= height; row++) {
+   ctx.strokeStyle = row % 8 === 0 ? '#5e5c4e' : '#383b32';
+   ctx.beginPath(); ctx.moveTo(0, row * scale + .5); ctx.lineTo(canvas.width, row * scale + .5); ctx.stroke();
+  }
+  ctx.fillStyle = '#f3d18a'; ctx.fillRect(x * scale, y * scale, scale, scale);
+  find('[data-x]').value = String(x); find('[data-y]').value = String(y);
+  find('[data-position]').textContent = `Pixel (${x}, ${y}): ${x} steps right and ${y} steps down from (0, 0).`;
+  find('[data-code]').textContent = `oled.fill(0)\noled.pixel(${x}, ${y}, 1)\noled.show()`;
+  canvas.setAttribute('aria-label', `128 by 64 OLED coordinate model. One lit pixel at (${x}, ${y}). Arrow keys move it.`);
+ }
+ function moveFromInputs() {
+  const nextX = find('[data-x]').valueAsNumber, nextY = find('[data-y]').valueAsNumber;
+  if (!Number.isInteger(nextX) || !Number.isInteger(nextY) || nextX < 0 || nextX >= width || nextY < 0 || nextY >= height) {
+   find('[data-position]').textContent = 'Choose whole numbers: x from 0 to 127 and y from 0 to 63. The pixel has not moved.';
+   return;
+  }
+  x = nextX; y = nextY; render();
+ }
+ find('[data-move]').addEventListener('click', moveFromInputs);
+ for (const input of [find('[data-x]'), find('[data-y]')]) input.addEventListener('keydown', event => {
+  if (event.key === 'Enter') { event.preventDefault(); moveFromInputs(); }
+ });
+ canvas.addEventListener('click', event => {
+  const rect = canvas.getBoundingClientRect();
+  x = Math.max(0, Math.min(width - 1, Math.floor((event.clientX - rect.left) / rect.width * width)));
+  y = Math.max(0, Math.min(height - 1, Math.floor((event.clientY - rect.top) / rect.height * height)));
+  render();
+ });
+ canvas.addEventListener('keydown', event => {
+  const moves = {ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1]};
+  if (!Object.prototype.hasOwnProperty.call(moves, event.key)) return;
+  event.preventDefault();
+  x = Math.max(0, Math.min(width - 1, x + moves[event.key][0]));
+  y = Math.max(0, Math.min(height - 1, y + moves[event.key][1]));
+  render();
+ });
+ root.querySelectorAll('[data-corner]').forEach(button => button.addEventListener('click', () => {
+  const bottom = button.dataset.corner === 'bottom';
+  x = bottom ? width - 1 : 0; y = bottom ? height - 1 : 0; render();
+ }));
+ find('[data-interactive]').hidden = false;
+ render();
+})();
+</script>

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "drawing-primitive",
+    "term": "Drawing primitive",
+    "definition": "A basic operation used to assemble a picture.",
+    "example": "A pixel, line, or rectangle."
+  },
+  {
+    "id": "endpoint",
+    "term": "Endpoint",
+    "definition": "A coordinate where a line begins or ends.",
+    "example": "`line(4, 12, 11, 12, 1)` ends at `(11, 12)`."
+  },
+  {
+    "id": "dimensions",
+    "term": "Dimensions",
+    "definition": "An object's width and height, measured as counts.",
+    "example": "An 8 × 8 square extends seven positions beyond its starting coordinate."
+  },
+  {
+    "id": "off-by-one-error",
+    "term": "Off-by-one error",
+    "definition": "A count or boundary that is one too large or too small.",
+    "example": "Starting an eight-pixel square at 121 makes it extend past column 127."
+  },
+  {
+    "id": "outline",
+    "term": "Outline",
+    "definition": "Only the boundary of a shape.",
+    "example": "`oled.rect(...)`."
+  },
+  {
+    "id": "filled-shape",
+    "term": "Filled shape",
+    "definition": "A shape whose interior is drawn too.",
+    "example": "`oled.fill_rect(...)`."
+  },
+  {
+    "id": "character-cell",
+    "term": "Character cell",
+    "definition": "The area reserved for one character.",
+    "example": "The built-in font uses 8 × 8 cells."
+  },
+  {
+    "id": "glyph",
+    "term": "Glyph",
+    "definition": "The visible shape inside a character cell.",
+    "example": "A letter can leave blank columns in its eight-pixel-wide cell."
+  },
+  {
+    "id": "scene",
+    "term": "Scene",
+    "definition": "A picture assembled from several parts.",
+    "example": "A heading, stars, and a moving square."
+  },
+  {
+    "id": "state",
+    "term": "State",
+    "definition": "Values describing the program's current situation.",
+    "example": "The square's current x-coordinate."
+  },
+  {
+    "id": "frame",
+    "term": "Frame",
+    "definition": "One complete still image.",
+    "example": "A scene with the square at x = 12."
+  },
+  {
+    "id": "animation",
+    "term": "Animation",
+    "definition": "A sequence of displayed frames that creates apparent change or movement.",
+    "example": "Show the square at x = 0, then 4, then 8."
+  },
+  {
+    "id": "trail",
+    "term": "Trail",
+    "definition": "Pixels left from earlier object positions.",
+    "example": "Moving without clearing leaves old squares behind."
+  },
+  {
+    "id": "millisecond",
+    "term": "Millisecond",
+    "definition": "One thousandth of a second.",
+    "example": "`sleep_ms(100)` pauses for at least 0.1 seconds."
+  },
+  {
+    "id": "clipping",
+    "term": "Clipping",
+    "definition": "Leaving the part of a drawing outside the drawable area undrawn.",
+    "example": "A square whose right border is at x = 128 loses that border on a 128-wide screen."
+  }
+]
