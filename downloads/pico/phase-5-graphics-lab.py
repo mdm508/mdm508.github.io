@@ -1,47 +1,36 @@
-"""Phase 5: drawing graphics and making frames change over time.
+"""Phase 5: compose a scene and animate successive frames.
 
 Lesson: https://mdm508.github.io/post/drawing-graphics/
+Keep ssd1306.py in the SAME FOLDER ON THE PICO as this file.
+Upload the driver from the Phase 1 kit too; a laptop copy is not enough.
+Wiring: GP0 -> SDA, GP1 -> SCL, 3V3(OUT) -> VCC, GND -> GND.
 
-You need ssd1306.py in the SAME FOLDER on the Pico as this lab file.
-Get the driver from the Phase 1 kit linked in the lesson and upload it too.
+Only setup runs below. Write your own experiments beneath it, then run
+this WHOLE file on the Pico in Thonny or with MicroPico in VS Code.
+Replace earlier drawing experiments; keep a function when a later problem
+needs it. Use finite loops so the animation finishes by itself.
 
-Wiring: GP0 -> SDA, GP1 -> SCL, 3V3 -> VCC, GND -> GND.
-
-Only setup runs below. Write your own experiment code using the prompts.
-Use MicroPico's Run command in VS Code, or run setup in Thonny.
-Read the Python-session note linked in the lesson before using >>>.
-Use the Pico's MicroPico terminal or Thonny Shell for short experiments.
-For a function or animation loop, write the block in this file and run it
-with setup. The animation should stop on its own after a finite loop.
-No input() pauses are needed.
+No input() pauses or preserved session are required. If you choose to use
+>>> instead, the lesson links an optional MicroPico Python-session note.
 """
+
 from machine import Pin, I2C
 from ssd1306 import SSD1306_I2C
 from time import sleep_ms
 
-
 WIDTH = 128
 HEIGHT = 64
 i2c = I2C(0, scl=Pin(1), sda=Pin(0), freq=200_000)
+print("I2C devices:", i2c.scan())
 oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
 
-# Experiment 1 (Q2-Q4): compare drawing primitives.
-# Draw a line, an outlined rectangle, and a filled rectangle, one at a
-# time. Predict their last occupied coordinates before displaying them.
+# Q1: Compare a line's ending coordinate with a horizontal line's length.
+# Q2: Fit an outlined 8 x 8 square at the edge, then move one pixel farther.
+# Q3: Place two adjacent character cells without gaps or overlaps.
+# Q4: Write draw_scene(x), keeping preparation separate from show().
 
-# Experiment 2 (Q5-Q6): compose a complete scene.
-# Center a short heading. Add a border, ground line, and small square.
-# Draw every part before sending the frame once.
-
-# Experiment 3 (Q7): describe the scene with a function.
-# Give your function an x argument. Rebuild the entire picture in RAM,
-# using x to position the moving square. Keep show() outside the function.
-
-# Experiment 4 (Q8-Q11): animate and investigate.
-# Use a finite loop to move the square while keeping it fully on screen.
-# Send each prepared frame, then pause briefly. Compare keeping versus
-# clearing old pixels, and try two different pause lengths.
-
-# Experiment 5 (Q12): make it yours.
-# Design a scene with two drawing primitives, a heading, and one moving
-# part. State which values change, which stay fixed, and where it stops.
+# Homework
+# Q5: Center Hi Yush on a lit panel with four pixels of padding.
+# Q6 (challenging): Animate through the final fitting x; count frames and
+# image bytes. Keep your scene function above this finite loop.
+# Q7 (very challenging): Trace and repair a loop that shows before drawing.

@@ -18,12 +18,20 @@
   text-transform: uppercase;
 }
 
-.article-outline__links ul {
+.article-outline__links > ul {
   columns: 2;
   column-gap: 2rem;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.article-outline__links ul ul {
+  columns: auto;
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  list-style: disc;
+  color: var(--text-secondary);
 }
 
 .article-outline__links li {
@@ -141,7 +149,7 @@
     padding: 0.9rem 1rem;
   }
 
-  .article-outline__links ul {
+  .article-outline__links > ul {
     columns: 1;
   }
 
@@ -152,4 +160,298 @@
     padding-left: 0.8rem;
     padding-right: 0.8rem;
   }
+}
+
+
+.article-content .lesson-context {
+  margin: 0 0 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.article-content .lesson-context a {
+  color: inherit;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.article-content .lesson-context a:hover {
+  color: var(--rich-brown);
+}
+
+/* Exercise styling is scoped so other lessons keep their existing layout. */
+.article-content .lesson-exercise {
+  margin: 1.8rem 0 2.2rem;
+  padding: 1.1rem 1.25rem;
+  background: rgba(248, 235, 201, 0.25);
+  border-left: 3px solid rgba(139, 104, 62, 0.48);
+  border-radius: 0 6px 6px 0;
+}
+
+.article-content .lesson-exercise__title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+  line-height: 1.45;
+  color: var(--text-primary);
+  font-size: 1.15rem;
+}
+
+.article-content .lesson-review-divider {
+  margin: 3rem 0 1.75rem;
+  border: 0;
+  border-top: 1px solid rgba(139, 104, 62, 0.35);
+}
+
+.lesson-exercise__number {
+  flex: 0 0 auto;
+  padding: 0.15rem 0.4rem;
+  color: var(--text-secondary);
+  background: rgba(139, 104, 62, 0.1);
+  border-radius: 4px;
+  font: 600 0.72rem/1.5 ui-monospace, monospace;
+}
+
+.lesson-exercise__body > :first-child {
+  margin-top: 0;
+}
+
+.lesson-exercise__body > :last-child {
+  margin-bottom: 0;
+}
+
+.exercise-step {
+  display: grid;
+  grid-template-columns: 6.1rem minmax(0, 1fr);
+  gap: 0.6rem;
+  margin: 0.8rem 0;
+}
+
+.exercise-step__label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding-top: 0.08rem;
+  color: var(--rich-brown);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.exercise-step__label svg {
+  flex: 0 0 20px;
+  margin-top: 0.08rem;
+}
+
+.exercise-step__content > :first-child {
+  margin-top: 0;
+}
+
+.exercise-step__content > :last-child {
+  margin-bottom: 0;
+}
+
+.lesson-exercise .qa-hints,
+.lesson-exercise .qa-answer {
+  margin: 0.15rem 0 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.lesson-exercise .qa-hints {
+  margin-top: 1rem;
+}
+
+.lesson-exercise :is(.qa-hints, .qa-answer) > summary {
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.55rem 0.1rem;
+  color: var(--text-secondary);
+  background: none;
+  font-size: 0.88rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.lesson-exercise :is(.qa-hints, .qa-answer) > summary:hover {
+  color: var(--rich-brown);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.lesson-exercise :is(.qa-hints, .qa-answer) > summary:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.lesson-exercise :is(.qa-hints__content, .qa-answer__content) {
+  padding: 0.25rem 0 0.75rem;
+  border: 0;
+}
+
+.lesson-exercise .qa-answer[open] {
+  margin-top: 0.3rem;
+  border-top: 1px solid rgba(139, 104, 62, 0.18);
+}
+
+.lesson-exercise .qa-answer__content > p:last-child {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(139, 104, 62, 0.18);
+}
+
+@media (max-width: 520px) {
+  .article-content .lesson-exercise {
+    padding: 0.9rem 0.85rem;
+  }
+
+  .article-content .lesson-exercise__title {
+    gap: 0.5rem;
+  }
+
+  .exercise-step {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+    margin: 1rem 0;
+  }
+}
+
+.lesson-reveal-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0 1.25rem;
+}
+
+.lesson-reveal-controls[hidden] { display: none; }
+
+.lesson-reveal-controls__label {
+  margin-right: 0.25rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.lesson-reveal-controls button {
+  padding: 0.5rem 0.7rem;
+  color: var(--rich-brown);
+  background: var(--cream);
+  border: 1px solid rgba(139, 104, 62, 0.35);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.lesson-reveal-controls button:hover {
+  background: var(--light-orange);
+}
+
+.lesson-reveal-controls button:focus-visible,
+.glossary-definition > summary:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 3px;
+}
+
+.lesson-review-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.recall-glossary .glossary-definition {
+  padding: 0.25rem 0;
+  border-top: 1px solid rgba(139, 104, 62, 0.2);
+}
+
+.glossary-definition > summary {
+  padding: 0.6rem 0;
+  color: var(--rich-brown);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.glossary-definition > summary:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.glossary-definition__content { padding: 0 0 0.75rem 1rem; }
+.glossary-definition__content > :first-child { margin-top: 0; }
+.glossary-definition__content > :last-child { margin-bottom: 0; }
+.glossary-definition__example { color: var(--text-secondary); font-size: 0.92rem; }
+
+.lesson-exercise__difficulty {
+  display: inline-block;
+  margin-left: 0.25rem;
+  color: var(--rich-orange);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.oled-code-guide {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(139, 104, 62, 0.2);
+  border-radius: 5px;
+}
+
+.oled-code-guide__instruction {
+  margin: 0 0 0.7rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.oled-code-guide__lines { display: grid; gap: 0.25rem; }
+
+.oled-code-guide__lines button {
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--rich-brown);
+  text-align: left;
+  cursor: pointer;
+}
+
+.oled-code-guide__lines button code {
+  padding: 0;
+  background: none;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.oled-code-guide__lines button:hover {
+  background: rgba(248, 235, 201, 0.6);
+}
+
+.oled-code-guide__lines button[aria-pressed="true"] {
+  border-left-color: var(--accent-orange);
+  background: rgba(248, 235, 201, 0.75);
+}
+
+.oled-code-guide__lines button:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+}
+
+.oled-code-guide__explanation {
+  margin: 0.8rem 0 0;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(139, 104, 62, 0.18);
 }
