@@ -1,0 +1,86 @@
+[
+  {
+    "id": "class",
+    "term": "Class",
+    "definition": "A definition of a kind of object and its behavior.",
+    "example": "Calling `Label(\"Hi Yush\")` makes an instance of `Label`."
+  },
+  {
+    "id": "instance",
+    "term": "Instance",
+    "definition": "One object made from a class.",
+    "example": "Two `Label(...)` calls create two objects with separate `text` attributes."
+  },
+  {
+    "id": "attribute",
+    "term": "Attribute",
+    "definition": "A named part of an object, reached using a dot. Here we use attributes to store instance data.",
+    "example": "`oled.buffer` is the display object's image storage."
+  },
+  {
+    "id": "method",
+    "term": "Method",
+    "definition": "An operation supplied by a class and called on an instance.",
+    "example": "`oled.show()` calls a method with `oled` supplied as `self`."
+  },
+  {
+    "id": "self",
+    "term": "self",
+    "definition": "The conventional parameter name for the instance receiving a method call.",
+    "example": "Inside `first.rename(\"READY\")`, `self` refers to the object named `first`."
+  },
+  {
+    "id": "initializer",
+    "term": "Initializer (`__init__`)",
+    "definition": "The method Python calls to initialize a newly created instance.",
+    "example": "This driver's initialization configures the controller and sends a blank frame."
+  },
+  {
+    "id": "inheritance",
+    "term": "Inheritance",
+    "definition": "Using methods supplied by a base class when a subclass does not supply its own implementation.",
+    "example": "`SSD1306_I2C` inherits `text()` through `SSD1306` from `FrameBuffer`."
+  },
+  {
+    "id": "base-subclass",
+    "term": "Base class and subclass",
+    "definition": "A base class supplies shared behavior; a subclass builds on it.",
+    "example": "`SSD1306` is a base class of `SSD1306_I2C` and a subclass of `FrameBuffer`."
+  },
+  {
+    "id": "super",
+    "term": "super()",
+    "definition": "A way to continue method lookup after the current class, on the same instance.",
+    "example": "`super().write_data(buf)` lets a counting override preserve the inherited transfer."
+  },
+  {
+    "id": "override",
+    "term": "Override",
+    "definition": "A subclass's implementation of a method that would otherwise come from a base class.",
+    "example": "`CountingOLED.write_data()` adds counters before delegating the transfer."
+  },
+  {
+    "id": "transport",
+    "term": "Transport",
+    "definition": "The part responsible for carrying commands and image bytes over a particular connection.",
+    "example": "`SSD1306_I2C` uses I\u00b2C; `SSD1306_SPI` supplies a different transport."
+  },
+  {
+    "id": "command-data",
+    "term": "Command and image data",
+    "definition": "Commands and their parameters select controller behavior; image data describes pixel states.",
+    "example": "`invert(1)` sends a command without rewriting `oled.buffer`."
+  },
+  {
+    "id": "test-double",
+    "term": "Test double",
+    "definition": "A stand-in providing the operations another object needs, so we can test its requests.",
+    "example": "`RecordingI2C` records writes but does not communicate with an OLED."
+  },
+  {
+    "id": "snapshot",
+    "term": "Snapshot",
+    "definition": "A copy preserving contents from a particular moment.",
+    "example": "`bytes(data)` prevents later reuse of the driver's temporary array from changing old records."
+  }
+]

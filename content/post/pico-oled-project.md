@@ -31,6 +31,7 @@ Read the published lessons in order. Each one builds on the ideas introduced bef
 | [Phase 3: Memory Organization](/post/pages-and-display-memory/) | Explore a tiny Lite-Brite, flatten a 2D board into a list, and map coordinates to pages, bytes, and bits. | Which stored bit controls a particular pixel? |
 | [Phase 4: The Frame Buffer](/post/the-frame-buffer/) | Connect drawing methods to raw bytes, save frames, and investigate complete-image transfers. | What changes in Pico RAM, and what reaches the screen? |
 | [Phase 5: Drawing Graphics](/post/drawing-graphics/) | Fit shapes and character cells precisely, compose scenes, and animate them with a finite loop. | How does a sequence of still frames create movement? |
+| [Phase 6: The SSD1306 Driver](/post/the-ssd1306-driver/) | Read the real driver, follow its class relationships, and record its transfer requests. | Where do methods come from, and how can we test what they do? |
 
 ### Coming Next
 
@@ -38,7 +39,6 @@ These phases are planned. Their lesson links will be added here as they become a
 
 | Planned phase | What you will learn and do | The question behind it |
 | --- | --- | --- |
-| Phase 6: The SSD1306 Driver | Read the driver we have been using and examine how its classes share responsibilities. | Where do drawing methods and hardware operations come from? |
 | Phase 7: I²C Communication | Follow addresses, commands, and image data from the Pico to the OLED controller. | What actually travels between the two devices? |
 | Phase 8: Inside the SSD1306 Chip | Use selected datasheet diagrams to understand display memory and the controller's job. | What happens after the bytes arrive? |
 | Phase 9: Build Our Own Driver | Assemble a minimal driver that initializes the OLED and sends a prepared image. | Can we build the small layer we now understand? |

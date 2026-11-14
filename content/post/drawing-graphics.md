@@ -351,8 +351,8 @@ Appending a transfer to the broken loop would reveal the last frame, but would s
 
 You can now explain a scene's positions, prepare it from a changing value, and send it at the right point in a loop. We have used the driver extensively; next we'll open it. **How does it share work with `framebuf.FrameBuffer`, and which parts are specific to this OLED?**
 
-Phase 6 is planned. Until it is available, try changing your scene's artwork or square size and recalculate its safe movement bounds.
+In [Phase 6: The SSD1306 Driver](/post/the-ssd1306-driver/), we will trace those calls through the real source and build a recorder to test what the driver sends.
 
-[Back to Phase 4 ←](/post/the-frame-buffer/) · [Project roadmap and planned phases](/post/pico-oled-project/)
+[Continue to Phase 6: The SSD1306 Driver →](/post/the-ssd1306-driver/) · [Back to Phase 4 ←](/post/the-frame-buffer/) · [Project roadmap](/post/pico-oled-project/)
 
 For reference: [MicroPython drawing and 8 × 8 text](https://docs.micropython.org/en/v1.26.0/library/framebuf.html), the [implementation that provides `fill_rect()`](https://github.com/micropython/micropython/blob/v1.26.0/extmod/modframebuf.c), and [`sleep_ms()` timing](https://docs.micropython.org/en/v1.26.0/library/time.html#time.sleep_ms).

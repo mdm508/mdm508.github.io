@@ -24,5 +24,6 @@ Connect code to the physical world through experiments, questions, and projects.
 3. [Memory Organization]({{< relref "/post/pages-and-display-memory.md" >}}) — Practice a grid-to-list mapping, then find pixels in pages, bytes, and bits.
 4. [The Frame Buffer]({{< relref "/post/the-frame-buffer.md" >}}) — Follow drawing into RAM, save a frame, and choose when to send it.
 5. [Drawing Graphics]({{< relref "/post/drawing-graphics.md" >}}) — Fit shapes and character cells precisely, compose scenes, and animate frames.
+6. [The SSD1306 Driver]({{< relref "/post/the-ssd1306-driver.md" >}}) — Trace inherited methods, follow setup and transfers, and test the driver with a recording connection.
 
 Later phases will explore communication and the controller, then build a small driver.
