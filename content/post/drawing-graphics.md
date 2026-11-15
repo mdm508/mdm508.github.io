@@ -351,7 +351,7 @@ Appending a transfer to the broken loop would reveal the last frame, but would s
 
 You can now explain a scene's positions, prepare it from a changing value, and send it at the right point in a loop. We have used the driver extensively; next we'll open it. **How does it share work with `framebuf.FrameBuffer`, and which parts are specific to this OLED?**
 
-In [Phase 6: The SSD1306 Driver](/post/the-ssd1306-driver/), we will trace those calls through the real source and build a recorder to test what the driver sends.
+In [Phase 6: The SSD1306 Driver](/post/the-ssd1306-driver/), we will trace those calls through the real source and use a recorder to test what the driver sends.
 
 [Continue to Phase 6: The SSD1306 Driver →](/post/the-ssd1306-driver/) · [Back to Phase 4 ←](/post/the-frame-buffer/) · [Project roadmap](/post/pico-oled-project/)
 

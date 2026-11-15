@@ -168,19 +168,34 @@ def main():
 
     driver = load_driver()
     env = {"ssd1306": driver, "WIDTH": 128, "HEIGHT": 64}
-    assert run(blocks(source)[0], env) == "PICO"
-    assert run(blocks(questions[1])[0], env) == "READY\nPICO"
+    assert run(blocks(source)[0], env) == "64"
+    assert run(blocks(questions[1])[0], env) == "64 0"
+    assert env["first"].buffer is not env["second"].buffer
     assert "show" not in driver.SSD1306_I2C.__dict__
     assert "show" in driver.SSD1306.__dict__
     assert "text" not in driver.SSD1306_I2C.__dict__ and "text" not in driver.SSD1306.__dict__
     assert driver.SSD1306.fill is FrameBuffer.fill
-    run(blocks(answers[5])[0], env)
+    # The supplied scaffold is intentionally wrong in one recording line.
+    run(blocks(questions[5])[0], env)
+    assert run(blocks(questions[5])[1], env) == "False\nTrue"
+    assert env["bus"].events[0][2] is env["scratch"]
+    repaired = next(code for code in blocks(answers[5]) if code.startswith("class RecordingI2C:"))
+    run(repaired, env)
     assert run(blocks(questions[5])[1], env) == "True\nTrue"
-    assert run(blocks(answers[5])[1], env) == "1024\nwritevto\n1025"
+    assert run(blocks(answers[5])[-1], env) == "1024\nwritevto\n1025"
     assert env["bus"].events[-1] == ("writevto", 60, b"\x40" + bytes(1024))
     Recorder = env["RecordingI2C"]
     assert Recorder().writeto(60, b"ab") == 2
     assert Recorder().writevto(60, [b"a", bytearray(b"bc")]) == 3
+
+    assert driver.SSD1306_SPI.show is driver.SSD1306_I2C.show
+    assert driver.SSD1306_SPI.init_display is driver.SSD1306_I2C.init_display
+    assert driver.SSD1306_SPI.write_data is not driver.SSD1306_I2C.write_data
+    assert driver.SSD1306_SPI.write_cmd is not driver.SSD1306_I2C.write_cmd
+    assert source.index("## Read show() as a Recipe") < source.index('{{< lesson-exercise number="2"')
+    assert source.index("## Follow a Successful Setup First") < source.index('{{< lesson-exercise number="3"')
+    assert source.index("{{< driver-call-trace >}}") < source.index("## Read show() as a Recipe")
+    assert 'title="Optional: count transfers' in source
 
     # Simulate precisely the Q3 edit on a copy of the class AST, never on disk.
     tree = ast.parse(DRIVER.read_text())

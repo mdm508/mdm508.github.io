@@ -3,13 +3,13 @@
     "id": "class",
     "term": "Class",
     "definition": "A definition of a kind of object and its behavior.",
-    "example": "Calling `Label(\"Hi Yush\")` makes an instance of `Label`."
+    "example": "`TinyDisplay()` makes an instance with a buffer and a `set_column()` method."
   },
   {
     "id": "instance",
     "term": "Instance",
     "definition": "One object made from a class.",
-    "example": "Two `Label(...)` calls create two objects with separate `text` attributes."
+    "example": "Two `TinyDisplay()` calls create two objects with separate image buffers."
   },
   {
     "id": "attribute",
@@ -27,7 +27,7 @@
     "id": "self",
     "term": "self",
     "definition": "The conventional parameter name for the instance receiving a method call.",
-    "example": "Inside `first.rename(\"READY\")`, `self` refers to the object named `first`."
+    "example": "Inside `first.set_column(2, 64)`, `self` refers to the first display object."
   },
   {
     "id": "initializer",
@@ -51,11 +51,11 @@
     "id": "super",
     "term": "super()",
     "definition": "A way to continue method lookup after the current class, on the same instance.",
-    "example": "`super().write_data(buf)` lets a counting override preserve the inherited transfer."
+    "example": "`super().__init__(...)` continues the driver's setup on the same instance."
   },
   {
     "id": "override",
-    "term": "Override",
+    "term": "Override (optional extension)",
     "definition": "A subclass's implementation of a method that would otherwise come from a base class.",
     "example": "`CountingOLED.write_data()` adds counters before delegating the transfer."
   },

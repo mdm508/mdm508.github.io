@@ -2,150 +2,186 @@
 .driver-trace { margin:1.5rem 0; padding:1rem; border:1px solid var(--medium-brown); border-radius:8px; background:var(--light-orange); }
 .driver-trace h3 { margin-top:0; }
 .driver-trace__choose { display:grid; gap:.4rem; margin:.8rem 0; }
-.driver-trace select { width:100%; max-width:100%; padding:.55rem; background:var(--cream); color:var(--deep-brown); border:1px solid var(--medium-brown); border-radius:4px; font:inherit; }
-.driver-trace__owners { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.4rem; padding:0; margin:1rem 0; list-style:none; }
-.driver-trace__owners li { min-width:0; padding:.5rem; border:1px solid var(--medium-brown); border-radius:4px; background:var(--cream); font: .75rem/1.5 ui-monospace,monospace; overflow-wrap:anywhere; }
-.driver-trace__owners li[data-active="true"] { background:#f7cb6b; color:var(--deep-brown); border:2px solid var(--rich-brown); padding:calc(.5rem - 1px); }
-.driver-trace__owners small { display:block; font: .7rem/1.5 sans-serif; }
-.driver-trace__stage { display:grid; min-width:0; }
-.driver-trace__card { grid-area:1 / 1; align-self:start; min-width:0; visibility:hidden; }
-.driver-trace__card[data-active="true"] { visibility:visible; }
-.driver-trace__card p { margin:.7rem 0; }
-.driver-trace__card p:first-child { margin-top:0; }
-.driver-trace__card pre { margin:.7rem 0; padding:.75rem; white-space:pre-wrap; overflow-wrap:anywhere; }
-.driver-trace__card pre code { white-space:inherit; background:transparent; color:inherit; padding:0; }
-.driver-trace__controls { display:flex; flex-wrap:wrap; gap:.6rem; padding-top:.8rem; margin-top:.8rem; border-top:1px solid var(--medium-brown); }
-.driver-trace button { min-height:2.8rem; padding:.5rem .8rem; border:1px solid var(--rich-brown); border-radius:4px; background:var(--rich-brown); color:var(--cream); font:inherit; cursor:pointer; }
+.driver-trace select { width:100%; max-width:100%; min-height:2.7rem; padding:.5rem; background:var(--cream); color:var(--deep-brown); border:1px solid var(--medium-brown); border-radius:4px; font:inherit; }
+.driver-trace__objects { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:.75rem; margin:1rem 0; }
+.driver-trace__object { min-width:0; padding:.75rem; border:2px solid var(--medium-brown); border-radius:5px; background:var(--cream); }
+.driver-trace__object[data-active="true"] { border-color:var(--rich-brown); box-shadow:inset 0 0 0 1px var(--rich-brown); }
+.driver-trace__object p { margin:0 0 .4rem; }
+.driver-trace__object small { display:block; font-size:.8rem; }
+.driver-trace__owners { display:grid; gap:.3rem; padding:0; margin:.5rem 0; list-style:none; }
+.driver-trace__owners li { min-width:0; padding:.25rem .45rem; border:1px solid var(--medium-brown); border-radius:3px; font:.8rem/1.5 ui-monospace,monospace; overflow-wrap:anywhere; }
+.driver-trace__owners li[data-active="true"] { background:#f7cb6b; color:var(--deep-brown); }
+.driver-trace__questions { display:grid; margin:.7rem 0; }
+.driver-trace__question { grid-area:1/1; margin:0; visibility:hidden; }
+.driver-trace__question[data-active="true"] { visibility:visible; }
+.driver-trace__prediction-label { display:block; margin:.5rem 0 .3rem; }
+.driver-trace__controls { display:flex; flex-wrap:wrap; gap:.5rem; margin:.75rem 0; }
+.driver-trace button { min-height:2.8rem; padding:.5rem .7rem; border:1px solid var(--rich-brown); border-radius:4px; background:var(--rich-brown); color:var(--cream); font:inherit; cursor:pointer; }
 .driver-trace [data-advance] { width:15rem; max-width:100%; }
-.driver-trace [data-reset] { background:transparent; color:var(--rich-brown); }
+.driver-trace :is([data-reveal],[data-reset]) { background:transparent; color:var(--rich-brown); }
 .driver-trace button:disabled { cursor:default; opacity:.5; }
 .driver-trace :is(button,select):focus-visible { outline:3px solid var(--accent-orange); outline-offset:3px; }
-.driver-trace__live { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.driver-trace__feedback { min-height:3em; margin:.6rem 0; }
+.driver-trace__answer { padding:.75rem; background:var(--cream); border-left:3px solid var(--rich-orange); }
+.driver-trace__answer p { margin:.6rem 0; }
+.driver-trace__answer p:first-child { margin-top:0; }
+.driver-trace__answer pre { margin:.6rem 0; padding:.7rem; white-space:pre-wrap; overflow-wrap:anywhere; }
+.driver-trace__answer pre code { white-space:inherit; background:transparent; color:inherit; padding:0; }
+.driver-trace [hidden] { display:none; }
 @media(max-width:600px) {
- .driver-trace__owners { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .driver-trace__objects { grid-template-columns:minmax(0,1fr); }
  .driver-trace__controls button { width:100%; }
 }
 </style>
 <section class="driver-trace" id="driver-call-trace" data-driver-trace aria-labelledby="driver-call-trace-title">
-<h3 id="driver-call-trace-title">Follow one call</h3>
+<h3 id="driver-call-trace-title">Which method? Which object?</h3>
+<p data-guide>First trace text(), then show(). Read setup and settings below before exploring the other calls.</p>
 <label class="driver-trace__choose">Call to investigate
 <select data-call aria-label="Call to investigate">
-<option value="text">oled.text("Hi Yush", 0, 0)</option>
-<option value="show" selected>oled.show()</option>
-<option value="invert">oled.invert(1)</option>
-<option value="construct">SSD1306_I2C(128, 64, i2c)</option>
+<option value="text" selected>1. text()</option>
+<option value="show" data-show-option disabled>2. show()</option>
+<option value="construct" data-extra-option hidden disabled>Later: construction</option>
+<option value="invert" data-extra-option hidden disabled>Later: oled.invert(1)</option>
 </select>
 </label>
-<ol class="driver-trace__owners" aria-label="Three classes in the lookup chain, followed by the separate connection object">
-<li data-owner="i2c">SSD1306_I2C<small>Display object's class</small></li>
-<li data-owner="ssd">SSD1306<small>Base class</small></li>
-<li data-owner="frame">FrameBuffer<small>Drawing base class</small></li>
-<li data-owner="bus">i2c<small>Separate connection object</small></li>
+<div class="driver-trace__objects" aria-label="One display object and its separate connection object">
+<div class="driver-trace__object" data-object="display">
+<p><strong>One display object: <code>oled</code></strong></p>
+<small>Look for its methods in this class chain:</small>
+<ol class="driver-trace__owners" aria-label="Method lookup on the same display instance">
+<li data-owner="i2c">SSD1306_I2C</li>
+<li data-owner="ssd">SSD1306</li>
+<li data-owner="frame">FrameBuffer</li>
 </ol>
-<div class="driver-trace__stage" data-stage></div>
-<div class="driver-trace__controls">
-<button type="button" data-advance aria-controls="driver-call-trace" disabled>Reveal first step</button>
-<button type="button" data-reset disabled>Start this call again</button>
+<small>One picture buffer: <code>oled.buffer</code></small>
 </div>
-<p class="driver-trace__live" data-live role="status" aria-live="polite" aria-atomic="true"></p>
-<noscript>Find text() in FrameBuffer, show() and invert() in SSD1306, and write_cmd()/write_data() in SSD1306_I2C. Follow each self call on the same display instance; only self.i2c calls use the separate connection object.</noscript>
+<div class="driver-trace__object" data-object="bus">
+<p><strong>A separate connection: <code>i2c</code></strong></p>
+<p><code>oled.i2c</code> refers to this object.</p>
+<small>It supplies <code>writeto()</code> and <code>writevto()</code>. It is outside the display's inheritance chain.</small>
+</div>
+</div>
+<p data-progress>Guided call 1 of 2 · Step 1</p>
+<div class="driver-trace__questions" data-questions></div>
+<label class="driver-trace__prediction-label" for="driver-trace-prediction">Your prediction</label>
+<select id="driver-trace-prediction" data-prediction aria-label="Your prediction"></select>
+<div class="driver-trace__controls">
+<button type="button" data-advance disabled>Check prediction</button>
+<button type="button" data-reveal disabled>Show explanation</button>
+<button type="button" data-reset disabled>Restart call</button>
+</div>
+<p class="driver-trace__feedback" data-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+<div class="driver-trace__answer" data-answer hidden>
+<p><strong data-title></strong></p>
+<p data-receiver></p>
+<pre><code data-code></code></pre>
+<p data-reason></p>
+</div>
+<noscript>Find text() in FrameBuffer and show() in SSD1306. Both run on the same oled object. In self.write_data(...), self is still oled; in self.i2c.writevto(...), the receiver is the separate connection object.</noscript>
 </section>
 <script>
 (() => {
   const root = document.currentScript.previousElementSibling;
   if (!root || !root.matches('[data-driver-trace]')) return;
+  const choices = {
+    definition:[['frame','FrameBuffer'],['ssd','SSD1306'],['i2c','SSD1306_I2C']],
+    receiver:[['display','Same display'],['new','New base object'],['bus','Connection object']],
+    change:[['ram','Prepared image'],['command','Controller setting'],['image','Image transfer']],
+    image:[['prepared','Current buffer'],['redraw','Saved drawing calls'],['clear','Blank image first']],
+    frames:[['zero','No image'],['one','One blank image'],['two','Two images']]
+  };
+  // Each item asks one question before revealing source context and reasoning.
   const routes = {
-    text: {
-      question:'Predict where Python will find text(). Will this call request any I²C transfer?',
-      steps:[
-        ['i2c','Look in the instance’s class','class SSD1306_I2C(SSD1306):','There is no text() definition here. Continue into its base class; the instance itself does not change.'],
-        ['ssd','Continue into SSD1306','class SSD1306(framebuf.FrameBuffer):','There is no text() definition here either. Continue into FrameBuffer.'],
-        ['frame','Run the drawing method','oled.text("Hi Yush", 0, 0)','FrameBuffer.text() edits the bytes backing this display object. No command or image transfer is requested. show() is still needed to send the picture.']
-      ]
-    },
-    show: {
-      question:'Predict where show() is defined. When it calls self.write_data(...), which implementation will run?',
-      steps:[
-        ['i2c','Start the method lookup','class SSD1306_I2C(SSD1306):','This class has writers but no show() definition. Continue into SSD1306.'],
-        ['ssd','Select the destination ranges','self.write_cmd(SET_COL_ADDR)\nself.write_cmd(x0)\nself.write_cmd(x1)\nself.write_cmd(SET_PAGE_ADDR)\nself.write_cmd(0)\nself.write_cmd(self.pages - 1)','For 128 × 64, the values are 0x21, 0, 127, 0x22, 0, 7. These six calls use the same display instance’s write_cmd().'],
-        ['i2c','Use the transport-specific writer','self.temp[0] = 0x80\nself.temp[1] = cmd\nself.i2c.writeto(self.addr, self.temp)','Each of the six command values reaches SSD1306_I2C.write_cmd(). It prepares two bytes and calls the separate connection object.'],
-        ['bus','Pass the six command writes to I²C','self.i2c.writeto(self.addr, self.temp)','The connection carries each request. The display buffer has not been changed by any of these writes.'],
-        ['i2c','Send the prepared image','self.write_list[1] = buf\nself.i2c.writevto(self.addr, self.write_list)','Back in show(), self.write_data(self.buffer) finds SSD1306_I2C.write_data(). Its list contains a prefix byte and the existing buffer.'],
-        ['bus','Complete one image transfer','i2c.writevto(address, parts)','One request contains 1,024 image bytes plus a one-byte prefix. show() reads and sends the prepared picture; it does not redraw it.']
-      ]
-    },
-    invert: {
-      question:'Predict whether invert(1) changes the Python buffer, sends an image, or sends a controller setting.',
-      steps:[
-        ['i2c','Look for invert()','class SSD1306_I2C(SSD1306):','No invert() definition appears here. Continue into SSD1306.'],
-        ['ssd','Build one setting command','self.write_cmd(SET_NORM_INV | (invert & 1))','For argument 1, 0xA6 | 1 is 0xA7. This method does not call fill() or write_data().'],
-        ['i2c','Use the I²C command writer','self.temp[0] = 0x80\nself.temp[1] = cmd\nself.i2c.writeto(self.addr, self.temp)','The same display instance uses its transport writer to prepare 80 A7.'],
-        ['bus','Request a setting change','i2c.writeto(0x3C, b"\\x80\\xa7")','One command write reaches the connection. No image is sent and the Python buffer is unchanged. The controller setting affects how image data is presented.']
-      ]
-    },
-    construct: {
-      question:'Predict what must be ready before the base initializer runs. Does construction send an image?',
-      steps:[
-        ['i2c','Prepare the transport state','self.i2c = i2c\nself.addr = addr\nself.temp = bytearray(2)\nself.write_list = [b"\\x40", None]','The connection and temporary storage are set up first. The next call is super().__init__(width, height, external_vcc).'],
-        ['ssd','Allocate the image','self.pages = self.height // 8\nself.buffer = bytearray(self.pages * self.width)','The same instance now has eight pages and a 1,024-byte buffer. Next, the base code calls the FrameBuffer initializer.'],
-        ['frame','Connect drawing to that storage','super().__init__(self.buffer, self.width, self.height, framebuf.MONO_VLSB)','FrameBuffer uses the supplied bytearray. This does not create a second picture buffer.'],
-        ['ssd','Initialize the controller, then clear and show','self.init_display()\n# init_display ends with:\nself.fill(0)\nself.show()','The setup sequence uses the subclass’s write_cmd(). At the end, fill(0) clears RAM and show() uses the transport writers to send a blank frame.'],
-        ['bus','Finish setup before returning oled','SSD1306_I2C(128, 64, i2c)','The connection has received setup writes, the show() range writes, and one blank image. The construction call then returns the initialized display object.']
-      ]
-    }
+    text:[
+      {kind:'definition', correct:'frame', owner:'frame', receiver:'display', question:'Python needs text(). Which class supplies its definition?', title:'An inherited drawing method', code:'oled.text("Hi Yush", 0, 0)', reason:'Lookup starts in SSD1306_I2C, continues into SSD1306, and finds text() in FrameBuffer. The receiving object is still oled.', hint:'Follow the class headers beyond the two Python classes. Neither defines text().'},
+      {kind:'change', correct:'ram', owner:'frame', receiver:'display', question:'What does this text() call change?', title:'Drawing changes the prepared picture', code:'oled.text("Hi Yush", 0, 0)', reason:'FrameBuffer.text() changes the bytes backing oled. It requests no I²C transfer; show() is still needed to send the picture.', hint:'Phase 4 separated preparing an image from sending it. Look for a call to show() or an I²C writer.'}
+    ],
+    show:[
+      {kind:'definition', correct:'ssd', owner:'ssd', receiver:'display', question:'Which class defines show()?', title:'Find the shared show() recipe', code:'self.write_cmd(SET_COL_ADDR)\n# More range-setting writes follow.\nself.write_data(self.buffer)', reason:'SSD1306 defines show(). It prepares the destination ranges and then asks the same display object to write its image.', hint:'Find def show in the file. The I²C subclass supplies the writers; the shared SSD1306 class supplies the recipe.'},
+      {kind:'receiver', correct:'display', owner:'i2c', receiver:'display', question:'Inside show(), who receives self.write_data(self.buffer)?', title:'The method definition changes; the object does not', code:'self.write_data(self.buffer)', reason:'self is still the original display instance. Method lookup finds its write_data() implementation in SSD1306_I2C. No new display object is created.', hint:'Follow the expression before the dot: self. Finding a base or subclass definition does not construct another object.'},
+      {kind:'receiver', correct:'bus', owner:null, receiver:'bus', question:'Inside that writer, who receives self.i2c.writevto(...)?', title:'Now the call reaches another object', code:'self.i2c.writevto(self.addr, self.write_list)', reason:'self.i2c selects the separate connection object. That object receives writevto(); it is not another class in the display inheritance chain.', hint:'Read the whole expression before .writevto: self.i2c refers to the stored connection.'},
+      {kind:'image', correct:'prepared', owner:'ssd', receiver:'display', question:'After the writes return to show(), which picture has it sent?', title:'Return to show() after the transfer', code:'self.write_data(self.buffer)\n# The call returns; show() finishes.', reason:'The existing buffer was sent. show() does not replay drawing calls, redraw the picture, or clear the buffer.', hint:'The argument is self.buffer, not a saved list of drawing instructions.'}
+    ],
+    construct:[
+      {kind:'definition', correct:'i2c', owner:'i2c', receiver:'display', question:'For SSD1306_I2C(...), which class supplies the first initializer?', title:'Prepare the transport state first', code:'self.i2c = i2c\nself.addr = addr\nself.temp = bytearray(2)\nself.write_list = [b"\\x40", None]', reason:'The I²C class prepares the connection and temporary storage before calling super().__init__(...). The new instance will be assigned to oled after setup returns.', hint:'Start with the class being called, then look for its __init__ definition.'},
+      {kind:'receiver', correct:'display', owner:'ssd', receiver:'display', question:'Does super().__init__(...) initialize this same instance or create a base-class object?', title:'Continue initialization on the same instance', code:'super().__init__(width, height, external_vcc)', reason:'The same new display instance receives the base initialization. SSD1306 allocates its buffer and connects FrameBuffer drawing to that storage.', hint:'super() continues method lookup on the existing instance. It does not call a class to create a second display.'},
+      {kind:'definition', correct:'i2c', owner:'i2c', receiver:'display', question:'Base-class init_display() calls self.write_cmd(...). Which class supplies that writer?', title:'Base code can use the subclass writer', code:'self.write_cmd(cmd)', reason:'Method lookup still starts at the actual instance’s class, SSD1306_I2C. Its writer can use the temporary array that was prepared before the base initializer ran.', hint:'The location of the calling code does not change the actual instance or its class.'},
+      {kind:'frames', correct:'one', owner:'ssd', receiver:'display', question:'Before construction returns, how many image transfers does this driver request?', title:'Setup includes a blank frame', code:'self.fill(0)\nself.show()', reason:'init_display() ends by clearing RAM and sending one blank image through the transport writers. Earlier setup and range writes are commands, not additional image transfers.', hint:'Find the last two statements of init_display(). Count image transfers separately from command writes.'}
+    ],
+    invert:[
+      {kind:'definition', correct:'ssd', owner:'ssd', receiver:'display', question:'Which class defines invert()?', title:'Find the controller-setting method', code:'self.write_cmd(SET_NORM_INV | (invert & 1))', reason:'SSD1306 defines invert(). It uses the transport writer supplied by the actual display instance.', hint:'Search for def invert in the shared class.'},
+      {kind:'change', correct:'command', owner:'ssd', receiver:'display', question:'What does invert(1) request?', title:'Change a setting, not the image bytes', code:'self.write_cmd(0xA6 | 1)', reason:'The resulting command is 0xA7. There is no fill() or write_data() call, so Python’s image buffer stays unchanged.', hint:'Read which writer is called: write_cmd(), not write_data().'},
+      {kind:'receiver', correct:'bus', owner:null, receiver:'bus', question:'The command writer calls self.i2c.writeto(...). Who receives that call?', title:'Pass the setting to the separate connection', code:'self.i2c.writeto(self.addr, self.temp)', reason:'The stored connection receives the request. The display object selected the command; the connection carries it.', hint:'self.i2c is an attribute referring to the connection object.'}
+    ]
   };
-  const stage = root.querySelector('[data-stage]');
-  const select = root.querySelector('[data-call]');
-  const advance = root.querySelector('[data-advance]');
-  const reset = root.querySelector('[data-reset]');
-  const live = root.querySelector('[data-live]');
-  const cards = {};
-  let position = -1;
-  const element = (tag, text) => {
-    const node = document.createElement(tag);
-    if (text !== undefined) node.textContent = text;
-    return node;
-  };
-  for (const [key, route] of Object.entries(routes)) {
-    const states = [[null,'Think first','',route.question], ...route.steps];
-    cards[key] = states.map(([owner,title,code,reason], index) => {
-      const card = element('div');
-      card.className = 'driver-trace__card';
-      card.id = `driver-trace-${key}-${index}`;
-      const progress = element('p', index ? `Step ${index} of ${route.steps.length}` : 'Before tracing');
-      const heading = element('p'); heading.append(element('strong', title));
-      card.append(progress, heading);
-      if (code) { const pre = element('pre'); pre.append(element('code', code)); card.append(pre); }
-      card.append(element('p', reason));
-      card.inert = true; card.setAttribute('aria-hidden','true');
-      stage.append(card);
-      return {card,owner,title,reason};
+  const find = selector => root.querySelector(selector);
+  const call = find('[data-call]');
+  const prediction = find('[data-prediction]');
+  const advance = find('[data-advance]');
+  const reveal = find('[data-reveal]');
+  const reset = find('[data-reset]');
+  const answer = find('[data-answer]');
+  const feedback = find('[data-feedback]');
+  const questions = {};
+  let route = 'text';
+  let index = 0;
+  let revealed = false;
+  let showUnlocked = false;
+  let exploring = false;
+  const element = (tag,text) => { const node=document.createElement(tag); if(text!==undefined)node.textContent=text; return node; };
+  for (const [name, steps] of Object.entries(routes)) {
+    questions[name] = steps.map((step,number) => {
+      const p=element('p',step.question); p.className='driver-trace__question'; p.id=`driver-question-${name}-${number}`;
+      p.inert=true; p.setAttribute('aria-hidden','true'); find('[data-questions]').append(p); return p;
     });
   }
-  function render(announce=true) {
-    const key = select.value;
-    const route = routes[key];
-    const active = cards[key][position + 1];
-    for (const [name, group] of Object.entries(cards)) {
-      group.forEach(({card},index) => {
-        const visible = name === key && index === position + 1;
-        card.dataset.active = String(visible);
-        card.inert = !visible;
-        card.setAttribute('aria-hidden',String(!visible));
-      });
-    }
-    root.querySelectorAll('[data-owner]').forEach(owner => { owner.dataset.active = String(owner.dataset.owner === active.owner); });
-    advance.textContent = position < 0 ? 'Reveal first step' : position === route.steps.length - 1 ? 'Trace this call again' : 'Next step →';
-    advance.setAttribute('aria-describedby',active.card.id);
-    reset.disabled = position < 0;
-    if (announce) live.textContent = `${active.title}. ${active.reason}`;
+  function showAnswer(message) {
+    const step=routes[route][index]; revealed=true;
+    answer.hidden=false; prediction.disabled=true; reveal.disabled=true;
+    find('[data-title]').textContent=step.title;
+    find('[data-receiver]').textContent=step.receiver==='bus' ? 'Receiver: the separate connection object.' : route==='construct' ? 'Receiver: the same new display instance.' : 'Receiver: the same oled object.';
+    find('[data-code]').textContent=step.code;
+    find('[data-reason]').textContent=step.reason;
+    root.querySelectorAll('[data-owner]').forEach(node=>{node.dataset.active=String(node.dataset.owner===step.owner);});
+    root.querySelectorAll('[data-object]').forEach(node=>{node.dataset.active=String(node.dataset.object===step.receiver);});
+    advance.textContent=index<routes[route].length-1 ? 'Next step →' : !exploring && route==='text' ? 'Next: show() →' : !exploring && route==='show' ? 'Explore calls' : 'Trace again';
+    reset.disabled=false; feedback.textContent=message;
   }
-  select.addEventListener('change', () => { position = -1; render(); });
-  reset.addEventListener('click', () => { position = -1; render(); });
-  advance.addEventListener('click', () => {
-    position = position === routes[select.value].steps.length - 1 ? -1 : position + 1;
-    render();
+  function render(message='') {
+    const step=routes[route][index]; revealed=false;
+    call.value=route; prediction.disabled=false; prediction.textContent='';
+    const blank=element('option','Choose an answer'); blank.value=''; prediction.append(blank);
+    for(const [value,label] of choices[step.kind]) { const option=element('option',label); option.value=value; prediction.append(option); }
+    prediction.value='';
+    for(const [name,items] of Object.entries(questions)) items.forEach((node,n)=>{const active=name===route&&n===index; node.dataset.active=String(active); node.inert=!active; node.setAttribute('aria-hidden',String(!active));});
+    prediction.setAttribute('aria-describedby',questions[route][index].id);
+    root.querySelectorAll('[data-owner]').forEach(node=>{node.dataset.active='false';});
+    root.querySelectorAll('[data-object]').forEach(node=>{node.dataset.active='false';});
+    find('[data-progress]').textContent=`${exploring ? 'Explore' : route==='text' ? 'Guided call 1 of 2' : 'Guided call 2 of 2'} · Step ${index+1} of ${routes[route].length}`;
+    answer.hidden=true; advance.textContent='Check prediction'; reveal.disabled=false; reset.disabled=index===0;
+    find('[data-show-option]').disabled=!showUnlocked;
+    root.querySelectorAll('[data-extra-option]').forEach(option=>{option.hidden=!exploring; option.disabled=!exploring;});
+    feedback.textContent=message;
+  }
+  advance.addEventListener('click',()=>{
+    const step=routes[route][index];
+    if(!revealed) {
+      if(!prediction.value) { feedback.textContent='Choose an answer first, or use Show explanation after thinking it through.'; return; }
+      if(prediction.value!==step.correct) { feedback.textContent=`Try again. ${step.hint}`; return; }
+      showAnswer('Yes. Read the explanation and point to the object receiving the call.'); return;
+    }
+    if(index<routes[route].length-1) { index++; render(); }
+    else if(!exploring&&route==='text') { showUnlocked=true; route='show'; index=0; render('Drawing is traced. Now follow the same oled object through show().'); }
+    else if(!exploring&&route==='show') { exploring=true; index=0; render('Guided traces complete. After reading setup and settings below, choose construction or inversion from the call menu.'); call.focus(); }
+    else { index=0; render(); }
   });
-  render(false); advance.disabled = false; root.dataset.ready = 'true';
+  reveal.addEventListener('click',()=>{ if(!revealed)showAnswer('Compare the explanation with your prediction before continuing.'); });
+  reset.addEventListener('click',()=>{index=0;render();});
+  call.addEventListener('change',()=>{
+    const selected=call.value;
+    if(!Object.hasOwn(routes,selected)||(selected==='show'&&!showUnlocked)||(['construct','invert'].includes(selected)&&!exploring)) {call.value=route;return;}
+    route=selected; index=0; render();
+  });
+  render(); advance.disabled=false; reveal.disabled=false; root.dataset.ready='true';
 })();
 </script>

@@ -2,7 +2,7 @@
 title: "Phase 6: The SSD1306 Driver — Follow the Method Calls"
 date: 2026-11-14T00:00:00-08:00
 draft: false
-description: "Read the real OLED driver, follow inherited methods and initialization, and build a recorder to investigate commands and image transfers."
+description: "Read the real OLED driver, follow inherited methods and initialization, and use a recording connection to investigate commands and image transfers."
 summary: "Find where drawing methods come from, trace show() through the driver, and test its behavior with a recording I²C stand-in."
 tags: ["python", "micropython", "raspberry-pi-pico", "electronics", "classes"]
 reading_time: 90
@@ -11,72 +11,75 @@ toc_depth: 3
 
 <aside class="lesson-context" aria-label="Related guides">Part of the <a href="/post/pico-oled-project/">Pico OLED project: guide and lesson roadmap</a>. Previously: <a href="/post/drawing-graphics/">Phase 5: Drawing Graphics</a>.</aside>
 
-Open `ssd1306.py` and search for `def text`. Nothing! Yet `oled.text("Hi Yush", 0, 0)` has worked all along. **Where did that method come from?** Today we'll follow the calls behind familiar commands. By the end, you'll be able to explain how the driver shares its work—and write a small recorder that lets you investigate it yourself.
+Open `ssd1306.py` and search for `def text`. Nothing! Yet `oled.text("Hi Yush", 0, 0)` has worked all along. **Where did that method come from?** Today we'll follow the calls behind familiar commands. By the end, you'll be able to follow those calls on one display object and explain when it uses a separate connection object. We'll use a recorder to check our reasoning.
 
 ## What You Will Be Able to Do
 
 - Explain a class, an instance, `self`, and inherited methods using code you can trace.
 - Follow the driver's setup and explain why its order matters.
 - Separate drawing, OLED commands, and image transfers by finding their definitions.
-- Record transfers and extend a method while preserving the work it already does.
+- Use recorded transfers to check a prediction and explain which code can be reused with another connection.
 
 ## Get Ready
 
-{{< download "/downloads/pico/phase-6-driver-lab.py" "Download the Phase 6 driver lab" >}}. Only imports, dimensions, and a readiness message run. Keep the [Phase 1 kit's `ssd1306.py`](/downloads/pico/phase-1-kit/ssd1306.py) in the **same folder on the Pico**. Open that file beside the lab so you can search its definitions. Keep the borrowed driver unchanged; write experiments in your lab file.
+{{< download "/downloads/pico/phase-6-driver-lab.py?v=2" "Download the Phase 6 driver lab" >}}. Only imports, dimensions, and a readiness message run; Q5 will create `oled` using the recorder. Keep the [Phase 1 kit's `ssd1306.py`](/downloads/pico/phase-1-kit/ssd1306.py) in the **same folder on the Pico**. Open that file beside the lab so you can search its definitions. Keep the borrowed driver unchanged; write experiments in your lab file.
 
 Run the whole lab file through Thonny or MicroPico in VS Code. Keep any class a later question uses, and replace earlier experiment code. No `input()` pauses or preserved Python session are needed.
 
-**An OLED connection is optional today.** Our final experiments replace the physical connection with a recorder. They still need MicroPython, such as on your Pico, because `framebuf` is built into that runtime. Ordinary desktop Python can run the small `Label` example below in a separate file; importing this driver there usually fails because `framebuf` is missing. Without a Pico, use the browser trace and work through the source on paper.
+**An OLED connection is optional today.** Our final experiments replace the physical connection with a recorder. They still need MicroPython, such as on your Pico, because `framebuf` is built into that runtime. Ordinary desktop Python can run the small `TinyDisplay` example below in a separate file; importing this driver there usually fails because `framebuf` is missing. Without a Pico, use the browser trace and work through the source on paper.
 
-We'll read the exact driver supplied in the kit. Other versions may arrange their code differently. The detailed meaning of controller settings and I²C control bytes comes in the next phases; today's job is to follow who calls whom.
+We'll read the exact driver supplied in the kit. Other versions may arrange their code differently. The detailed meaning of controller settings and I²C control bytes comes in the next phases; today's job is to follow who calls whom. The final subclass-writing challenge is an optional extension.
 
-## A Small Class You Can Follow
+<span id="a-small-class-you-can-follow"></span>
 
-A **class** defines a kind of object: the data it keeps and the methods it offers. An **instance** is one object made from that class. Calling the class creates an instance; its `__init__()` method sets up the starting state.
+## Put a Buffer and a Method Together
 
-Here is a small example before we tackle the driver:
+In Phase 3, we stored a picture in a `bytearray`. Let's give a tiny picture its own storage and an operation for changing it. Our toy is **8 columns × 8 rows**: one page, with eight vertical pixels in each column byte.
 
-```python
-class Label:
-    def __init__(self, text):
-        self.text = text
-
-    def rename(self, text):
-        self.text = text
-
-label = Label("Hi Yush")
-label.rename("PICO")
-print(label.text)  # PICO
-```
-
-`self.text` is an **attribute**: data belonging to that object. The parameter `text` is the new value arriving in a call. `self.text = text` stores that value on the object so it remains available after the method returns.
-
-In `label.rename("PICO")`, Python supplies `label` as the method's first argument, `self`. We supply only the new text. **`self` means the instance receiving this call.** A method can therefore work with an object without knowing the variable name we chose for it.
-
-{{< lesson-exercise number="1" title="Which label changes?" id="q1-which-label-changes" >}}
-
-Keep the `Label` class definition, replacing the earlier example calls with this code. Predict both printed lines, then run it:
+A **class** defines a kind of object and its methods. An **instance** is one object made from that class. Calling the class creates an instance; its `__init__()` method sets up its starting state:
 
 ```python
-first = Label("Hi Yush")
-second = Label("PICO")
-first.rename("READY")
-print(first.text)
-print(second.text)
+class TinyDisplay:
+    def __init__(self):
+        self.buffer = bytearray(8)
+
+    def set_column(self, x, value):
+        self.buffer[x] = value
+
+toy = TinyDisplay()
+toy.set_column(2, 0b01000000)
+print(toy.buffer[2])  # 64
 ```
 
-Explain which object `self` refers to inside `rename()`. Would renaming the variable `first` to `greeting` require changing the class?
+This little class only changes memory; it doesn't communicate with hardware. `set_column()` replaces one column's eight pixel states, just like sending a byte to the Phase 3 toy. Here it lights bit 6 in column 2, which represents pixel `(2, 6)` in our one-page picture.
+
+`self.buffer` is an **attribute**: data belonging to that particular object. In `toy.set_column(2, 64)`, Python supplies `toy` as the first argument, `self`. We supply `x` and `value`. **`self` means the instance receiving the call.** Its buffer remains available after the method returns.
+
+<span id="q1-which-label-changes"></span>
+
+{{< lesson-exercise number="1" title="Which picture changes?" id="q1-which-picture-changes" >}}
+
+Keep the `TinyDisplay` class definition, replacing the earlier example calls with this code. Predict the two numbers, then run it:
+
+```python
+first = TinyDisplay()
+second = TinyDisplay()
+first.set_column(2, 0b01000000)
+print(first.buffer[2], second.buffer[2])
+```
+
+Which object is `self` inside this call to `set_column()`? If we rename the variable `first` to `picture`, must we change the class too?
 
 {{< hints >}}
-- Calling `Label(...)` twice creates two instances.
-- Read `first.rename(...)` as a request to change the object named `first`.
+- Each call to `TinyDisplay()` runs the initializer and allocates a new buffer.
+- The object before `.set_column(...)` becomes that call's `self`.
 {{< /hints >}}
 {{< answer >}}
-The lines are `READY` and `PICO`. Each instance has its own `text` attribute. During this call, `self` refers to the object named `first`; the other instance is untouched.
+The output is `64 0`. The first picture has bit 6 lit in column 2; the second picture is still blank. During `first.set_column(...)`, `self` refers to the first display object.
 
-Renaming the outside variable doesn't require changing the class.
+Renaming the outside variable doesn't require changing the class. The method uses its `self` parameter, rather than a particular outside variable name.
 
-**A method's code can be shared while each instance keeps its own state.** In the driver, `self.buffer` belongs to the particular display object receiving a call.
+**Methods can share code while instances keep separate pictures.** In the real driver, `self.buffer` belongs to the particular display object receiving the call.
 {{< /answer >}}
 {{< /lesson-exercise >}}
 
@@ -106,36 +109,79 @@ So an `SSD1306_I2C` instance can use `FrameBuffer.text()` even though neither Py
 
 There is a different relationship in `self.i2c = i2c`: the display object **holds a reference to a separate connection object**. It uses that object's methods to communicate. The display isn't a subclass of `machine.I2C`.
 
-{{< lesson-exercise number="2" title="Find the definition, then the destination" id="q2-find-the-definition-then-the-destination" >}}
+We will keep two questions separate:
 
-For each call, identify the class that defines the method and decide whether the call changes the prepared image, requests a transfer, or performs a transport operation:
+- **Which object receives the call?** Follow the expression before the dot.
+- **Which class defines the method?** Follow the class headers to find the code.
 
-- `oled.text("Hi Yush", 0, 0)`
-- `oled.show()`
-- `oled.write_data(oled.buffer)`
+A method defined in `SSD1306` can still run on an `SSD1306_I2C` instance. Its `self` is that same display object.
 
-Use the class headers and search for the definitions. Which call belongs in our normal drawing code when we want to display a finished frame? Why isn't `write_data()` a complete replacement for it?
+<span id="trace-a-call-through-the-driver"></span>
+
+## Trace Drawing, Then Showing
+
+Start with `text()` in the guided trace. Make a prediction before revealing each explanation. Then trace `show()`, paying attention to the moment the call reaches the separate connection object. Other calls become available afterward; return to them after reading setup and settings below. This is a source-reading model; Q5 will test our predictions against the actual driver.
+
+{{< driver-call-trace >}}
+
+The important handoff in `show()` looks like this:
+
+```text
+oled.show()                      receiver: oled; definition: SSD1306
+  → self.write_data(self.buffer)  same oled; definition: SSD1306_I2C
+    → self.i2c.writevto(...)      receiver: the separate connection object
+```
+
+**Changing the class where we find the code does not change `self`.** Only the final line selects another object, through `self.i2c`.
+
+## Read show() as a Recipe
+
+Now open `SSD1306.show()` in the source. For our 128-column display, it selects a column range and a page range, then calls `self.write_data(self.buffer)`. The range ends are **inclusive**, just like the endpoints you counted in Phase 5.
+
+| Purpose for 128 × 64 | Values passed to `write_cmd()` |
+| --- | --- |
+| Select columns 0–127 | `0x21`, `0`, `127` |
+| Select pages 0–7 | `0x22`, `0`, `7` |
+
+These are six separate calls to `write_cmd()`, followed by **one** `write_data(self.buffer)` call. A command and its parameter bytes share that writer; not every value in the table is a new instruction.
+
+<span id="q4-same-width-half-the-height"></span>
+
+For a **128 × 32** display, the same code gives `32 // 8 = 4` pages, numbered 0–3, and `4 * 128 = 512` image bytes. The final page value becomes 3. Two explicit `show()` calls would send `2 * 512 = 1024` image bytes, even if only ten pixels changed. Dimensions determine the ranges and full-buffer transfer size.
+
+The I²C image writer combines `b"\x40"` with the buffer. That prefix is one byte with value `0x40`, separate from the image bytes. Phase 7 will unpack this control information and the device address.
+
+{{< lesson-exercise number="2" title="Can write_data() replace show()?" id="q2-find-the-definition-then-the-destination" >}}
+
+A friend says that these calls do the same job because both send `oled.buffer`:
+
+```python
+oled.write_data(oled.buffer)
+oled.show()
+```
+
+Use the source to explain what the first call skips. Which class defines each method? Is `self` a different object when execution moves between those definitions?
 
 {{< hints >}}
-- An absent definition means continue into the base class, not that the method is unavailable.
-- `show()` does work before it calls `write_data()`.
+- Read the statements before `self.write_data(self.buffer)` inside `show()`.
+- Finding inherited code does not construct another object.
 {{< /hints >}}
 {{< answer >}}
-| Call | Definition | Work |
-| --- | --- | --- |
-| `text(...)` | `framebuf.FrameBuffer` | Draw glyphs into the prepared image. |
-| `show()` | `SSD1306` | Select the display's destination range, then request an image transfer. |
-| `write_data(...)` | `SSD1306_I2C` | Pass the supplied image bytes to the I²C connection. |
+`write_data()` is defined in `SSD1306_I2C`; it passes the supplied image bytes to the connection. `show()` is defined in `SSD1306`; it first sends the destination-range values, then calls that same `write_data()` method.
 
-Use `show()` in our drawing programs. Calling `write_data()` directly skips the address-range commands that this driver's `show()` sends first; we cannot assume the controller is already positioned correctly.
+Use `show()` in our normal drawing programs. Calling `write_data()` alone skips the range setup, so we cannot assume the controller is positioned correctly.
 
-**An inherited method is still part of the object's interface.** Finding its definition tells us which layer owns its work.
+Both methods run on the **same `oled` instance**. The separate connection object receives the later `self.i2c.writevto(...)` call.
+
+**A method's responsibility includes its preparation, not just its last operation.** Following the complete call explains why our application uses `show()`.
 {{< /answer >}}
 {{< /lesson-exercise >}}
 
-## Follow Setup on the Same Instance
+<span id="follow-setup-on-the-same-instance"></span>
 
-A **module** is a unit of Python code, such as `ssd1306.py`. The lab uses `import ssd1306`, so we reach the class as `ssd1306.SSD1306_I2C`. Earlier lessons imported the class name directly; both forms reach the same class.
+## Follow a Successful Setup First
+
+The lab uses `import ssd1306`, so we reach the class as `ssd1306.SSD1306_I2C`. Earlier lessons imported the class name directly; both forms reach the same class in `ssd1306.py`.
 
 Our familiar construction call is:
 
@@ -143,33 +189,28 @@ Our familiar construction call is:
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 ```
 
-Here `i2c` must already refer to a connection object. Inside the I²C class's initializer, the driver stores that connection, the device address, and temporary transfer storage. Then it calls:
+Here `i2c` must already refer to a connection object. A new display instance is initialized before the result is assigned to `oled`. Follow that same instance through setup:
 
-```python
-super().__init__(width, height, external_vcc)
+1. **`SSD1306_I2C.__init__()`** stores the connection, address, and temporary transfer storage, including `self.temp = bytearray(2)`.
+2. It calls **`super().__init__(...)`**. In this chain, that continues into `SSD1306.__init__()` on the same new instance.
+3. **`SSD1306.__init__()`** stores dimensions, calculates eight pages, and allocates one 1,024-byte buffer. Its next `super().__init__(...)` reaches `FrameBuffer`, connecting drawing operations to that storage.
+4. Back in **`SSD1306.__init__()`**, `self.init_display()` sends the controller's setup values. It finishes with `self.fill(0)` and `self.show()`, sending a blank frame.
+5. The initialization calls return, and the construction result is assigned to **`oled`**.
+
+**`super()` continues to the next class in the chain; it does not create another display object.** There is one instance throughout those steps.
+
+Look more closely at the first setup command inside step 4:
+
+```text
+init_display() is defined in SSD1306
+  → self.write_cmd(cmd)
+    → find write_cmd in SSD1306_I2C
+      → use self.temp, then self.i2c.writeto(...)
 ```
 
-**`super()` continues to the next class in the inheritance chain, using the same instance.** Here that next initializer is `SSD1306.__init__()`. It does not create another display object.
+Method lookup still starts with the actual instance's class, even while base-class code is running. That is how `SSD1306` can use the transport writer supplied by `SSD1306_I2C`.
 
-Read that base initializer in the file. Its key steps are:
-
-1. Store the dimensions and calculate `self.pages = self.height // 8`.
-2. Allocate `self.buffer = bytearray(self.pages * self.width)`.
-3. Call the `FrameBuffer` initializer with that buffer, the dimensions, and `MONO_VLSB`.
-4. Call `self.init_display()`.
-
-For 128 × 64, that is eight pages and a 1,024-byte buffer—the layout from Phase 3. The `FrameBuffer` initializer gives its drawing methods access to that storage.
-
-Now inspect `init_display()`. It sends setup command values, then ends with:
-
-```python
-self.fill(0)
-self.show()
-```
-
-**Constructing this driver already sends a blank frame.** That explains why rerunning a whole file can clear a previous picture before your drawing code begins.
-
-There is another useful surprise: `init_display()` is defined in `SSD1306`, but its `self.write_cmd(...)` calls reach the implementation in `SSD1306_I2C`. A subclass can provide a method that base-class code calls. We call that **overriding** when it replaces a method supplied by a base class; here the transport subclass supplies writers that `SSD1306` expects but does not define.
+You can now return to the trace and choose **construction**. Explain why the temporary transfer storage is already ready before that first command runs.
 
 {{< lesson-exercise number="3" title="Why prepare the connection first?" id="q3-why-prepare-the-connection-first" >}}
 
@@ -201,51 +242,29 @@ In a fresh session, a failed `oled = ...` also leaves no `oled` name: the constr
 {{< /answer >}}
 {{< /lesson-exercise >}}
 
-## Trace a Call Through the Driver
+## Why Split the Driver This Way?
 
-Choose a call below and predict which definition runs first. Reveal one step at a time, explaining each handoff before continuing. For construction, repeated setup writes are grouped together; the model is a reading aid, not a Python interpreter or a physical bus simulation.
+The file also contains `SSD1306_SPI`, for another serial connection called SPI. Compare its class header and writer method names with those in `SSD1306_I2C`. Both classes build on `SSD1306`, which builds on `FrameBuffer`.
 
-{{< driver-call-trace >}}
+{{< lesson-exercise number="4" title="Change the connection, keep the picture" id="q4-change-the-connection-keep-the-picture" >}}
 
-## Read show() as a Recipe
+Suppose we use a compatible SSD1306 display with an SPI connection. You don't need to know SPI's wiring rules for this question.
 
-For our 128-column display, `SSD1306.show()` selects a column range and a page range, then sends `self.buffer`. The range ends are **inclusive**, just like the endpoints you counted in Phase 5.
-
-The six command values for 128 × 64 are:
-
-| Purpose | Values passed to `write_cmd()` |
-| --- | --- |
-| Select columns 0–127 | `0x21`, `0`, `127` |
-| Select pages 0–7 | `0x22`, `0`, `7` |
-
-These are six separate calls to `write_cmd()`, followed by **one** `write_data(self.buffer)` call. A command and its parameter bytes share that writer; not every value in the table is a new instruction.
-
-The I²C writer adds control information to those values. For an image transfer it combines `b"\x40"` with the buffer. That prefix is one byte with value `0x40`; it is separate from our 1,024 image bytes. Phase 7 will unpack these transport bytes and the device address.
-
-The file also includes `SSD1306_SPI`, which supplies writers for another serial connection, SPI. It reuses the same `SSD1306` base behavior. We use its existence to see the design: shared display work, different transport implementations. We don't need to wire SPI for this lesson.
-
-{{< lesson-exercise number="4" title="Same width, half the height" id="q4-same-width-half-the-height" >}}
-
-Imagine constructing this driver for a **128 × 32** display. Work out its page count, buffer length, and the six values passed to `write_cmd()` by `show()`. Keep the column count at 128, so the narrow-display offset branch does not apply.
-
-If the program draws ten pixels and then calls `show()` twice, how many image bytes do those two calls send? Count only those explicit calls, excluding construction and transport control information.
+Which parts can we reuse: drawing methods, buffer layout, the `show()` recipe, or the two transport writers? Explain which code is shared and which needs a connection-specific implementation. After changing how we construct `oled`, could our existing `text()`, `rect()`, and `show()` application calls stay the same?
 
 {{< hints >}}
-- Each page covers eight pixel rows.
-- Four pages have numbers 0–3.
-- This driver's `show()` sends the whole buffer even when the picture hasn't changed.
+- Compare the base-class names in the two transport class headers.
+- Find `write_cmd()` and `write_data()` inside each transport class.
+- `show()` asks those writers to do the sending; it doesn't operate the connection directly.
 {{< /hints >}}
 {{< answer >}}
-There are `32 // 8 = 4` pages and `4 * 128 = 512` image bytes.
+Both transport classes reuse the drawing methods from `FrameBuffer` and the buffer allocation, initialization recipe, and `show()` from `SSD1306`.
 
-```text
-write_cmd values: 0x21, 0, 127, 0x22, 0, 3
-then: write_data(buffer), with 512 image bytes
-```
+The transport-specific `write_cmd()` and `write_data()` implementations change. The SPI version also sets up its own connection and control pins. The method names provide the common interface the base code uses.
 
-The two explicit `show()` calls send `2 * 512 = 1024` image bytes. Drawing ten pixels doesn't reduce this driver's transfer size. The last page value is 3, not 4, because endpoints are inclusive.
+Once `oled` is constructed appropriately for that hardware, our existing drawing and `show()` calls can stay the same. This driver's pixel layout belongs to its shared frame-buffer setup; it isn't a consequence of choosing I²C.
 
-**Dimensions determine the ranges and transfer size; the number of changed pixels doesn't.** Reading the implementation lets us predict a cost that the method name alone doesn't reveal.
+**Separating responsibilities lets us change how a picture travels without rewriting how we draw it.** This is the reason for the class structure, beyond knowing the names of its parts.
 {{< /answer >}}
 {{< /lesson-exercise >}}
 
@@ -265,23 +284,26 @@ At the top of the file, names such as `SET_NORM_INV = const(0xA6)` give command 
 
 A setting can change the visible output without changing `self.buffer`. This extends Phase 4's distinction between the prepared image and the display: the controller also has settings that affect how it presents image data.
 
-## Build an Observation Point
+<span id="build-an-observation-point"></span>
 
-How could we check our traces without relying on a quick flash on the screen? The I²C subclass uses only two connection methods here: `writeto(address, data)` and `writevto(address, parts)`. We can give it a different object with those methods—one that records the requests instead of sending them.
+## Observe the Calls with a Recorder
 
-That object is a **test double**: a stand-in with the interface our driver needs. It can tell us which operations the driver requested. It cannot prove that a cable, a real bus, or an OLED controller works.
+How can we test our predictions without relying on a quick flash on the screen? The I²C subclass only needs its connection object to provide `writeto(address, data)` and `writevto(address, parts)`. We'll use a small **recording connection** that logs those requests instead of sending them to hardware.
 
-Our recorder will store events as tuples:
+The class is supplied in Q5. Your task is to repair one recording line, not invent all of its connection code. It stores each event as:
 
 ```text
 (method name, destination address, snapshot of the bytes)
 ```
 
-The snapshot matters. This driver reuses `self.temp`, a mutable two-byte array, for command writes. `bytes(data)` makes an immutable copy of its current contents, like the snapshots in Phase 4. Storing the original array would let later writes change our earlier records.
+This is a **test double**: a stand-in with the operations our driver needs. Its log tells us what the driver requested. It doesn't test the physical cable, bus, or OLED.
 
-For `writevto()`, `parts` is a list of byte sequences. `b"".join(parts)` joins their contents into one new `bytes` value. For example, joining `b"\x40"` and `bytearray([0x20, 0x00])` gives the three-byte sequence `40 20 00`. The `\x` notation writes a byte using two hex digits; these are byte values, not the characters in a hex number.
+Two byte operations will help you read it:
 
-To extend a display method later, we can define that method in a subclass, do our extra work, then call `super()` to preserve the next implementation. For example, an override of `write_data(self, buf)` can count the image bytes and then call `super().write_data(buf)` to keep the transfer. We will try that in the final problem.
+- `bytes(data)` captures the current contents of a mutable array as an immutable snapshot, like the frame copies in Phase 4.
+- `b"".join(parts)` joins a list of byte sequences into one new `bytes` value. The recorder's `writevto()` implementation already does this for you.
+
+For example, joining the prefix `b"\x40"` and `bytearray([0x20, 0x00])` gives three bytes: `40 20 00` in hex. The `\x` notation writes one byte with two hex digits; it doesn't store the printed characters of that number.
 
 <hr class="lesson-review-divider">
 
@@ -289,7 +311,7 @@ To extend a display method later, we can define that method in a subclass, do ou
 
 ### Explain yourself
 
-Explain each term before opening it. Trace `oled.text(...)` and `oled.show()` aloud: which instance is `self`, where does Python find each method, and when does a separate connection object get involved? Use one example where the buffer changes and another where a display setting changes. Draw your own small call map if it helps.
+Explain each term before opening it. Trace `oled.text(...)` and `oled.show()` aloud: which instance is `self`, where does Python find each method, and when does a separate connection object get involved? Use one example where the buffer changes and another where a display setting changes. Draw your own small call map if it helps. The overriding term is for the optional final challenge.
 
 <span id="glossary"></span>
 
@@ -298,11 +320,11 @@ Explain each term before opening it. Trace `oled.text(...)` and `oled.show()` al
 
 ### Exercises
 
-Write your solution before opening the hints. Keep the recorder class for the last two problems. ★ Challenging · ★★ Very challenging.
+Keep your repaired recorder for Q6. Q7 is an optional extension for students who want to write a subclass. ★ Challenging · ★★ Very challenging.
 
-{{< lesson-exercise number="5" level="4" title="Record the bytes before they change" id="q5-record-the-bytes-before-they-change" >}}
+{{< lesson-exercise number="5" level="4" title="Repair the recorder's memory" id="q5-record-the-bytes-before-they-change" >}}
 
-Complete this class. Each method should append one event to `self.events` and return the number of bytes recorded. Use method names `"writeto"` and `"writevto"` in the tuples. Keep the supplied `__init__()`:
+This recording connection is almost ready. **One line stores a shared reference where the log needs a snapshot.** Predict what the checks will print before changing it, then repair that line so both checks print `True`:
 
 ```python
 class RecordingI2C:
@@ -310,15 +332,14 @@ class RecordingI2C:
         self.events = []
 
     def writeto(self, address, data):
-        # Append (method name, address, an immutable byte snapshot).
-        pass
+        self.events.append(("writeto", address, data))  # Repair this record.
+        return len(data)
 
     def writevto(self, address, parts):
-        # Join the parts, then append an event with those bytes.
-        pass
+        payload = b"".join(parts)
+        self.events.append(("writevto", address, payload))
+        return len(payload)
 ```
-
-These checks should both print `True`. Why would storing `data` directly fail the first check?
 
 ```python
 bus = RecordingI2C()
@@ -330,14 +351,26 @@ bus.writevto(0x3C, [b"\x40", bytearray([0x20, 0x00])])
 print(bus.events[1][2] == b"\x40\x20\x00")
 ```
 
-Then clear the old event list with `bus.events.clear()` and construct `oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, bus)`. Inspect the final event's method name and byte count. Why do events appear before you explicitly call `show()`?
+Why does the bug matter for this driver? Look at how its `write_cmd()` method reuses `self.temp`.
+
+After the repair, clear the old log with `bus.events.clear()` and construct `oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, bus)`. Inspect the final event's method name and byte count. Explain why the log already includes an image transfer.
 
 {{< hints >}}
-- A list's `append(...)` adds one event; `bytes(data)` captures the contents at that moment.
-- Use `payload = b"".join(parts)` for the second method, then record and count that payload.
-- Construction ends by sending a blank frame. The image-transfer prefix is not part of the image buffer.
+- Before the repair, the first event refers to the same mutable array as `scratch`.
+- Capture the contents when the write happens, using `bytes(data)`.
+- Construction sends a blank frame. Its transport prefix is separate from the image bytes.
 {{< /hints >}}
 {{< answer >}}
+Before repair the checks print `False`, then `True`. The second method already creates an immutable byte value with `join()`.
+
+Replace the recording line in `writeto()` with:
+
+```python
+self.events.append(("writeto", address, bytes(data)))
+```
+
+The complete repaired class is:
+
 ```python
 class RecordingI2C:
     def __init__(self):
@@ -353,7 +386,7 @@ class RecordingI2C:
         return len(payload)
 ```
 
-Run the two checks with this class: both are `True`. Keeping `scratch` itself would record a shared reference, so changing it to `80 A7` would also change the apparent earlier event.
+Now both checks print `True`. Keeping `scratch` itself lets a later change alter the apparent earlier event. The real driver reuses `self.temp` for successive command writes, so that bug would make the command history unreliable.
 
 ```python
 bus.events.clear()
@@ -363,9 +396,9 @@ print(bus.events[-1][0])                  # writevto
 print(len(bus.events[-1][2]))             # 1025
 ```
 
-Setup commands and one blank frame are sent during initialization. The final event contains one prefix byte plus 1,024 image bytes. Clearing `bus.events` only removes recorded history; it doesn't clear a display buffer.
+Initialization sends a blank frame: one prefix byte plus 1,024 image bytes. Clearing the log removes recorded history, not the display buffer.
 
-**An observation is useful only if it preserves what happened at that moment.** The recorder also shows that the display's shared code can work with a different connection object, provided it offers the required methods.
+**A useful record preserves what happened at that moment.** A shared reference to changing data cannot do that job.
 {{< /answer >}}
 {{< /lesson-exercise >}}
 
@@ -405,7 +438,9 @@ Inversion requests one command write and no image transfer. The prepared bytes s
 {{< /answer >}}
 {{< /lesson-exercise >}}
 
-{{< lesson-exercise number="7" level="4" title="Count transfers without replacing them" difficulty="2" id="q7-count-transfers-without-replacing-them" >}}
+Before the optional challenge: an **override** is a subclass's replacement for a method supplied by its base class. It can add work and then delegate the existing work with `super()`. For example, inside an override of `write_data(self, buf)`, `super().write_data(buf)` continues to the inherited transfer implementation on the same instance.
+
+{{< lesson-exercise number="7" level="4" title="Optional: count transfers without replacing them" difficulty="2" id="q7-count-transfers-without-replacing-them" >}}
 
 Write `CountingOLED`, a subclass of `ssd1306.SSD1306_I2C`. Keep `frames` and `image_bytes` as instance attributes. Count each call to `write_data()` and the length of its image buffer, then preserve the inherited transfer behavior.
 
